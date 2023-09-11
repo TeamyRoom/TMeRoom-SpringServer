@@ -1,0 +1,33 @@
+spring:
+  jpa:
+    defer-datasource-initialization: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+        default_batch_fetch_size: 100
+      open-in-view: false
+      database-platform: org.hibernate.dialect.MariaDBDialect
+    hibernate:
+      ddl-auto: ${DDL_MODE}
+
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${DB_IP}:${DB_PORT}/tmeroom
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  sql:
+    init:
+      mode: always
+
+jwt:
+  secret:
+    key: ${JWT_KEY}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
