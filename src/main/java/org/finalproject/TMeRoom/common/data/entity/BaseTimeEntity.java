@@ -1,4 +1,4 @@
-package org.finalproject.TMeRoom.common.data.entity;
+package org.finalproject.tmeroom.common.data.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
