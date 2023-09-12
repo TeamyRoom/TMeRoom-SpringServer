@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
+import org.finalproject.tmeroom.member.constant.MemberRole;
 
 /**
  * 작성자: 김종민
@@ -39,6 +40,6 @@ public class Member extends BaseTimeEntity {
     private String email;
 
     @NotNull
-    private String role;
+    private MemberRole role;
 
 }
