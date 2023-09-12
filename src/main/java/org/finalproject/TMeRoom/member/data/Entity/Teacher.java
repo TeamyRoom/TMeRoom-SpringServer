@@ -2,6 +2,7 @@ package org.finalproject.tmeroom.member.data.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -14,6 +15,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @IdClass(TeacherPK.class)
+@RequiredArgsConstructor
 public class Teacher {
     @Id
     @Column(name = "teacher_id")

@@ -1,7 +1,9 @@
 package org.finalproject.tmeroom.question.data.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.hibernate.annotations.OnDelete;
@@ -14,23 +16,30 @@ import org.hibernate.annotations.OnDeleteAction;
  */
 @Entity
 @Getter
+@RequiredArgsConstructor
 public class Question extends BaseTimeEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
-    @OnDelete(action= OnDeleteAction.CASCADE)
     private Member author;
 
     @ManyToOne
     @JoinColumn(name = "lecture_id")
-    @OnDelete(action= OnDeleteAction.CASCADE)
+    @NotNull
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member lecture;
 
     @Column
+    @NotNull
     private String title;
 
     @Column
+    @NotNull
     private String content;
+
+    @Column
+    private String authorNickname;
 }

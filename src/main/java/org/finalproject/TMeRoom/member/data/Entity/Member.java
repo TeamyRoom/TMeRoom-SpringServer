@@ -4,7 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 
 /**
@@ -14,18 +17,24 @@ import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
  */
 @Entity
 @Getter
+@RequiredArgsConstructor
 public class Member extends BaseTimeEntity {
     @Id
+    @NotNull
     private String id;
 
+    @NotBlank
     private String pw;
 
+    @NotNull
     private String nickname;
 
     @Column(unique = true)
     @Email
+    @NotNull
     private String email;
 
+    @NotNull
     private String role;
 
 }
