@@ -1,4 +1,4 @@
-package org.finalproject.tmeroom.Comment.data.entity;
+package org.finalproject.tmeroom.comment.data.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
