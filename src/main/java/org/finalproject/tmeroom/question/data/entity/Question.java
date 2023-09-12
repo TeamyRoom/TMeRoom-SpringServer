@@ -1,40 +1,45 @@
-package org.finalproject.tmeroom.comment.data.entity;
+package org.finalproject.tmeroom.question.data.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
-import org.finalproject.tmeroom.member.data.entity.Member;
-import org.finalproject.tmeroom.question.data.entity.Question;
+import org.finalproject.tmeroom.member.data.Entity.Member;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * 작성자: 김종민
  * 작성일자: 2023-09-11
- * Comment Entity 작성
+ * Question Entity 작성
  */
 @Entity
 @Getter
 @RequiredArgsConstructor
-public class Comment extends BaseTimeEntity {
+public class Question extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "commenter_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @NotNull
-    private Member commenter;
+    @JoinColumn(name = "author_id")
+    private Member author;
 
+    @ManyToOne
+    @JoinColumn(name = "lecture_id")
+    @NotNull
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Member lecture;
+
+    @Column
+    @NotNull
+    private String title;
+
+    @Column
     @NotNull
     private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "question_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @NotNull
-    private Question question;
+    @Column
+    private String authorNickname;
 }
