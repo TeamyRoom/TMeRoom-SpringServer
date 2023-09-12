@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
 //    ==== 여기서부터 작성 ====
-
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러 발생"),
 //    ==== 여기까지 작성 ====
     ;
 
