@@ -1,4 +1,4 @@
-package org.finalproject.TMeRoom;
+package org.finalproject.tmeroom;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
