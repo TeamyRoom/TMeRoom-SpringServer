@@ -21,13 +21,13 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> runtimeExceptionHandler(RuntimeException e) {
         log.error("Error occurs: {}", e.toString());
         return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(Response.error(ErrorCode.INTERNAL_SERVER_ERROR.name()));
+                .body(Response.error(ErrorCode.INTERNAL_SERVER_ERROR.name(), ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
     }
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<?> applicationExceptionHandler(ApplicationException e) {
         return ResponseEntity.status(e.getStatus())
-                .body(Response.error(e.getMessage()));
+                .body(Response.error(e.getErrorCode().name(), e.getMessage()));
     }
 
 }
