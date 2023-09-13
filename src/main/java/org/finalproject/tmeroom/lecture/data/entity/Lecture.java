@@ -1,6 +1,7 @@
 package org.finalproject.tmeroom.lecture.data.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @RequiredArgsConstructor
 public class Lecture extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @NotBlank
+    private String code;
 
     @ManyToOne
     @NotNull
