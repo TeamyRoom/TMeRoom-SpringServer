@@ -28,12 +28,12 @@ public class Teacher {
     private Member member;
 
     @Id
-    @Column(name = "lecture_id")
-    private Long lectureId;
+    @Column(name = "lecture_code")
+    private String lectureCode;
 
     @ManyToOne
     @MapsId
-    @JoinColumn(name = "lecture_id")
+    @JoinColumn(name = "lecture_code")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Lecture lecture;
 }
