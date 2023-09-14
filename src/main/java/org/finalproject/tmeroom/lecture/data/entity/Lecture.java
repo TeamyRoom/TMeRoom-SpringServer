@@ -21,7 +21,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Lecture extends BaseTimeEntity {
     @Id
     @NotBlank
-    private String code;
+    private String lectureCode;
 
     @ManyToOne
     @NotNull
@@ -30,5 +30,5 @@ public class Lecture extends BaseTimeEntity {
     private Member manager;
 
     @NotNull
-    private String LectureName;
+    private String lectureName;
 }

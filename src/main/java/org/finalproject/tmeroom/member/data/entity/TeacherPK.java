@@ -10,5 +10,5 @@ import java.io.Serializable;
 public class TeacherPK implements Serializable {
     private String teacherId;
 
-    private Long lectureId;
+    private String lectureCode;
 }

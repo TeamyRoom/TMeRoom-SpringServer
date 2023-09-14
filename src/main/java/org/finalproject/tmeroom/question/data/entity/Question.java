@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
+import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -30,7 +31,7 @@ public class Question extends BaseTimeEntity {
     @JoinColumn(name = "lecture_id")
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Member lecture;
+    private Lecture lecture;
 
     @Column
     @NotNull
