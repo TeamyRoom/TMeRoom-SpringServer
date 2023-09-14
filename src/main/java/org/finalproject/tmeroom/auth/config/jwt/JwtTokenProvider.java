@@ -27,7 +27,7 @@ public class JwtTokenProvider {
     private final TokenAuthenticationService tokenAuthenticationService;
 
     private final long ACCESS_TOKEN_VALID_MILLISECOND = 1000L * 60 * 60;
-    @Value("${jwt.secret-key}")
+    @Value("${jwt.secret.key}")
     private String JWT_SECRET_KEY;
     private byte[] KEY_BYTES;
 
