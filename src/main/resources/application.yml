@@ -31,3 +31,30 @@ spring:
   config:
     activate:
       on-profile: prod
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    defer-datasource-initialization: false
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: ${H2_URL};
+    username: SA
+    password:
+
+  sql:
+    init:
+      mode: never
