@@ -1,8 +1,6 @@
 package org.finalproject.tmeroom.auth.config.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -26,7 +25,6 @@ public class JwtTokenProvider {
 
     private final TokenAuthenticationService tokenAuthenticationService;
 
-    private final long ACCESS_TOKEN_VALID_MILLISECOND = 1000L * 60 * 60;
     @Value("${jwt.secret.key}")
     private String JWT_SECRET_KEY;
     private byte[] KEY_BYTES;
@@ -40,13 +38,13 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(KEY_BYTES);
     }
 
-    public String createAccessToken(String subject) {
+    public String createToken(String subject, TokenType tokenType) {
         Claims claims = Jwts.claims().setSubject(subject);
         Date now = new Date();
-        String jwt = Jwts.builder()
+        return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_MILLISECOND))
+                .setExpiration(new Date(now.getTime() + tokenType.getValidTimeMilli()))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
         return jwt;
