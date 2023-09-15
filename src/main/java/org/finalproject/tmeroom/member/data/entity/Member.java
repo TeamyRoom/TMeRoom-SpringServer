@@ -42,4 +42,13 @@ public class Member extends BaseTimeEntity {
     @NotNull
     private MemberRole role;
 
+    @Builder
+    public Member(String id, String pw, String nickname, String email, MemberRole role) {
+        this.id = id;
+        this.pw = pw;
+        this.nickname = nickname;
+        this.email = email;
+        this.role = role == null ? MemberRole.GUEST : role;
+    }
+
 }
