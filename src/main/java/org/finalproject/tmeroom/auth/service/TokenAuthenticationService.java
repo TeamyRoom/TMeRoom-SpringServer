@@ -19,8 +19,8 @@ public class TokenAuthenticationService {
 
     private final MemberRepository memberRepository;
 
-    public MemberDto findMemberBySubject(String subject) {
-        Member member = memberRepository.findById(subject)
+    public MemberDto getMemberDto(String memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
         return MemberDto.from(member);
