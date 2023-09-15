@@ -76,7 +76,7 @@ public class LectureServiceTest {
 
         @Test
         @DisplayName("강의 관리자가 아닌 사람이 강의 삭제를 요청하면 예외가 발생한다.")
-        void givenNoOwnerDeleteRequest_whenDeleteLecture_thenOccurredException(){
+        void givenNoOwnerDeleteRequest_whenDeleteLecture_thenOccurredException() {
             //Given
             Lecture mockLecture = mock(Lecture.class);
             MemberDto noManager = mock(MemberDto.class);
@@ -95,7 +95,7 @@ public class LectureServiceTest {
 
         @Test
         @DisplayName("강의 관리자가 강의명 변경을 요청하면 강의명이 변경된다.")
-        void givenUpdateRequest_whenUpdateLecture_thenReturnLectureName(){
+        void givenUpdateRequest_whenUpdateLecture_thenReturnLectureName() {
             //Given
             MemberDto managerDto = mock(MemberDto.class);
             Member manager = mock(Member.class);

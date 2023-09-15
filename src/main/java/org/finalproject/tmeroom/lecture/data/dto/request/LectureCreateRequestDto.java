@@ -1,7 +1,10 @@
 package org.finalproject.tmeroom.lecture.data.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
@@ -19,7 +22,6 @@ public class LectureCreateRequestDto {
 
     public Lecture toEntity(String lectureCode, Member manager) {
         return Lecture.builder()
-                .lectureCode(lectureCode)
                 .lectureName(this.lectureName)
                 .manager(manager)
                 .build();

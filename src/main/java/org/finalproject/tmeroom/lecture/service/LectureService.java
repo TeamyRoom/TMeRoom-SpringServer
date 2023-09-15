@@ -34,7 +34,7 @@ public class LectureService extends LectureCommon {
     public void deleteLecture(String lectureCode, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.getReferenceById(lectureCode);
 
-            checkPermission(lecture, memberDTO);
+        checkPermission(lecture, memberDTO);
 
         lectureRepository.delete(lecture);
     }
@@ -52,17 +52,17 @@ public class LectureService extends LectureCommon {
     //수강중인 강의 조회
 
     //서비스 함수
-    private String makeHashCode(){
+    private String makeHashCode() {
         String hashCode;
-        do{
-            hashCode = UUID.randomUUID().toString().substring(0,8);
-        }while (isDuplicateLectureCode(hashCode));
+        do {
+            hashCode = UUID.randomUUID().toString().substring(0, 8);
+        } while (isDuplicateLectureCode(hashCode));
         return hashCode;
     }
 
-    private boolean isDuplicateLectureCode(String hashCode){
+    private boolean isDuplicateLectureCode(String hashCode) {
         List<String> lectureCodes = lectureRepository.findAllLectureCode();
-        if(lectureCodes.contains(hashCode)) return true;
+        if (lectureCodes.contains(hashCode)) return true;
         else return false;
     }
 }
