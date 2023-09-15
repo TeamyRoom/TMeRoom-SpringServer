@@ -42,4 +42,22 @@ class JwtTokenProviderTest {
             assertThat(accessToken).isNotNull();
         }
     }
+
+    @Nested
+    @DisplayName("액세스 토큰 발급 기능 테스트")
+    class aboutCreatingAccessToken {
+
+        @Test
+        @DisplayName("액세스 토큰 발급시, 서브젝트를 넘기면, 액세스 토큰을 발급한다.")
+        void givenSubject_whenCreatingAccessToken_thenReturnsAccessToken() {
+            // given
+            String subject = "tester";
+
+            // when
+            String accessToken = jwtTokenProvider.createToken(subject, TokenType.ACCESS);
+
+            // then
+            assertThat(accessToken).isNotNull();
+        }
+    }
 }

@@ -42,7 +42,9 @@ public class JwtTokenProvider {
     }
 
     public String createToken(String subject, TokenType tokenType) {
-        Claims claims = Jwts.claims().setSubject(subject);
+        Claims claims = Jwts.claims()
+                .setId(tokenType.getName())
+                .setSubject(subject);
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
@@ -64,6 +66,15 @@ public class JwtTokenProvider {
         return foundCookie.getValue();
     }
 
+    private String getId(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getId();
+    }
+
     public boolean isTokenValid(String token) {
         try {
             Jws<Claims> claims = Jwts
@@ -71,7 +82,9 @@ public class JwtTokenProvider {
                     .setSigningKey(getKey())
                     .build()
                     .parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
+            boolean isValid = !claims.getBody().getExpiration().before(new Date());
+            boolean isAccessToken = getId(token).equals(TokenType.ACCESS.getName());
+            return isValid && isAccessToken;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
