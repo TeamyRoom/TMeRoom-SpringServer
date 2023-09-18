@@ -1,11 +1,7 @@
 package org.finalproject.TMeRoom.auth.config.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.aspectj.lang.annotation.Before;
 import org.finalproject.tmeroom.auth.config.jwt.JwtTokenProvider;
 import org.finalproject.tmeroom.auth.config.jwt.TokenType;
 import org.finalproject.tmeroom.auth.service.TokenAuthenticationService;
@@ -19,9 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.Date;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -32,15 +25,26 @@ import static org.mockito.BDDMockito.given;
 @DisplayName("JWT 관련 테스트")
 class JwtTokenProviderTest {
 
+    private final String masterToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhY2Nlc3NUb2tlbiIsInN1YiI6InRlc3RlciIsImlhdCI6MTY5NDc2MTE3NSwiZXhwIjo5MjIzMzcyMDM2ODU0Nzc1fQ.SUaqRU7eASLiN1Rw2AM5dJqd2a8hxpgTHLBxzzJ15MI";
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
-
     @MockBean
     private TokenAuthenticationService tokenAuthenticationService;
     @MockBean
     private HttpServletRequest request;
 
-    private final String masterToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhY2Nlc3NUb2tlbiIsInN1YiI6InRlc3RlciIsImlhdCI6MTY5NDc2MTE3NSwiZXhwIjo5MjIzMzcyMDM2ODU0Nzc1fQ.SUaqRU7eASLiN1Rw2AM5dJqd2a8hxpgTHLBxzzJ15MI";
+    private Cookie createCookie(String key, String value) {
+        return new Cookie(key, value);
+    }
+
+    private MemberDto getMockMemberDto() {
+        return MemberDto.builder()
+                .id("tester00")
+                .email("tester@test.com")
+                .nickname("tester")
+                .role(MemberRole.GUEST)
+                .build();
+    }
 
     @Nested
     @DisplayName("토큰 발급 기능 테스트")
@@ -114,7 +118,6 @@ class JwtTokenProviderTest {
         }
     }
 
-
     @Nested
     @DisplayName("권한 조회 기능 테스트")
     class aboutAuthenticatingToken {
@@ -135,19 +138,5 @@ class JwtTokenProviderTest {
             assertThat(receivedUpat.getName()).isEqualTo(expectedUpat.getName());
             assertThat(receivedUpat.getCredentials()).isEqualTo(receivedUpat.getCredentials());
         }
-    }
-
-
-    private Cookie createCookie(String key, String value) {
-        return new Cookie(key, value);
-    }
-
-    private MemberDto getMockMemberDto() {
-        return MemberDto.builder()
-                .id("tester00")
-                .email("tester@test.com")
-                .nickname("tester")
-                .role(MemberRole.GUEST)
-                .build();
     }
 }

@@ -45,10 +45,13 @@ public class LectureServiceTest {
         @DisplayName("강의 관리자가 강의명을 넘겨주면 강의 생성 후 코드를 반환한다.")
         void givenCreateRequest_whenCreateLecture_thenReturnLectureCode() {
             //Given
+            MemberDto mockManager = MemberDto.builder()
+                    .id("manager")
+                    .build();
             given(memberRepository.findById("manager")).willReturn(Optional.of(Member.builder().id("manager").build()));
             LectureCreateRequestDto requestDTO = new LectureCreateRequestDto();
             requestDTO.setLectureName("Hello! World");
-            requestDTO.setMemberDTO(new MemberDto("manager"));
+            requestDTO.setMemberDTO(mockManager);
 
             //When
             LectureCreateResponseDto responseDTO = lectureService.createLecture(requestDTO);
