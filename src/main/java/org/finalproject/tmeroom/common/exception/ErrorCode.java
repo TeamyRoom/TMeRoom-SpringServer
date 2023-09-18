@@ -17,7 +17,9 @@ public enum ErrorCode {
     INVALID_PERMISSION(HttpStatus.FORBIDDEN, "소유자 불일치"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
-//    ==== 여기까지 작성 ====
+    DUPLICATE_ID(HttpStatus.BAD_REQUEST, "입력한 유저 정보 중복"),
+    DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "입력한 유저 정보 중복")
+    //    ==== 여기까지 작성 ====
     ;
 
     private final HttpStatus status;
