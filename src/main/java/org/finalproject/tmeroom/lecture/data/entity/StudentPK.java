@@ -1,4 +1,4 @@
-package org.finalproject.tmeroom.member.data.entity;
+package org.finalproject.tmeroom.lecture.data.entity;
 
 import java.io.Serializable;
 

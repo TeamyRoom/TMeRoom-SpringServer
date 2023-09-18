@@ -1,11 +1,14 @@
 package org.finalproject.tmeroom.lecture.data.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
+import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -18,6 +21,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Lecture extends BaseTimeEntity {
     @Id
     @NotBlank
@@ -31,4 +36,8 @@ public class Lecture extends BaseTimeEntity {
 
     @NotNull
     private String lectureName;
+
+    public void update(LectureUpdateRequestDto requestDTO) {
+        this.lectureName = requestDTO.getLectureName();
+    }
 }

@@ -12,9 +12,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-//    ==== 여기서부터 작성 ====
+    //    ==== 여기서부터 작성 ====
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러 발생"),
-//    ==== 여기까지 작성 ====
+    INVALID_PERMISSION(HttpStatus.FORBIDDEN, "소유자 불일치"),
+    //    ==== 여기까지 작성 ====
     ;
 
     private final HttpStatus status;

@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
@@ -17,6 +19,8 @@ import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
  */
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class Member extends BaseTimeEntity {
     @Id
