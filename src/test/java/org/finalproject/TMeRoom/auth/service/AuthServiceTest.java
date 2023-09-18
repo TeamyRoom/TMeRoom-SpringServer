@@ -31,7 +31,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(classes = {AuthService.class})
-@TestPropertySource(properties = {"JWT_KEY=LongLongLongLongLongLongLongLongTestJWTKey"})
 @DisplayName("인증 서비스 로직 테스트")
 class AuthServiceTest {
 
