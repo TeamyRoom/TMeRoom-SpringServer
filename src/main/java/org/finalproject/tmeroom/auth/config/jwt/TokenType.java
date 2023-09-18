@@ -9,7 +9,7 @@ import org.springframework.http.ResponseCookie;
 public enum TokenType {
 
     ACCESS("accessToken", 1000L * 60 * 60),
-    REFRESH("accessToken", 1000L * 60 * 60 * 24 * 7),
+    REFRESH("refreshToken", 1000L * 60 * 60 * 24 * 7),
     ;
 
     private final String name;
