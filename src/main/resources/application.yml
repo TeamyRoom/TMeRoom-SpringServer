@@ -1,4 +1,13 @@
+jwt:
+  secret:
+    key: ${JWT_KEY}
+
+---
 spring:
+  config:
+    activate:
+      on-profile: local
+
   jpa:
     defer-datasource-initialization: false
     show-sql: false
@@ -12,25 +21,16 @@ spring:
     hibernate:
       ddl-auto: ${DDL_MODE}
 
+  sql:
+    init:
+      mode: always
+
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://${DB_IP}:${DB_PORT}/tmeroom
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
-  sql:
-    init:
-      mode: always
-
-jwt:
-  secret:
-    key: ${JWT_KEY}
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
 
 ---
 spring:
@@ -51,7 +51,7 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: ${H2_URL};
+    url: jdbc:h2:mem:testdb;MODE=MySQL;
     username: SA
     password:
 
