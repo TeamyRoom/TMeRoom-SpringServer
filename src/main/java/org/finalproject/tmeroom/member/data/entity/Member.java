@@ -6,11 +6,12 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
+import org.finalproject.tmeroom.member.constant.MemberRole;
 
 /**
  * 작성자: 김종민
@@ -19,9 +20,7 @@ import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
  */
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
     @Id
     @NotNull
@@ -39,6 +38,15 @@ public class Member extends BaseTimeEntity {
     private String email;
 
     @NotNull
-    private String role;
+    private MemberRole role;
+
+    @Builder
+    public Member(String id, String pw, String nickname, String email, MemberRole role) {
+        this.id = id;
+        this.pw = pw;
+        this.nickname = nickname;
+        this.email = email;
+        this.role = role == null ? MemberRole.GUEST : role;
+    }
 
 }
