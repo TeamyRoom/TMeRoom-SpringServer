@@ -19,6 +19,9 @@ import org.hibernate.annotations.OnDeleteAction;
  * Question Entity 작성
  */
 @Entity
+@Table(indexes = {
+        @Index(columnList = "lecture_id")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Question extends BaseTimeEntity {
