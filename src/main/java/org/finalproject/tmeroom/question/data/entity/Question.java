@@ -2,11 +2,14 @@ package org.finalproject.tmeroom.question.data.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.member.data.entity.Member;
+import org.finalproject.tmeroom.question.data.dto.request.QuestionUpdateRequestDto;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -17,7 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
  */
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Question extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,4 +46,28 @@ public class Question extends BaseTimeEntity {
 
     @Column
     private String authorNickname;
+
+    @Column
+    private Boolean isPublic;
+
+    @Builder
+    public Question(Long id, Member author, @NotNull Lecture lecture, @NotNull String title, @NotNull String content, String authorNickname, Boolean isPublic) {
+        this.id = id;
+        this.author = author;
+        this.lecture = lecture;
+        this.title = title;
+        this.content = content;
+        this.authorNickname = authorNickname;
+        this.isPublic = isPublic;
+    }
+
+    public void update(QuestionUpdateRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.isPublic = requestDto.getIsPublic();
+    }
+
+    public void makePublic() {
+        this.isPublic = true;
+    }
 }
