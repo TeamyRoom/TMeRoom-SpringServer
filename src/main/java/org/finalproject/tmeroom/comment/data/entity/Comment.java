@@ -2,8 +2,10 @@ package org.finalproject.tmeroom.comment.data.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.finalproject.tmeroom.comment.data.dto.request.CommentUpdateRequestDto;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.question.data.entity.Question;
@@ -16,7 +18,11 @@ import org.hibernate.annotations.OnDeleteAction;
  * Comment Entity 작성
  */
 @Entity
+@Table(indexes = {
+        @Index(columnList = "question_id")
+})
 @Getter
+@Builder
 @RequiredArgsConstructor
 public class Comment extends BaseTimeEntity {
     @Id
@@ -37,4 +43,8 @@ public class Comment extends BaseTimeEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NotNull
     private Question question;
+
+    public void update(CommentUpdateRequestDto requestDto) {
+        this.content = requestDto.getContent();
+    }
 }

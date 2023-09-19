@@ -1,5 +1,6 @@
 package org.finalproject.tmeroom.question.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.dto.Response;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
@@ -21,42 +22,42 @@ import org.springframework.web.bind.annotation.*;
 public class questionController {
     private final QuestionService questionService;
 
-    // 질문 목록 조회(GET)
+    // 질문 목록 조회
     @GetMapping("/lecture/{lectureCode}/questions")
     public Response<Page<QuestionListResponseDto>> lookupQuestions(@PathVariable String lectureCode, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<QuestionListResponseDto> dtoList = questionService.lookupQuestions(lectureCode, pageable);
         return Response.success(dtoList);
     }
 
-    // 질문 단일 조회(GET)
+    // 질문 단일 조회
     @GetMapping("/lecture/{lectureCode}/question/{questionId}")
     public Response<QuestionDetailResponseDto> readQuestion(@PathVariable String lectureCode, @PathVariable Long questionId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         QuestionDetailResponseDto dto = questionService.readQuestion(questionId);
         return Response.success(dto);
     }
 
-    // 질문 게시(POST)
+    // 질문 게시
     @PostMapping("/lecture/{lectureCode}/question")
-    public Response<Void> createQuestion(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto, QuestionCreateRequestDto requestDto) {
+    public Response<Void> createQuestion(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto, @RequestBody @Valid QuestionCreateRequestDto requestDto) {
         questionService.createQuestion(lectureCode, memberDto, requestDto);
         return Response.success();
     }
 
-    // 질문 수정(PUT)
+    // 질문 수정
     @PutMapping("/lecture/{lectureCode}/question/{questionId}")
-    public Response<Void> updateQuestion(@PathVariable String lectureCode, @PathVariable Long questionId, @AuthenticationPrincipal MemberDto memberDto, QuestionUpdateRequestDto requestDto) {
+    public Response<Void> updateQuestion(@PathVariable String lectureCode, @PathVariable Long questionId, @AuthenticationPrincipal MemberDto memberDto, @RequestBody @Valid QuestionUpdateRequestDto requestDto) {
         questionService.updateQuestion(questionId, memberDto, requestDto);
         return Response.success();
     }
 
-    // 질문 삭제(DELETE)
+    // 질문 삭제
     @DeleteMapping("/lecture/{lectureCode}/question/{questionId}")
     public Response<Void> deleteQuestion(@PathVariable String lectureCode, @PathVariable Long questionId, @AuthenticationPrincipal MemberDto memberDto) {
         questionService.deleteQuestion(questionId, memberDto);
         return Response.success();
     }
 
-    // 질문 공개 여부 수정(PUT)
+    // 질문 공개 여부 수정
     @PutMapping("/lecture/{lectureCode}/question/{questionId}/public")
     public Response<Void> openQuestion(@PathVariable String lectureCode, @PathVariable Long questionId, @AuthenticationPrincipal MemberDto memberDto) {
         questionService.openQuestion(questionId, memberDto);
