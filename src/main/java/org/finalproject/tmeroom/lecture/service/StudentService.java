@@ -1,8 +1,7 @@
 package org.finalproject.tmeroom.lecture.service;
 
 import lombok.RequiredArgsConstructor;
-import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
-import org.finalproject.tmeroom.lecture.data.dto.request.StudentUpdateRequestDto;
+import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.StudentDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.lecture.data.entity.Student;
@@ -28,9 +27,17 @@ public class StudentService extends LectureCommon {
     private final MemberRepository memberRepository;
     private final LectureRepository lectureRepository;
 
+    // 내 강의 목록 보기
+    public Page<LectureDetailResponseDto> lookupMyLectures(MemberDto memberDTO, Pageable pageable) {
+        Member member = memberRepository.getReferenceById(memberDTO.getId());
+
+        Page<Student> myLectures = studentRepository.findByMember(pageable, member);
+        return myLectures.map(LectureDetailResponseDto::from);
+    }
+
     //수강 신청
-    public void applyLecture(LectureUpdateRequestDto requestDTO, MemberDto memberDTO) {
-        Lecture lecture = lectureRepository.findById(requestDTO.getLectureCode()).orElseThrow();
+    public void applyLecture(String lectureCode, MemberDto memberDTO) {
+        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
 
         checkPermission(lecture, memberDTO);
 
@@ -46,7 +53,7 @@ public class StudentService extends LectureCommon {
     }
 
     //수강 신청 철회
-    public void cancelLecture(String lectureCode, MemberDto memberDTO) {
+    public void cancelApplication(String lectureCode, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
 
         Student student = studentRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode);
@@ -55,7 +62,7 @@ public class StudentService extends LectureCommon {
     }
 
     //강의 수강 신청 인원 목록 조회
-    public Page<StudentDetailResponseDto> checkApplicants(String lectureCode, Pageable pageable, MemberDto memberDTO) {
+    public Page<StudentDetailResponseDto> checkApplicants(String lectureCode, MemberDto memberDTO, Pageable pageable) {
         Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
         checkPermission(lecture, memberDTO);
 
@@ -64,11 +71,11 @@ public class StudentService extends LectureCommon {
     }
 
     //수강 신청 수락
-    public void acceptApplicant(StudentUpdateRequestDto requestDTO, MemberDto memberDTO) {
-        Lecture lecture = lectureRepository.findById(requestDTO.getLectureCode()).orElseThrow();
+    public void acceptApplicant(String lectureCode, String applicantId, MemberDto memberDTO) {
+        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
         checkPermission(lecture, memberDTO);
 
-        Student student = studentRepository.findByMemberIdAndLectureCode(requestDTO.getStudentId(), requestDTO.getLectureCode());
+        Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode);
 
         student.acceptStudent();
     }
