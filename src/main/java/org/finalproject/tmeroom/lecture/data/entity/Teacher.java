@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -17,7 +18,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @IdClass(TeacherPK.class)
 @RequiredArgsConstructor
-public class Teacher {
+public class Teacher extends BaseTimeEntity {
     @Id
     @Column(name = "teacher_id")
     private String teacherId;
@@ -39,7 +40,7 @@ public class Teacher {
     private Lecture lecture;
 
     @Builder
-    public Teacher(Member member, Lecture lecture){
+    public Teacher(Member member, Lecture lecture) {
         this.teacherId = member.getId();
         this.lectureCode = lecture.getLectureCode();
     }

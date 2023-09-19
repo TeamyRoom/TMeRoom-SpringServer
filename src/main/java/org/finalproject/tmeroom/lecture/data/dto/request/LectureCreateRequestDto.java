@@ -15,13 +15,12 @@ import org.finalproject.tmeroom.member.data.entity.Member;
 @Setter
 public class LectureCreateRequestDto {
     @NotBlank
-    protected String lectureCode;
-    @NotBlank
     protected String lectureName;
     protected MemberDto memberDTO;
 
     public Lecture toEntity(String lectureCode, Member manager) {
         return Lecture.builder()
+                .lectureCode(lectureCode)
                 .lectureName(this.lectureName)
                 .manager(manager)
                 .build();

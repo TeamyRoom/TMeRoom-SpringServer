@@ -2,11 +2,9 @@ package org.finalproject.tmeroom.lecture.data.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 
 @Getter
-@NoArgsConstructor
 public class LectureCreateResponseDto {
     String lectureCode;
 

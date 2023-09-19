@@ -48,9 +48,6 @@ public class LectureService extends LectureCommon {
         lecture.update(requestDTO);
     }
 
-
-    //수강중인 강의 조회
-
     //서비스 함수
     private String makeHashCode() {
         String hashCode;
@@ -62,7 +59,6 @@ public class LectureService extends LectureCommon {
 
     private boolean isDuplicateLectureCode(String hashCode) {
         List<String> lectureCodes = lectureRepository.findAllLectureCode();
-        if (lectureCodes.contains(hashCode)) return true;
-        else return false;
+        return lectureCodes.contains(hashCode);
     }
 }
