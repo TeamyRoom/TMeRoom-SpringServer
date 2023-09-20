@@ -32,15 +32,15 @@ public class MemberController {
         return Response.success();
     }
 
-    @PostMapping("/email/confirm/{confirm-code}")
-    public Response<Void> confirmMail(@PathVariable("confirm-code") String confirmCode) {
+    @PostMapping("/email/confirm/{confirmCode}")
+    public Response<Void> confirmMail(@PathVariable String confirmCode) {
         memberService.confirmEmail(confirmCode);
         return Response.success();
     }
 
     // TODO: 프론트 없을 때 테스트 용도. 프론트 완료되면 삭제 예정
-    @GetMapping("/email/confirm/{confirm-code}")
-    public Response<Void> confirmMailTemp(@PathVariable("confirm-code") String confirmCode) {
+    @GetMapping("/email/confirm/{confirmCode}")
+    public Response<Void> confirmMailTemp(@PathVariable String confirmCode) {
         memberService.confirmEmail(confirmCode);
         return Response.success();
     }
