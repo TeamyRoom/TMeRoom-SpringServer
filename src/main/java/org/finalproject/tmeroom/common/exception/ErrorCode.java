@@ -18,7 +18,9 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     DUPLICATE_ID(HttpStatus.BAD_REQUEST, "입력한 유저 정보 중복"),
-    DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "입력한 유저 정보 중복")
+    DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "입력한 유저 정보 중복"),
+    EMAIL_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, "이메일 인증 이미 완료"),
+    CONFIRM_CODE_NOT_VALID(HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 인증 코드"),
     //    ==== 여기까지 작성 ====
     ;
 
