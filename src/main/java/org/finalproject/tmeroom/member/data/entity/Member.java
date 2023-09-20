@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
+import org.finalproject.tmeroom.common.exception.ApplicationException;
+import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.member.constant.MemberRole;
 
 /**
@@ -47,6 +49,13 @@ public class Member extends BaseTimeEntity {
         this.nickname = nickname;
         this.email = email;
         this.role = role == null ? MemberRole.GUEST : role;
+    }
+
+    public void confirmEmail() {
+        if (!role.equals(MemberRole.GUEST)) {
+            throw new ApplicationException(ErrorCode.EMAIL_ALREADY_CONFIRMED);
+        }
+        role = MemberRole.USER;
     }
 
 }
