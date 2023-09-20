@@ -76,7 +76,7 @@ public class MemberService {
         sb.append("<h3>인증 링크</h3>");
         sb.append("<div style='font-size:130%'>");
         sb.append("<strong>");
-        sb.append("localhost:8080/api/v1/member/confirm/" + confirmCode + "</strong></div><br/>");
+        sb.append("localhost:8080/api/v1/email/member/confirm/" + confirmCode + "</strong></div><br/>");
         sb.append("</div></br></br>");
         sb.append("<p>감사합니다.</p>");
         sb.append("</div>");
