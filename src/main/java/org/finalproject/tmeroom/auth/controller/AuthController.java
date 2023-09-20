@@ -1,6 +1,7 @@
 package org.finalproject.tmeroom.auth.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.auth.config.jwt.TokenType;
 import org.finalproject.tmeroom.auth.data.dto.request.LoginRequestDto;
@@ -22,7 +23,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public Response<Void> login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
+    public Response<Void> login(@RequestBody @Valid LoginRequestDto requestDto, HttpServletResponse response) {
 
         LoginResponseDto responseDto = authService.login(requestDto);
 
