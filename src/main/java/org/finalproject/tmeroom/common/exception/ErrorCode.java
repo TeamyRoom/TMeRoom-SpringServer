@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     //    ==== 여기서부터 작성 ====
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러 발생"),
+    REQUEST_PARSE_ERROR(HttpStatus.BAD_REQUEST, "필드 검증 실패"),
     AUTHENTICATION_ERROR(HttpStatus.UNAUTHORIZED, "인증 중 오류 발생"),
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "쿠키에 토큰 없음"),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰"),
