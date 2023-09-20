@@ -4,7 +4,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.finalproject.tmeroom.common.data.dto.Response;
+import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -12,6 +16,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * 작성자: 김태민
+ * 작성일자: 2023-09-18
+ * 요청에서 JWT를 추출하고 그에 담긴 회원 정보를 조회해 인증 정보를 부여
+ */
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -25,7 +35,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = jwtTokenProvider.resolveToken(request, TokenType.ACCESS);
 
             // 토큰 유효성 체크
-            if (token == null || !jwtTokenProvider.isTokenValid(token)) {
+            if (token == null) {
+                writeResult(response, ErrorCode.TOKEN_NOT_FOUND);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            if (!jwtTokenProvider.isTokenValid(token)) {
+                writeResult(response, ErrorCode.TOKEN_EXPIRED);
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -35,9 +52,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (RuntimeException e) {
+            writeResult(response, ErrorCode.AUTHENTICATION_ERROR);
             filterChain.doFilter(request, response);
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void writeResult(HttpServletResponse response, ErrorCode errorCode) throws IOException{
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(errorCode.getStatus().value());
+        response.getWriter().write(Response.error(errorCode.name(), errorCode.getMessage()).toStream());
     }
 }
