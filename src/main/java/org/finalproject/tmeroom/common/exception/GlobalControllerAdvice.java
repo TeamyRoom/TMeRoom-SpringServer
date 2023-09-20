@@ -1,9 +1,12 @@
 package org.finalproject.tmeroom.common.exception;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.finalproject.tmeroom.common.data.dto.Response;
+import org.finalproject.tmeroom.common.data.dto.ValidationMessageDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,7 +24,8 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> runtimeExceptionHandler(RuntimeException e) {
         log.error("Error occurs: {}", e.toString());
         return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(Response.error(ErrorCode.INTERNAL_SERVER_ERROR.name(), ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
+                .body(Response.error(ErrorCode.INTERNAL_SERVER_ERROR.name(),
+                        ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
     }
 
     @ExceptionHandler(ApplicationException.class)
@@ -30,5 +34,16 @@ public class GlobalControllerAdvice {
                 .body(Response.error(e.getErrorCode().name(), e.getMessage()));
     }
 
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public ResponseEntity<?> validExceptionHandler(MethodArgumentNotValidException e) {
+
+        // 파싱 중 검증에 실패한 필드의 실패 메시지를 필드별로 모읍니다.
+        List<ValidationMessageDto> messages = e.getFieldErrors().stream()
+                .map(ValidationMessageDto::from)
+                .toList();
+
+        return ResponseEntity.status(ErrorCode.REQUEST_PARSE_ERROR.getStatus())
+                .body(Response.error(ErrorCode.REQUEST_PARSE_ERROR.name(), messages));
+    }
 }
 
