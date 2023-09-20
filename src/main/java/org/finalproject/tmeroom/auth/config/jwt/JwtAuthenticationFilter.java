@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.finalproject.tmeroom.common.data.dto.Response;
@@ -42,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             if (!jwtTokenProvider.isTokenValid(token)) {
-                writeResult(response, ErrorCode.TOKEN_EXPIRED);
+                writeResult(response, ErrorCode.TOKEN_INVALID);
                 filterChain.doFilter(request, response);
                 return;
             }

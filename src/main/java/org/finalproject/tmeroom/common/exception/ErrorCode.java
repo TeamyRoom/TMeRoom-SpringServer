@@ -16,7 +16,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러 발생"),
     AUTHENTICATION_ERROR(HttpStatus.UNAUTHORIZED, "인증 중 오류 발생"),
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "쿠키에 토큰 없음"),
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰 유효 기간 만료"),
+    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰"),
     AUTHORIZATION_ERROR(HttpStatus.FORBIDDEN, "권한 필요"),
     INVALID_PERMISSION(HttpStatus.FORBIDDEN, "소유자 불일치"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
