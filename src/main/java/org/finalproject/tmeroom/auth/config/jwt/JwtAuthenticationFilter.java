@@ -4,16 +4,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.finalproject.tmeroom.common.data.dto.Response;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 /**
  * 작성자: 김태민
@@ -35,13 +33,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 토큰 유효성 체크
             if (token == null) {
-                writeResult(response, ErrorCode.TOKEN_NOT_FOUND);
+                response.setHeader("jwt-error", ErrorCode.TOKEN_NOT_FOUND.name());
                 filterChain.doFilter(request, response);
                 return;
             }
 
             if (!jwtTokenProvider.isTokenValid(token)) {
-                writeResult(response, ErrorCode.TOKEN_INVALID);
+                response.setHeader("jwt-error", ErrorCode.TOKEN_INVALID.name());
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -51,17 +49,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (RuntimeException e) {
-            writeResult(response, ErrorCode.AUTHENTICATION_ERROR);
             filterChain.doFilter(request, response);
             return;
         }
         filterChain.doFilter(request, response);
-    }
-
-    private void writeResult(HttpServletResponse response, ErrorCode errorCode) throws IOException{
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setStatus(errorCode.getStatus().value());
-        response.getWriter().write(Response.error(errorCode.name(), errorCode.getMessage()).toStream());
     }
 }
