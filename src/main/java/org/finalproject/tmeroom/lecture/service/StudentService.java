@@ -39,13 +39,11 @@ public class StudentService extends LectureCommon {
     public void applyLecture(String lectureCode, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
 
-        checkPermission(lecture, memberDTO);
-
         Member registeringStudent = memberRepository.findById(memberDTO.getId()).orElseThrow();
 
         Student student = Student.builder()
                 .lecture(lecture)
-                .student(registeringStudent)
+                .member(registeringStudent)
                 .appliedAt(LocalDateTime.now())
                 .build();
 
@@ -54,8 +52,6 @@ public class StudentService extends LectureCommon {
 
     //수강 신청 철회
     public void cancelApplication(String lectureCode, MemberDto memberDTO) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
-
         Student student = studentRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode);
 
         studentRepository.delete(student);

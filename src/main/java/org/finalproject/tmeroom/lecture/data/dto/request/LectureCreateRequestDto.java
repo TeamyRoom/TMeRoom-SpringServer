@@ -1,18 +1,14 @@
 package org.finalproject.tmeroom.lecture.data.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Getter
-@Setter
+@Data
 public class LectureCreateRequestDto {
     @NotBlank
     protected String lectureName;

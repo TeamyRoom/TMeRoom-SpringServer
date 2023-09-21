@@ -42,6 +42,8 @@ public class Teacher extends BaseTimeEntity {
     @Builder
     public Teacher(Member member, Lecture lecture) {
         this.teacherId = member.getId();
+        this.member = member;
         this.lectureCode = lecture.getLectureCode();
+        this.lecture = lecture;
     }
 }
