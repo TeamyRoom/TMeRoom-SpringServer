@@ -36,11 +36,11 @@ class MemberServiceTest {
     private PasswordEncoder passwordEncoder;
 
     private MemberCreateRequestDto getMockRequestDto() {
-        return MemberCreateRequestDto.builder()
-                .email("testGuest@test.com")
-                .memberId("testGuest")
-                .password("password")
-                .build();
+        MemberCreateRequestDto dto = new MemberCreateRequestDto();
+        dto.setEmail("testGuest@test.com");
+        dto.setMemberId("testGuest");
+        dto.setPassword("password");
+        return dto;
     }
 
     private Member getMockGuestMember() {

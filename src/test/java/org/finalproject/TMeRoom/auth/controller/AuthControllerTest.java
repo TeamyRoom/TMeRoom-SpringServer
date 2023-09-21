@@ -1,15 +1,6 @@
 package org.finalproject.TMeRoom.auth.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import org.finalproject.tmeroom.auth.config.SecurityConfig;
 import org.finalproject.tmeroom.auth.controller.AuthController;
 import org.finalproject.tmeroom.auth.data.dto.request.LoginRequestDto;
@@ -29,6 +20,16 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(
         controllers = AuthController.class,
@@ -57,11 +58,9 @@ class AuthControllerTest {
             // Given
             String id = "tester00";
             String password = "test";
-            LoginRequestDto requestDto = LoginRequestDto
-                    .builder()
-                    .id(id)
-                    .pw(password)
-                    .build();
+            LoginRequestDto requestDto = new LoginRequestDto();
+            requestDto.setId(id);
+            requestDto.setPw(password);
             LoginResponseDto responseDto = LoginResponseDto.builder()
                     .accessToken("mockAccessToken")
                     .build();
@@ -90,11 +89,9 @@ class AuthControllerTest {
             // Given
             String id = "wrongId";
             String password = "password";
-            LoginRequestDto requestDto = LoginRequestDto
-                    .builder()
-                    .id(id)
-                    .pw(password)
-                    .build();
+            LoginRequestDto requestDto = new LoginRequestDto();
+            requestDto.setId(id);
+            requestDto.setPw(password);
             given(authService.login(any(LoginRequestDto.class))).willThrow(
                     new ApplicationException(ErrorCode.USER_NOT_FOUND)
             );
@@ -114,11 +111,9 @@ class AuthControllerTest {
             // Given
             String id = "tester";
             String password = "wrongPw";
-            LoginRequestDto requestDto = LoginRequestDto
-                    .builder()
-                    .id(id)
-                    .pw(password)
-                    .build();
+            LoginRequestDto requestDto = new LoginRequestDto();
+            requestDto.setId(id);
+            requestDto.setPw(password);
             given(authService.login(any(LoginRequestDto.class))).willThrow(
                     new ApplicationException(ErrorCode.INVALID_PASSWORD)
             );

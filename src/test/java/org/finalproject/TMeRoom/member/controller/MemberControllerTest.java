@@ -2,10 +2,6 @@ package org.finalproject.TMeRoom.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finalproject.TMeRoom.config.TestSecurityConfig;
-import org.finalproject.tmeroom.auth.data.dto.request.LoginRequestDto;
-import org.finalproject.tmeroom.auth.data.dto.response.LoginResponseDto;
-import org.finalproject.tmeroom.common.exception.ApplicationException;
-import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.member.controller.MemberController;
 import org.finalproject.tmeroom.member.data.dto.request.MemberCreateRequestDto;
 import org.finalproject.tmeroom.member.data.dto.response.MemberCreateResponseDto;
@@ -17,17 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -59,13 +49,12 @@ class MemberControllerTest {
             String pw = "test";
             String email = "testerGuest@test.com";
             String nickname = "게스트";
-            MemberCreateRequestDto requestDto = MemberCreateRequestDto
-                    .builder()
-                    .memberId(id)
-                    .password(pw)
-                    .email(email)
-                    .nickname(nickname)
-                    .build();
+            MemberCreateRequestDto requestDto = new MemberCreateRequestDto();
+            requestDto.setMemberId(id);
+            requestDto.setPassword(pw);
+            requestDto.setEmail(email);
+            requestDto.setNickname(nickname);
+
             MemberCreateResponseDto responseDto = mock(MemberCreateResponseDto.class);
             given(memberService.createMember(requestDto)).willReturn(responseDto);
 
