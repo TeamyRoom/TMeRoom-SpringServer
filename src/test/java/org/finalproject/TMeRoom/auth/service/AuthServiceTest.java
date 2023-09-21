@@ -111,10 +111,10 @@ class AuthServiceTest {
     }
 
     private LoginRequestDto getMockRequestDto() {
-        return LoginRequestDto.builder()
-                .id("tester00")
-                .pw("test")
-                .build();
+        LoginRequestDto dto = new LoginRequestDto();
+        dto.setId("tester00");
+        dto.setPw("test");
+        return dto;
     }
 
     private Member getMockMember() {

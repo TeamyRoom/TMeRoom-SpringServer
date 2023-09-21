@@ -16,7 +16,6 @@ import org.finalproject.tmeroom.member.data.entity.Member;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Data
-@Builder
 public class MemberCreateRequestDto {
 
     @NotBlank(message = CANNOT_BE_NULL)

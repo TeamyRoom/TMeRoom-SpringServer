@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class LoginRequestDto {
 
     @NotBlank(message = CANNOT_BE_NULL)
