@@ -30,7 +30,6 @@ public class QuestionService {
     // 질문 목록 조회
     public Page<QuestionListResponseDto> lookupQuestions(String lectureCode, Pageable pageable) {
         Lecture lecture = lectureRepository.getReferenceById(lectureCode);
-
         Page<Question> questions = questionRepository.findByLecture(pageable, lecture);
 
         return questions.map(QuestionListResponseDto::from);
@@ -38,15 +37,18 @@ public class QuestionService {
 
     // 질문 단일 조회
     public QuestionDetailResponseDto readQuestion(Long questionId) {
-        Question question = questionRepository.findById(questionId).orElseThrow();
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
 
         return QuestionDetailResponseDto.from(question);
     }
 
     // 질문 게시
     public void createQuestion(String lectureCode, MemberDto memberDto, QuestionCreateRequestDto requestDto) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
-        Member member = memberRepository.findById(memberDto.getId()).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+        Member member = memberRepository.findById(memberDto.getId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
         Question question = requestDto.toEntity(lecture, member);
 
         questionRepository.save(question);
@@ -54,7 +56,8 @@ public class QuestionService {
 
     // 질문 수정
     public void updateQuestion(Long questionId, MemberDto memberDto, QuestionUpdateRequestDto requestDto) {
-        Question question = questionRepository.findById(questionId).orElseThrow();
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
 
         checkPermission(question, memberDto);
 
@@ -63,8 +66,8 @@ public class QuestionService {
 
     // 질문 삭제
     public void deleteQuestion(Long questionId, MemberDto memberDto) {
-        Question question = questionRepository.findById(questionId).orElseThrow();
-
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
         checkPermission(question, memberDto);
 
         questionRepository.delete(question);
@@ -72,8 +75,8 @@ public class QuestionService {
 
     // 질문 공개 여부 수정
     public void openQuestion(Long questionId, MemberDto memberDto) {
-        Question question = questionRepository.findById(questionId).orElseThrow();
-
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
         checkPermission(question, memberDto);
 
         question.makePublic();

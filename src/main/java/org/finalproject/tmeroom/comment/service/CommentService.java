@@ -29,7 +29,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     // 댓글 조회
-    public Page<CommentDetailResponseDto> readComments(Long questionId, Pageable pageable){
+    public Page<CommentDetailResponseDto> readComments(Long questionId, Pageable pageable) {
         Question question = questionRepository.getReferenceById(questionId);
         Page<Comment> commentPage = commentRepository.findByQuestion(pageable, question);
 
@@ -37,7 +37,7 @@ public class CommentService {
     }
 
     // 댓글 게시
-    public void createComment(Long questionId, CommentCreateRequestDto requestDto, MemberDto memberDto){
+    public void createComment(Long questionId, CommentCreateRequestDto requestDto, MemberDto memberDto) {
         Question question = questionRepository.getReferenceById(questionId);
         Member commenter = memberRepository.getReferenceById(memberDto.getId());
         Comment comment = requestDto.toEntity(commenter, question);
@@ -46,17 +46,19 @@ public class CommentService {
     }
 
     // 댓글 수정
-    public void updateComment(Long commentId, CommentUpdateRequestDto requestDto, MemberDto memberDto){
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
-        
+    public void updateComment(Long commentId, CommentUpdateRequestDto requestDto, MemberDto memberDto) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_COMMENT_ID));
+
         checkPermission(comment, memberDto);
-        
-        comment.update(requestDto);        
+
+        comment.update(requestDto);
     }
 
     // 댓글 삭제
-    public void deleteComment(Long commentId, MemberDto memberDto){
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
+    public void deleteComment(Long commentId, MemberDto memberDto) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_COMMENT_ID));
         checkPermission(comment, memberDto);
 
         commentRepository.delete(comment);

@@ -1,6 +1,8 @@
 package org.finalproject.tmeroom.lecture.service;
 
 import lombok.RequiredArgsConstructor;
+import org.finalproject.tmeroom.common.exception.ApplicationException;
+import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.TeacherDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
@@ -28,7 +30,8 @@ public class TeacherService extends LectureCommon {
 
     //강의 강사 조회
     public Page<TeacherDetailResponseDto> lookupTeachers(String lectureCode, MemberDto memberDto, Pageable pageable) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDto);
 
         Page<Teacher> teachers = teacherRepository.findByLecture(pageable, lecture);
@@ -38,11 +41,13 @@ public class TeacherService extends LectureCommon {
 
     //강의 강사 임명
     public void appointTeacher(String lectureCode, MemberDto memberDTO, AppointTeacherRequestDto requestDTO) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
         checkPermission(lecture, memberDTO);
 
-        Member appointedMember = memberRepository.findById(requestDTO.getTeacherId()).orElseThrow();
+        Member appointedMember = memberRepository.findById(requestDTO.getTeacherId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
         Teacher teacher = Teacher.builder()
                 .lecture(lecture)
@@ -54,7 +59,8 @@ public class TeacherService extends LectureCommon {
 
     //강의 강사 해임
     public void dismissTeacher(String lectureCode, String teacherId, MemberDto memberDTO) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
         Teacher dismissedTeacher = teacherRepository.findByMemberIdAndLectureCode(teacherId, lectureCode);

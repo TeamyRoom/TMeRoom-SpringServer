@@ -1,6 +1,8 @@
 package org.finalproject.tmeroom.lecture.service;
 
 import lombok.RequiredArgsConstructor;
+import org.finalproject.tmeroom.common.exception.ApplicationException;
+import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.StudentDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
@@ -32,14 +34,16 @@ public class StudentService extends LectureCommon {
         Member member = memberRepository.getReferenceById(memberDTO.getId());
 
         Page<Student> myLectures = studentRepository.findByMember(pageable, member);
-        return myLectures.map(LectureDetailResponseDto::from);
+        return myLectures.map(student -> LectureDetailResponseDto.from(student));
     }
 
     //수강 신청
     public void applyLecture(String lectureCode, MemberDto memberDTO) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        Member registeringStudent = memberRepository.findById(memberDTO.getId()).orElseThrow();
+        Member registeringStudent = memberRepository.findById(memberDTO.getId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
         Student student = Student.builder()
                 .lecture(lecture)
@@ -59,7 +63,8 @@ public class StudentService extends LectureCommon {
 
     //강의 수강 신청 인원 목록 조회
     public Page<StudentDetailResponseDto> checkApplicants(String lectureCode, MemberDto memberDTO, Pageable pageable) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
         Page<Student> applicants = studentRepository.findByLecture(pageable, lecture);
@@ -68,7 +73,8 @@ public class StudentService extends LectureCommon {
 
     //수강 신청 수락
     public void acceptApplicant(String lectureCode, String applicantId, MemberDto memberDTO) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
         Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode);
@@ -78,7 +84,8 @@ public class StudentService extends LectureCommon {
 
     //수강 신청 반려
     public void rejectApplicant(String lectureCode, String applicantId, MemberDto memberDTO) {
-        Lecture lecture = lectureRepository.findById(lectureCode).orElseThrow();
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
         Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode);
