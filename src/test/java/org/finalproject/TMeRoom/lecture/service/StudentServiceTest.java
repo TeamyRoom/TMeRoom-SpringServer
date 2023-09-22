@@ -1,5 +1,9 @@
 package org.finalproject.TMeRoom.lecture.service;
 
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.finalproject.tmeroom.common.exception.ApplicationException;
+import org.finalproject.tmeroom.common.exception.ErrorCode;
+import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.StudentDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.lecture.data.entity.Student;
@@ -19,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -98,9 +104,31 @@ class StudentServiceTest {
                 .build();
     }
 
+    public MemberDto getMockAnonymousDto(){
+        return MemberDto.builder()
+                .id("anonymous")
+                .nickname("anonymous")
+                .build();
+    }
+
     @Test
+    @DisplayName("내가 수강중인 강의 목록 조회")
     void lookupMyLectures() {
-        //TODO : 수강 목록 조회 테스트
+        //Given
+        MemberDto mockStudentDto = getMockStudentDto();
+        Lecture lecture = getMockLecture();
+        Student student = getMockStudent();
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Student> studentPage = new PageImpl<>(List.of(student), pageable, 0);
+
+        given(memberRepository.getReferenceById("student")).willReturn(student.getMember());
+        given(studentRepository.findByMember(any(Pageable.class), eq(student.getMember()))).willReturn(studentPage);
+
+        //When
+        Page<LectureDetailResponseDto> lectureResponsePage = studentService.lookupMyLectures(mockStudentDto, pageable);
+
+        //Then
+        assertThat(lectureResponsePage.get().findFirst().get().getLectureCode()).isEqualTo(lecture.getLectureCode());
     }
 
     @Test
@@ -147,9 +175,8 @@ class StudentServiceTest {
         then(studentRepository).should().delete(studentEntity);
     }
 
-
     @Test
-    @DisplayName("수강신청 인원 목록 조회")
+    @DisplayName("관리자가 수강신청 인원 목록 조회 요청시 인원 목록을 반환한다")
     void checkApplicants() {
         //Given
         String lectureCode = "code";
@@ -168,6 +195,30 @@ class StudentServiceTest {
 
         //Then
         assertThat(studentResponsePage.get().findFirst().get().getMemberNickname()).isEqualTo(student.getMember().getNickname());
+    }
+
+    @Test
+    @DisplayName("관리자가 아닌 사람이 수강신청 인원 목록 조회 요청시 예외를 발생시킨다")
+    void GivenPermissionFail_whenCheckApplicants_ThenReturnException() {
+        //Given
+        String lectureCode = "code";
+        MemberDto mockAnonymousDto = getMockAnonymousDto();
+        Lecture lecture = getMockLecture();
+        Student student = getMockStudent();
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Student> studentPage = new PageImpl<>(List.of(student), pageable, 0);
+
+
+        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+        given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
+
+        //When
+        Throwable throwable = catchThrowable(() -> studentService.checkApplicants(lectureCode, mockAnonymousDto, pageable));
+
+        //Then
+        AssertionsForClassTypes.assertThat(throwable)
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
     }
 
     @Test
@@ -190,6 +241,26 @@ class StudentServiceTest {
     }
 
     @Test
+    @DisplayName("관리자가 아닌 사람이 수강신청 수락시 예외를 발생시킨다")
+    void GivenPermissionFail_whenAcceptApplicants_ThenReturnException() {
+        //Given
+        Lecture lecture = getMockLecture();
+        Student student = getMockStudent();
+        String lectureCode = "code";
+        MemberDto mockAnonymousDto = getMockAnonymousDto();
+        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+        given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(),lectureCode)).willReturn(student);
+
+        //When
+        Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
+
+        //Then
+        AssertionsForClassTypes.assertThat(throwable)
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
+    }
+
+    @Test
     @DisplayName("수강 신청 반려")
     void rejectApplicant() {
         //Given
@@ -205,5 +276,25 @@ class StudentServiceTest {
 
         //Then
         then(studentRepository).should().delete(student);
+    }
+
+    @Test
+    @DisplayName("관리자가 아닌 사람이 수강신청 인원 목록 조회 요청시 예외를 발생시킨다")
+    void GivenPermissionFail_whenDismissApplicants_ThenReturnException() {
+        //Given
+        Lecture lecture = getMockLecture();
+        Student student = getMockStudent();
+        String lectureCode = "code";
+        MemberDto mockAnonymousDto = getMockAnonymousDto();
+        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+        given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(),lectureCode)).willReturn(student);
+
+        //When
+        Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
+
+        //Then
+        AssertionsForClassTypes.assertThat(throwable)
+                .isInstanceOf(ApplicationException.class)
+                .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
     }
 }
