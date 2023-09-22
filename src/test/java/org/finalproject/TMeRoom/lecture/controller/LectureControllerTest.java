@@ -21,13 +21,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -62,7 +59,7 @@ class LectureControllerTest {
         return MemberDto.from(member);
     }
 
-    private Lecture getMockLecture(){
+    private Lecture getMockLecture() {
         return Lecture.builder()
                 .lectureCode("code")
                 .lectureName("강의명")
@@ -96,7 +93,7 @@ class LectureControllerTest {
 
     @Test
     @DisplayName("강의 수정")
-    void updateLecture() throws Exception{
+    void updateLecture() throws Exception {
         // Given
         LectureUpdateRequestDto requestDto = new LectureUpdateRequestDto();
         requestDto.setLectureCode("code");
@@ -104,42 +101,11 @@ class LectureControllerTest {
 
         // When & Then
         mockMvc.perform(put("/api/v1/lecture/code")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsBytes(requestDto)))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsBytes(requestDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.resultCode == 'SUCCESS')]").exists());
-    }
-
-    @Nested
-    @DisplayName("강의 삭제")
-    class aboutLectureDelete{
-        @Test
-        @DisplayName("강의 관리자가 삭제 요청시 강의 삭제")
-        void successDeleteLecture() throws Exception{
-
-            // Given
-
-            // When & Then
-            mockMvc.perform(delete("/api/v1/lecture/code")
-                            .contentType(MediaType.APPLICATION_JSON_VALUE))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[?(@.resultCode == 'SUCCESS')]").exists());
-        }
-
-        @Test
-        @DisplayName("강의 관리자가 아닌 사람이 삭제 요청시 강의 삭제 실패")
-        void failDeleteLecture() throws Exception{
-            // Given
-
-            // When & Then
-            mockMvc.perform(delete("/api/v1/lecture/code")
-                            .contentType(MediaType.APPLICATION_JSON_VALUE))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[?(@.resultCode == 'SUCCESS')]").exists());
-        }
     }
 
     @Test
@@ -201,5 +167,36 @@ class LectureControllerTest {
     @Disabled
     void rejectApplicant() {
 
+    }
+
+    @Nested
+    @DisplayName("강의 삭제")
+    class aboutLectureDelete {
+        @Test
+        @DisplayName("강의 관리자가 삭제 요청시 강의 삭제")
+        void successDeleteLecture() throws Exception {
+
+            // Given
+
+            // When & Then
+            mockMvc.perform(delete("/api/v1/lecture/code")
+                            .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[?(@.resultCode == 'SUCCESS')]").exists());
+        }
+
+        @Test
+        @DisplayName("강의 관리자가 아닌 사람이 삭제 요청시 강의 삭제 실패")
+        void failDeleteLecture() throws Exception {
+            // Given
+
+            // When & Then
+            mockMvc.perform(delete("/api/v1/lecture/code")
+                            .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[?(@.resultCode == 'SUCCESS')]").exists());
+        }
     }
 }

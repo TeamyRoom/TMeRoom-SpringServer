@@ -1,10 +1,9 @@
 package org.finalproject.tmeroom.auth.data.dto.request;
 
-import static org.finalproject.tmeroom.common.exception.ValidationMessage.CANNOT_BE_NULL;
-
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Data;
+
+import static org.finalproject.tmeroom.common.exception.ValidationMessage.CANNOT_BE_NULL;
 
 @Data
 public class LoginRequestDto {

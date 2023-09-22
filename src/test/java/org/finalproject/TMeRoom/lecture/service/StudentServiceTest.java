@@ -142,7 +142,8 @@ class StudentServiceTest {
 
             String lectureCode = "code";
 
-            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(Lecture.builder().lectureCode(lectureCode).lectureName("강의").manager(manager).build()));
+            given(lectureRepository.findById(lectureCode)).willReturn(
+                    Optional.of(Lecture.builder().lectureCode(lectureCode).lectureName("강의").manager(manager).build()));
             given(memberRepository.findById("student")).willReturn(Optional.of(Member.builder().id("student").build()));
 
             //When
@@ -168,7 +169,8 @@ class StudentServiceTest {
                     .build();
 
 
-            given(studentRepository.findByMemberIdAndLectureCode(mockStudentDto.getId(), lectureCode)).willReturn(studentEntity);
+            given(studentRepository.findByMemberIdAndLectureCode(mockStudentDto.getId(), lectureCode)).willReturn(
+                    studentEntity);
 
             //When
             studentService.cancelApplication(lectureCode, mockStudentDto);
@@ -197,10 +199,12 @@ class StudentServiceTest {
             given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
 
             //When
-            Page<StudentDetailResponseDto> studentResponsePage = studentService.checkApplicants(lectureCode, mockManagerDto, pageable);
+            Page<StudentDetailResponseDto> studentResponsePage =
+                    studentService.checkApplicants(lectureCode, mockManagerDto, pageable);
 
             //Then
-            assertThat(studentResponsePage.get().findFirst().get().getMemberNickname()).isEqualTo(student.getMember().getNickname());
+            assertThat(studentResponsePage.get().findFirst().get().getMemberNickname()).isEqualTo(
+                    student.getMember().getNickname());
         }
 
         @Test
@@ -219,7 +223,8 @@ class StudentServiceTest {
             given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
 
             //When
-            Throwable throwable = catchThrowable(() -> studentService.checkApplicants(lectureCode, mockAnonymousDto, pageable));
+            Throwable throwable =
+                    catchThrowable(() -> studentService.checkApplicants(lectureCode, mockAnonymousDto, pageable));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -241,7 +246,8 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto managerDto = getMockManagerDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
+                    student);
 
             //When
             studentService.acceptApplicant(lectureCode, student.getStudentId(), managerDto);
@@ -260,10 +266,12 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto mockAnonymousDto = getMockAnonymousDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
+                    student);
 
             //When
-            Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
+            Throwable throwable = catchThrowable(
+                    () -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -284,7 +292,8 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto managerDto = getMockManagerDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
+                    student);
 
             //When
             studentService.rejectApplicant(lectureCode, student.getStudentId(), managerDto);
@@ -302,10 +311,12 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto mockAnonymousDto = getMockAnonymousDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
+                    student);
 
             //When
-            Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
+            Throwable throwable = catchThrowable(
+                    () -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)

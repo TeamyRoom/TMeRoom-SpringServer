@@ -96,7 +96,8 @@ class MemberServiceTest {
             given(passwordEncoder.encode(mockRequestDto.getPassword())).willReturn(mockMember.getPw());
 
             // When
-            ApplicationException e = assertThrows(ApplicationException.class, () -> memberService.createMember(mockRequestDto));
+            ApplicationException e =
+                    assertThrows(ApplicationException.class, () -> memberService.createMember(mockRequestDto));
 
             // Then
             then(memberRepository).should().existsById(mockRequestDto.getMemberId());
@@ -117,7 +118,8 @@ class MemberServiceTest {
             given(passwordEncoder.encode(mockRequestDto.getPassword())).willReturn(mockMember.getPw());
 
             // When
-            ApplicationException e = assertThrows(ApplicationException.class, () -> memberService.createMember(mockRequestDto));
+            ApplicationException e =
+                    assertThrows(ApplicationException.class, () -> memberService.createMember(mockRequestDto));
 
             // Then
             then(memberRepository).should().existsById(mockRequestDto.getMemberId());

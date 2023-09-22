@@ -7,6 +7,7 @@ import lombok.Getter;
  * 작성자: 김태민
  * 작성일자: 2023-09-12
  * 컨트롤러에서 응답 데이터를 담아 보낼 때 사용하는 클래스
+ *
  * @param <T> 응답 데이터가 담길 ResponseDto
  */
 @Getter

@@ -1,11 +1,12 @@
 package org.finalproject.tmeroom.member.repository;
 
-import java.time.Duration;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.time.Duration;
+import java.util.Optional;
 
 /**
  * 작성자: 김태민
@@ -17,10 +18,9 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class EmailConfirmRedisRepository implements EmailConfirmRepository {
 
-    private final RedisTemplate<String, String> redisTemplate;
-
     private final static Duration ITEM_TTL = Duration.ofDays(1);
     private final static String REDIS_PREFIX = "EMAIL_CODE:";
+    private final RedisTemplate<String, String> redisTemplate;
 
     private String getKey(String key) {
         return REDIS_PREFIX + key;
