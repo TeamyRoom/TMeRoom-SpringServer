@@ -15,6 +15,7 @@ import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,10 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -36,7 +34,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -74,7 +73,7 @@ class StudentServiceTest {
     }
 
 
-    public Student getMockStudent(){
+    public Student getMockStudent() {
         return Student.builder()
                 .member(getMockStudentMember())
                 .lecture(getMockLecture())
@@ -90,21 +89,21 @@ class StudentServiceTest {
                 .build();
     }
 
-    public MemberDto getMockStudentDto(){
+    public MemberDto getMockStudentDto() {
         return MemberDto.builder()
                 .id("student")
                 .nickname("student")
                 .build();
     }
 
-    public MemberDto getMockManagerDto(){
+    public MemberDto getMockManagerDto() {
         return MemberDto.builder()
                 .id("manager")
                 .nickname("manager")
                 .build();
     }
 
-    public MemberDto getMockAnonymousDto(){
+    public MemberDto getMockAnonymousDto() {
         return MemberDto.builder()
                 .id("anonymous")
                 .nickname("anonymous")
@@ -131,170 +130,187 @@ class StudentServiceTest {
         assertThat(lectureResponsePage.get().findFirst().get().getLectureCode()).isEqualTo(lecture.getLectureCode());
     }
 
-    @Test
+    @Nested
     @DisplayName("수강신청")
-    void applyLecture() {
-        //Given
-        Member manager = getMockManager();
-        MemberDto mockStudent = getMockStudentDto();
+    class aboutApplication {
+        @Test
+        @DisplayName("학생이 수강신청 요청시 수강 신청이 된다.")
+        void GivenApplyLectureRequest_whenDismissApplicants_ThenApplyLecture() {
+            //Given
+            Member manager = getMockManager();
+            MemberDto mockStudent = getMockStudentDto();
 
-        String lectureCode = "code";
+            String lectureCode = "code";
 
-        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(Lecture.builder().lectureCode(lectureCode).lectureName("강의").manager(manager).build()));
-        given(memberRepository.findById("student")).willReturn(Optional.of(Member.builder().id("student").build()));
+            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(Lecture.builder().lectureCode(lectureCode).lectureName("강의").manager(manager).build()));
+            given(memberRepository.findById("student")).willReturn(Optional.of(Member.builder().id("student").build()));
 
-        //When
-        studentService.applyLecture(lectureCode, mockStudent);
+            //When
+            studentService.applyLecture(lectureCode, mockStudent);
 
-        //Then
-        then(studentRepository).should().save(any(Student.class));
+            //Then
+            then(studentRepository).should().save(any(Student.class));
+        }
+
+        @Test
+        @DisplayName("학생이 수강신청 취소시 수강 신청이 취소 된다.")
+        void GivenCancelApplicationRequest_whenDismissApplicants_ThenReturnException() {
+            //Given
+            String lectureCode = "code";
+            Member mockStudent = getMockStudentMember();
+            MemberDto mockStudentDto = getMockStudentDto();
+
+            Lecture mockLecture = getMockLecture();
+            Student studentEntity = Student.builder()
+                    .member(mockStudent)
+                    .lecture(mockLecture)
+                    .appliedAt(LocalDateTime.now())
+                    .build();
+
+
+            given(studentRepository.findByMemberIdAndLectureCode(mockStudentDto.getId(), lectureCode)).willReturn(studentEntity);
+
+            //When
+            studentService.cancelApplication(lectureCode, mockStudentDto);
+
+            //Then
+            then(studentRepository).should().delete(studentEntity);
+        }
     }
 
-    @Test
-    @DisplayName("수강신청 취소")
-    void cancelApplication() {
-        //Given
-        String lectureCode = "code";
-        Member mockStudent = getMockStudentMember();
-        MemberDto mockStudentDto = getMockStudentDto();
+    @Nested
+    @DisplayName("수강신청 인원 목록 조회")
+    class checkApplicants {
+        @Test
+        @DisplayName("관리자가 수강신청 인원 목록 조회 요청시 인원 목록을 반환한다")
+        void GivenCheckApplicantsRequest_whenDismissApplicants_ThenReturnApplicantsList() {
+            //Given
+            String lectureCode = "code";
+            MemberDto mockManagerDto = getMockManagerDto();
+            Lecture lecture = getMockLecture();
+            Student student = getMockStudent();
+            Pageable pageable = PageRequest.of(0, 20);
+            Page<Student> studentPage = new PageImpl<>(List.of(student), pageable, 0);
 
-        Lecture mockLecture = getMockLecture();
-        Student studentEntity = Student.builder()
-                .member(mockStudent)
-                .lecture(mockLecture)
-                .appliedAt(LocalDateTime.now())
-                .build();
+
+            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
+
+            //When
+            Page<StudentDetailResponseDto> studentResponsePage = studentService.checkApplicants(lectureCode, mockManagerDto, pageable);
+
+            //Then
+            assertThat(studentResponsePage.get().findFirst().get().getMemberNickname()).isEqualTo(student.getMember().getNickname());
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사람이 수강신청 인원 목록 조회 요청시 예외를 발생시킨다")
+        void GivenPermissionFail_whenCheckApplicants_ThenReturnException() {
+            //Given
+            String lectureCode = "code";
+            MemberDto mockAnonymousDto = getMockAnonymousDto();
+            Lecture lecture = getMockLecture();
+            Student student = getMockStudent();
+            Pageable pageable = PageRequest.of(0, 20);
+            Page<Student> studentPage = new PageImpl<>(List.of(student), pageable, 0);
 
 
-        given(studentRepository.findByMemberIdAndLectureCode(mockStudentDto.getId(), lectureCode)).willReturn(studentEntity);
+            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
 
-        //When
-        studentService.cancelApplication(lectureCode, mockStudentDto);
+            //When
+            Throwable throwable = catchThrowable(() -> studentService.checkApplicants(lectureCode, mockAnonymousDto, pageable));
 
-        //Then
-        then(studentRepository).should().delete(studentEntity);
+            //Then
+            AssertionsForClassTypes.assertThat(throwable)
+                    .isInstanceOf(ApplicationException.class)
+                    .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
+        }
     }
 
-    @Test
-    @DisplayName("관리자가 수강신청 인원 목록 조회 요청시 인원 목록을 반환한다")
-    void checkApplicants() {
-        //Given
-        String lectureCode = "code";
-        MemberDto mockManagerDto = getMockManagerDto();
-        Lecture lecture = getMockLecture();
-        Student student = getMockStudent();
-        Pageable pageable = PageRequest.of(0, 20);
-        Page<Student> studentPage = new PageImpl<>(List.of(student), pageable, 0);
 
-
-        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-        given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
-
-        //When
-        Page<StudentDetailResponseDto> studentResponsePage = studentService.checkApplicants(lectureCode, mockManagerDto, pageable);
-
-        //Then
-        assertThat(studentResponsePage.get().findFirst().get().getMemberNickname()).isEqualTo(student.getMember().getNickname());
-    }
-
-    @Test
-    @DisplayName("관리자가 아닌 사람이 수강신청 인원 목록 조회 요청시 예외를 발생시킨다")
-    void GivenPermissionFail_whenCheckApplicants_ThenReturnException() {
-        //Given
-        String lectureCode = "code";
-        MemberDto mockAnonymousDto = getMockAnonymousDto();
-        Lecture lecture = getMockLecture();
-        Student student = getMockStudent();
-        Pageable pageable = PageRequest.of(0, 20);
-        Page<Student> studentPage = new PageImpl<>(List.of(student), pageable, 0);
-
-
-        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-        given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
-
-        //When
-        Throwable throwable = catchThrowable(() -> studentService.checkApplicants(lectureCode, mockAnonymousDto, pageable));
-
-        //Then
-        AssertionsForClassTypes.assertThat(throwable)
-                .isInstanceOf(ApplicationException.class)
-                .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
-    }
-
-    @Test
+    @Nested
     @DisplayName("수강 신청 수락")
-    void acceptApplicant() {
-        //Given
-        Lecture lecture = getMockLecture();
-        Student student = getMockStudent();
-        String lectureCode = "code";
-        MemberDto managerDto = getMockManagerDto();
-        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-        given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(),lectureCode)).willReturn(student);
+    class acceptApplicant {
+        @Test
+        @DisplayName("관리자가 수강신청 수락요청시 수락 된다.")
+        void GivenAcceptApplicantRequest_whenDismissApplicants_ThenAcceptApplicant() {
+            //Given
+            Lecture lecture = getMockLecture();
+            Student student = getMockStudent();
+            String lectureCode = "code";
+            MemberDto managerDto = getMockManagerDto();
+            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
 
-        //When
-        studentService.acceptApplicant(lectureCode, student.getStudentId(), managerDto);
+            //When
+            studentService.acceptApplicant(lectureCode, student.getStudentId(), managerDto);
 
-        //Then
-        Duration duration = Duration.between(student.getAcceptedAt(), LocalDateTime.now());
-        assertEquals(duration.getSeconds(), 0);
+            //Then
+            Duration duration = Duration.between(student.getAcceptedAt(), LocalDateTime.now());
+            assertEquals(duration.getSeconds(), 0);
+        }
+
+        @Test
+        @DisplayName("관리자가 아닌 사람이 수강신청 수락시 예외를 발생시킨다")
+        void GivenPermissionFail_whenAcceptApplicants_ThenReturnException() {
+            //Given
+            Lecture lecture = getMockLecture();
+            Student student = getMockStudent();
+            String lectureCode = "code";
+            MemberDto mockAnonymousDto = getMockAnonymousDto();
+            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
+
+            //When
+            Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
+
+            //Then
+            AssertionsForClassTypes.assertThat(throwable)
+                    .isInstanceOf(ApplicationException.class)
+                    .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
+        }
     }
 
-    @Test
-    @DisplayName("관리자가 아닌 사람이 수강신청 수락시 예외를 발생시킨다")
-    void GivenPermissionFail_whenAcceptApplicants_ThenReturnException() {
-        //Given
-        Lecture lecture = getMockLecture();
-        Student student = getMockStudent();
-        String lectureCode = "code";
-        MemberDto mockAnonymousDto = getMockAnonymousDto();
-        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-        given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(),lectureCode)).willReturn(student);
-
-        //When
-        Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
-
-        //Then
-        AssertionsForClassTypes.assertThat(throwable)
-                .isInstanceOf(ApplicationException.class)
-                .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
-    }
-
-    @Test
+    @Nested
     @DisplayName("수강 신청 반려")
-    void rejectApplicant() {
-        //Given
-        Lecture lecture = getMockLecture();
-        Student student = getMockStudent();
-        String lectureCode = "code";
-        MemberDto managerDto = getMockManagerDto();
-        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-        given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(),lectureCode)).willReturn(student);
+    class rejectApplicant {
+        @Test
+        @DisplayName("관리자가 수강신청 반려 요청시 반려 시킨다.")
+        void GivenRejectApplicantRequest_whenDismissApplicants_ThenRejectApplicant() {
+            //Given
+            Lecture lecture = getMockLecture();
+            Student student = getMockStudent();
+            String lectureCode = "code";
+            MemberDto managerDto = getMockManagerDto();
+            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
 
-        //When
-        studentService.rejectApplicant(lectureCode, student.getStudentId(), managerDto);
+            //When
+            studentService.rejectApplicant(lectureCode, student.getStudentId(), managerDto);
 
-        //Then
-        then(studentRepository).should().delete(student);
-    }
+            //Then
+            then(studentRepository).should().delete(student);
+        }
 
-    @Test
-    @DisplayName("관리자가 아닌 사람이 수강신청 인원 목록 조회 요청시 예외를 발생시킨다")
-    void GivenPermissionFail_whenDismissApplicants_ThenReturnException() {
-        //Given
-        Lecture lecture = getMockLecture();
-        Student student = getMockStudent();
-        String lectureCode = "code";
-        MemberDto mockAnonymousDto = getMockAnonymousDto();
-        given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-        given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(),lectureCode)).willReturn(student);
+        @Test
+        @DisplayName("관리자가 아닌 사람이 수강신청 반려시 예외를 발생시킨다")
+        void GivenPermissionFail_whenDismissApplicants_ThenReturnException() {
+            //Given
+            Lecture lecture = getMockLecture();
+            Student student = getMockStudent();
+            String lectureCode = "code";
+            MemberDto mockAnonymousDto = getMockAnonymousDto();
+            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(student);
 
-        //When
-        Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
+            //When
+            Throwable throwable = catchThrowable(() -> studentService.acceptApplicant(lectureCode, student.getStudentId(), mockAnonymousDto));
 
-        //Then
-        AssertionsForClassTypes.assertThat(throwable)
-                .isInstanceOf(ApplicationException.class)
-                .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
+            //Then
+            AssertionsForClassTypes.assertThat(throwable)
+                    .isInstanceOf(ApplicationException.class)
+                    .hasMessage(ErrorCode.INVALID_PERMISSION.getMessage());
+        }
     }
 }

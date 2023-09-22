@@ -1,6 +1,8 @@
 package org.finalproject.tmeroom.lecture.service;
 
 import lombok.RequiredArgsConstructor;
+import org.finalproject.tmeroom.common.exception.ApplicationException;
+import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureCreateResponseDto;
@@ -41,7 +43,8 @@ public class LectureService extends LectureCommon {
 
     //강의 정보 수정
     public void updateLecture(LectureUpdateRequestDto requestDTO) {
-        Lecture lecture = lectureRepository.findById(requestDTO.getLectureCode()).orElseThrow();
+        Lecture lecture = lectureRepository.findById(requestDTO.getLectureCode())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
         checkPermission(lecture, requestDTO.getMemberDTO());
 

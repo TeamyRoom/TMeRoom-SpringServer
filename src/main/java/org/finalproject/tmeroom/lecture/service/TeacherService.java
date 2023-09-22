@@ -40,6 +40,7 @@ public class TeacherService extends LectureCommon {
     }
 
     //강의 강사 임명
+    //TODO: 강사 임명시 바로 임명되는 로직에서 -> 이메일 수락 후 임명되는 로직으로 변경 필요
     public void appointTeacher(String lectureCode, MemberDto memberDTO, AppointTeacherRequestDto requestDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
