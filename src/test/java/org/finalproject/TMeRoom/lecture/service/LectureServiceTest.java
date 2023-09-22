@@ -38,6 +38,20 @@ public class LectureServiceTest {
     @MockBean
     private MemberRepository memberRepository;
 
+    private Member getMockManager() {
+        return Member.builder()
+                .id("manager")
+                .build();
+    }
+
+    private Lecture getMockLecture(String 강의명, Member 관리자) {
+        return Lecture.builder()
+                .lectureCode("1234")
+                .lectureName(강의명)
+                .manager(관리자)
+                .build();
+    }
+
     @Nested
     @DisplayName("강의 기능 테스트")
     class aboutLecture {
@@ -77,6 +91,8 @@ public class LectureServiceTest {
             then(lectureRepository).should().delete(mockLecture);
         }
 
+
+
         @Test
         @DisplayName("강의 관리자가 아닌 사람이 강의 삭제를 요청하면 예외가 발생한다.")
         void givenNoOwnerDeleteRequest_whenDeleteLecture_thenOccurredException() {
@@ -100,11 +116,9 @@ public class LectureServiceTest {
         @DisplayName("강의 관리자가 강의명 변경을 요청하면 강의명이 변경된다.")
         void givenUpdateRequest_whenUpdateLecture_thenReturnLectureName() {
             //Given
-            MemberDto managerDto = mock(MemberDto.class);
-            Member manager = mock(Member.class);
+            Member manager = getMockManager();
+            MemberDto managerDto = MemberDto.from(manager);
             Lecture mockLecture = getMockLecture("1234", manager);
-            given(manager.getId()).willReturn("manager");
-            given(managerDto.getId()).willReturn("manager");
             given(lectureRepository.findById("1234")).willReturn(Optional.of(mockLecture));
             given(memberRepository.findById("manager")).willReturn(Optional.of(manager));
 
@@ -121,18 +135,28 @@ public class LectureServiceTest {
             assertThat(mockLecture.getLectureName()).isEqualTo(modifiedName);
         }
 
-        private Member getMockManager() {
-            return Member.builder()
-                    .id("manager")
-                    .build();
-        }
+        @Test
+        @DisplayName("없는 강의코드에 대한 요청이 들어오면 예외를 발생시킨다.")
+        void givenNoExistLecture_whenLectureService_thenReturnException() {
+            //Given
+            Member manager = getMockManager();
+            MemberDto managerDto = MemberDto.from(manager);
+            Lecture mockLecture = getMockLecture("1234", manager);
+            given(memberRepository.findById("manager")).willReturn(Optional.of(manager));
 
-        private Lecture getMockLecture(String 강의명, Member 관리자) {
-            return Lecture.builder()
-                    .lectureCode("1234")
-                    .lectureName(강의명)
-                    .manager(관리자)
-                    .build();
+            LectureUpdateRequestDto requestDTO = new LectureUpdateRequestDto();
+            String modifiedName = "Hello! World2";
+            requestDTO.setLectureName(modifiedName);
+            requestDTO.setMemberDTO(managerDto);
+            requestDTO.setLectureCode("1234");
+
+            //When
+            Throwable throwable = catchThrowable(() -> lectureService.updateLecture(requestDTO));
+
+            //Then
+            assertThat(throwable)
+                    .isInstanceOf(ApplicationException.class)
+                    .hasMessage(ErrorCode.INVALID_LECTURE_CODE.getMessage());
         }
     }
 }

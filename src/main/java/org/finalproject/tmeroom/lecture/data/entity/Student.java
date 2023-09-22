@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -49,9 +50,11 @@ public class Student {
     private LocalDateTime acceptedAt;
 
     @Builder
-    public Student(Member student, Lecture lecture, LocalDateTime appliedAt) {
-        this.studentId = student.getId();
+    public Student(Member member, Lecture lecture, LocalDateTime appliedAt) {
+        this.studentId = member.getId();
+        this.member = member;
         this.lectureCode = lecture.getLectureCode();
+        this.lecture = lecture;
         this.appliedAt = appliedAt;
     }
 
