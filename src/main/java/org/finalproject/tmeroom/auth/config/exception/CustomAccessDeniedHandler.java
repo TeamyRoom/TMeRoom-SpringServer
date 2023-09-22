@@ -2,13 +2,14 @@ package org.finalproject.tmeroom.auth.config.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.finalproject.tmeroom.common.data.dto.Response;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * 작성자: 김태민

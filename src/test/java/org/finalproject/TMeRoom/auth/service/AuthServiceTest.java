@@ -1,15 +1,5 @@
 package org.finalproject.TMeRoom.auth.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 import org.finalproject.tmeroom.auth.config.jwt.JwtTokenProvider;
 import org.finalproject.tmeroom.auth.config.jwt.TokenType;
 import org.finalproject.tmeroom.auth.data.dto.request.LoginRequestDto;
@@ -18,7 +8,6 @@ import org.finalproject.tmeroom.auth.service.AuthService;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.member.constant.MemberRole;
-import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @SpringBootTest(classes = {AuthService.class})
 @DisplayName("인증 서비스 로직 테스트")
@@ -43,6 +40,23 @@ class AuthServiceTest {
     private JwtTokenProvider jwtTokenProvider;
     @MockBean
     private MemberRepository memberRepository;
+
+    private LoginRequestDto getMockRequestDto() {
+        LoginRequestDto dto = new LoginRequestDto();
+        dto.setId("tester00");
+        dto.setPw("test");
+        return dto;
+    }
+
+    private Member getMockMember() {
+        return Member.builder()
+                .id("tester00")
+                .pw("encodedPw")
+                .email("tester@test.com")
+                .nickname("tester")
+                .role(MemberRole.USER)
+                .build();
+    }
 
     @Nested
     @DisplayName("로그인 기능 테스트")
@@ -108,22 +122,5 @@ class AuthServiceTest {
             then(jwtTokenProvider).shouldHaveNoInteractions();
             assertEquals(e.getErrorCode(), ErrorCode.INVALID_PASSWORD);
         }
-    }
-
-    private LoginRequestDto getMockRequestDto() {
-        LoginRequestDto dto = new LoginRequestDto();
-        dto.setId("tester00");
-        dto.setPw("test");
-        return dto;
-    }
-
-    private Member getMockMember() {
-        return Member.builder()
-                .id("tester00")
-                .pw("encodedPw")
-                .email("tester@test.com")
-                .nickname("tester")
-                .role(MemberRole.USER)
-                .build();
     }
 }

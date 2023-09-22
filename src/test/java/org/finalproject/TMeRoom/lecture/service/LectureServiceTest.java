@@ -92,7 +92,6 @@ public class LectureServiceTest {
         }
 
 
-
         @Test
         @DisplayName("강의 관리자가 아닌 사람이 강의 삭제를 요청하면 예외가 발생한다.")
         void givenNoOwnerDeleteRequest_whenDeleteLecture_thenOccurredException() {

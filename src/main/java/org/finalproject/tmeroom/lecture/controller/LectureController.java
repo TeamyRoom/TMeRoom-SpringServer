@@ -19,14 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -65,7 +58,9 @@ public class LectureController {
     @GetMapping("/lecture/{lectureCode}/teachers")
     public Response<Page<TeacherDetailResponseDto>> readTeachers(@PathVariable String lectureCode,
                                                                  @AuthenticationPrincipal MemberDto memberDto,
-                                                                 @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                 @PageableDefault(sort = "createdAt",
+                                                                         direction = Sort.Direction.DESC)
+                                                                 Pageable pageable) {
         Page<TeacherDetailResponseDto> dtoList = teacherService.lookupTeachers(lectureCode, memberDto, pageable);
         return Response.success(dtoList);
     }
@@ -89,7 +84,9 @@ public class LectureController {
     // 수강 중인 강의 조회
     @GetMapping("/lectures/taking")
     public Response<Page<LectureDetailResponseDto>> lookupMyLectures(@AuthenticationPrincipal MemberDto memberDto,
-                                                                     @PageableDefault(sort = "appliedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                     @PageableDefault(sort = "appliedAt",
+                                                                             direction = Sort.Direction.DESC)
+                                                                     Pageable pageable) {
         Page<LectureDetailResponseDto> dtoList = studentService.lookupMyLectures(memberDto, pageable);
         return Response.success(dtoList);
     }
@@ -113,7 +110,9 @@ public class LectureController {
     @GetMapping("/lecture/{lectureCode}/applications")
     public Response<Page<StudentDetailResponseDto>> readStudents(@PathVariable String lectureCode,
                                                                  @AuthenticationPrincipal MemberDto memberDto,
-                                                                 @PageableDefault(sort = "appliedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                 @PageableDefault(sort = "appliedAt",
+                                                                         direction = Sort.Direction.DESC)
+                                                                 Pageable pageable) {
         Page<StudentDetailResponseDto> dtoList = studentService.checkApplicants(lectureCode, memberDto, pageable);
         return Response.success(dtoList);
     }

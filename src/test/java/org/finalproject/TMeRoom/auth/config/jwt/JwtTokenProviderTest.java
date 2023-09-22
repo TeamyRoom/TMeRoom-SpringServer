@@ -25,7 +25,8 @@ import static org.mockito.BDDMockito.given;
 @DisplayName("JWT 관련 테스트")
 class JwtTokenProviderTest {
 
-    private final String masterToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhY2Nlc3NUb2tlbiIsInN1YiI6InRlc3RlciIsImlhdCI6MTY5NDc2MTE3NSwiZXhwIjo5MjIzMzcyMDM2ODU0Nzc1fQ.SUaqRU7eASLiN1Rw2AM5dJqd2a8hxpgTHLBxzzJ15MI";
+    private final String masterToken =
+            "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhY2Nlc3NUb2tlbiIsInN1YiI6InRlc3RlciIsImlhdCI6MTY5NDc2MTE3NSwiZXhwIjo5MjIzMzcyMDM2ODU0Nzc1fQ.SUaqRU7eASLiN1Rw2AM5dJqd2a8hxpgTHLBxzzJ15MI";
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @MockBean
@@ -129,7 +130,8 @@ class JwtTokenProviderTest {
             String validToken = masterToken;
             MemberDto mockMemberDto = getMockMemberDto();
             given(tokenAuthenticationService.getMemberDto("tester")).willReturn(mockMemberDto);
-            UsernamePasswordAuthenticationToken expectedUpat = new UsernamePasswordAuthenticationToken(mockMemberDto, null, mockMemberDto.getAuthorities());
+            UsernamePasswordAuthenticationToken expectedUpat =
+                    new UsernamePasswordAuthenticationToken(mockMemberDto, null, mockMemberDto.getAuthorities());
 
             // when
             UsernamePasswordAuthenticationToken receivedUpat = jwtTokenProvider.getAuthentication(validToken);

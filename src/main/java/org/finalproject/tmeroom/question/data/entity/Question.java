@@ -54,7 +54,8 @@ public class Question extends BaseTimeEntity {
     private Boolean isPublic;
 
     @Builder
-    public Question(Long id, Member author, @NotNull Lecture lecture, @NotNull String title, @NotNull String content, String authorNickname, Boolean isPublic) {
+    public Question(Long id, Member author, @NotNull Lecture lecture, @NotNull String title, @NotNull String content,
+                    String authorNickname, Boolean isPublic) {
         this.id = id;
         this.author = author;
         this.lecture = lecture;

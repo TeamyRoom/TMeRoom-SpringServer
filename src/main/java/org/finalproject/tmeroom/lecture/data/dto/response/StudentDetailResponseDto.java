@@ -15,7 +15,8 @@ public class StudentDetailResponseDto {
     LocalDateTime acceptedAt;
 
     @Builder
-    public StudentDetailResponseDto(String memberNickname, String lectureCode, String lectureName, LocalDateTime appliedAt, LocalDateTime acceptedAt) {
+    public StudentDetailResponseDto(String memberNickname, String lectureCode, String lectureName,
+                                    LocalDateTime appliedAt, LocalDateTime acceptedAt) {
         this.memberNickname = memberNickname;
         this.lectureCode = lectureCode;
         this.lectureName = lectureName;

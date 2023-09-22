@@ -2,7 +2,10 @@ package org.finalproject.tmeroom.comment.data.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.finalproject.tmeroom.comment.data.dto.request.CommentUpdateRequestDto;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 import org.finalproject.tmeroom.member.data.entity.Member;

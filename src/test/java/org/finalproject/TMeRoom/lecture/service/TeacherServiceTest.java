@@ -117,10 +117,12 @@ class TeacherServiceTest {
             given(teacherRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
 
             //When
-            Page<TeacherDetailResponseDto> teagerResponsePage = teacherService.lookupTeachers(lectureCode, mockManagerDto, pageable);
+            Page<TeacherDetailResponseDto> teagerResponsePage =
+                    teacherService.lookupTeachers(lectureCode, mockManagerDto, pageable);
 
             //Then
-            assertThat(teagerResponsePage.get().findFirst().get().getNickName()).isEqualTo(teacher.getMember().getNickname());
+            assertThat(teagerResponsePage.get().findFirst().get().getNickName()).isEqualTo(
+                    teacher.getMember().getNickname());
         }
 
         @Test
@@ -139,7 +141,8 @@ class TeacherServiceTest {
             given(teacherRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
 
             //When
-            Throwable throwable = catchThrowable(() -> teacherService.lookupTeachers(lectureCode, mockAnonymousDto, pageable));
+            Throwable throwable =
+                    catchThrowable(() -> teacherService.lookupTeachers(lectureCode, mockAnonymousDto, pageable));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -187,7 +190,8 @@ class TeacherServiceTest {
             given(memberRepository.findById(dto.getTeacherId())).willReturn(Optional.of(teacher));
 
             //When
-            Throwable throwable = catchThrowable(() -> teacherService.appointTeacher(lectureCode, mockAnonymousDto, dto));
+            Throwable throwable =
+                    catchThrowable(() -> teacherService.appointTeacher(lectureCode, mockAnonymousDto, dto));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -209,7 +213,8 @@ class TeacherServiceTest {
             Teacher teacher = getMockTeacher();
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode)).willReturn(teacher);
+            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode)).willReturn(
+                    teacher);
 
             //When
             teacherService.dismissTeacher(lectureCode, teacher.getTeacherId(), mockManagerDto);
@@ -228,10 +233,12 @@ class TeacherServiceTest {
             Teacher teacher = getMockTeacher();
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode)).willReturn(teacher);
+            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode)).willReturn(
+                    teacher);
 
             //When
-            Throwable throwable = catchThrowable(() -> teacherService.dismissTeacher(lectureCode, teacher.getTeacherId(), mockAnonymousDto));
+            Throwable throwable = catchThrowable(
+                    () -> teacherService.dismissTeacher(lectureCode, teacher.getTeacherId(), mockAnonymousDto));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)

@@ -16,7 +16,8 @@ public class QuestionDetailResponseDto {
 
 
     @Builder
-    public QuestionDetailResponseDto(Long questionId, String questionTitle, String questionContent, String authorNickname, LocalDateTime createdAt) {
+    public QuestionDetailResponseDto(Long questionId, String questionTitle, String questionContent,
+                                     String authorNickname, LocalDateTime createdAt) {
         this.questionId = questionId;
         this.questionTitle = questionTitle;
         this.questionContent = questionContent;

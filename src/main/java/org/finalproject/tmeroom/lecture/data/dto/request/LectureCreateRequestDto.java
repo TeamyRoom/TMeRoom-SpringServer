@@ -1,7 +1,9 @@
 package org.finalproject.tmeroom.lecture.data.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
