@@ -49,12 +49,11 @@ public class Student {
     private LocalDateTime acceptedAt;
 
     @Builder
-    public Student(Member member, Lecture lecture, LocalDateTime appliedAt) {
+    public Student(Member member, Lecture lecture) {
         this.studentId = member.getId();
         this.member = member;
         this.lectureCode = lecture.getLectureCode();
         this.lecture = lecture;
-        this.appliedAt = appliedAt;
     }
 
     public void acceptStudent() {

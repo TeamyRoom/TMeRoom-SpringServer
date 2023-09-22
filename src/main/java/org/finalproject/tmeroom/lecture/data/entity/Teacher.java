@@ -8,6 +8,9 @@ import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 /**
  * 작성자: 김종민
@@ -39,6 +42,13 @@ public class Teacher extends BaseTimeEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Lecture lecture;
 
+    @CreatedDate
+    @Column(updatable = false, name = "suggested_at")
+    private LocalDateTime suggestedAt;
+
+    @Column(name = "accepted_at")
+    private LocalDateTime acceptedAt;
+
     @Builder
     public Teacher(Member member, Lecture lecture) {
         this.teacherId = member.getId();
@@ -46,4 +56,9 @@ public class Teacher extends BaseTimeEntity {
         this.lectureCode = lecture.getLectureCode();
         this.lecture = lecture;
     }
+
+    public void accept() {
+        this.acceptedAt = LocalDateTime.now();
+    }
+
 }

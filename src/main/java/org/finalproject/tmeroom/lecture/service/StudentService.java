@@ -18,8 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -48,7 +46,6 @@ public class StudentService extends LectureCommon {
         Student student = Student.builder()
                 .lecture(lecture)
                 .member(registeringStudent)
-                .appliedAt(LocalDateTime.now())
                 .build();
 
         studentRepository.save(student);
