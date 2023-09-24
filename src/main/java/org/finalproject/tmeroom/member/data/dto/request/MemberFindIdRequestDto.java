@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class MemberFindIdRequestDto {
 
-    private String name;
     private String email;
 }

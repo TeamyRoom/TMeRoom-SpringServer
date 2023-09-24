@@ -50,31 +50,28 @@ class MemberServiceTest {
     @MockBean
     private MailService mailService;
 
-    private MemberCreateRequestDto getMockRequestDto() {
-        MemberCreateRequestDto dto = new MemberCreateRequestDto();
-        dto.setEmail("testGuest@test.com");
-        dto.setMemberId("testGuest");
-        dto.setPassword("password");
-        return dto;
-    }
 
     private Member getMockGuestMember() {
+        given(passwordEncoder.encode("password")).willReturn("encodedPw");
         return Member.builder()
                 .id("testGuest")
-                .pw("encodedPw")
+                .pw("password")
                 .email("testGuest@test.com")
                 .nickname("testGuest")
                 .role(MemberRole.GUEST)
+                .encoder(passwordEncoder)
                 .build();
     }
 
     private Member getMockUserMember() {
+        given(passwordEncoder.encode("password")).willReturn("encodedPw");
         return Member.builder()
                 .id("testUser")
-                .pw("encodedPw")
+                .pw("password")
                 .email("testUser@test.com")
                 .nickname("testUser")
                 .role(MemberRole.USER)
+                .encoder(passwordEncoder)
                 .build();
     }
 
@@ -85,6 +82,14 @@ class MemberServiceTest {
     @Nested
     @DisplayName("회원가입 기능 테스트")
     class AboutCreateMember {
+
+        private MemberCreateRequestDto getMockRequestDto() {
+            MemberCreateRequestDto dto = new MemberCreateRequestDto();
+            dto.setEmail("testGuest@test.com");
+            dto.setMemberId("testGuest");
+            dto.setPassword("password");
+            return dto;
+        }
 
         @Test
         @DisplayName("정상적인 요청이라면, 회원 가입시, 새로운 회원을 생성후 반환한다.")
