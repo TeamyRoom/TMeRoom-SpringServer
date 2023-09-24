@@ -25,20 +25,6 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
 
-    //TODO: 테스트용, 삭제 필요
-    @PostConstruct
-    public void createTester() {
-        memberRepository.save(
-                Member.builder()
-                        .id("tester00")
-                        .pw(passwordEncoder.encode("test"))
-                        .nickname("tester")
-                        .email("tester@test.com")
-                        .role(MemberRole.USER)
-                        .build()
-        );
-    }
-
     @Transactional
     public LoginResponseDto login(LoginRequestDto requestDto) {
 
@@ -54,6 +40,4 @@ public class AuthService {
                 .accessToken(accessToken)
                 .build();
     }
-
-
 }

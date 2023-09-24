@@ -1,6 +1,7 @@
 package org.finalproject.TMeRoom.lecture.service;
 
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.finalproject.TMeRoom.common.util.MockMemberProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
@@ -10,7 +11,6 @@ import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
 import org.finalproject.tmeroom.lecture.service.TeacherService;
-import org.finalproject.tmeroom.member.constant.MemberRole;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,12 +32,15 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockManagerMember;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockTeacherMember;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @SpringBootTest(classes = {TeacherService.class})
+@Import(value = MockMemberProvider.class)
 @ActiveProfiles("test")
 @DisplayName("강사 서비스")
 class TeacherServiceTest {
@@ -51,29 +55,9 @@ class TeacherServiceTest {
 
     private Lecture getMockLecture() {
         return Lecture.builder()
-                .manager(getMockManager())
+                .manager(getMockManagerMember())
                 .lectureName("강의명")
                 .lectureCode("code")
-                .build();
-    }
-
-    private Member getMockManager() {
-        return Member.builder()
-                .id("manager")
-                .pw("encodedPw")
-                .email("testGuest@test.com")
-                .nickname("manager")
-                .role(MemberRole.USER)
-                .build();
-    }
-
-    private Member getMockTeacherMember() {
-        return Member.builder()
-                .id("teacher")
-                .pw("encodedPw")
-                .email("testGuest@test.com")
-                .nickname("teacher")
-                .role(MemberRole.USER)
                 .build();
     }
 

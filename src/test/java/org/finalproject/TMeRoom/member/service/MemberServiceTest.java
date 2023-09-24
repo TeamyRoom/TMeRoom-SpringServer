@@ -1,9 +1,9 @@
 package org.finalproject.TMeRoom.member.service;
 
+import org.finalproject.TMeRoom.common.util.MockMemberProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.common.service.MailService;
-import org.finalproject.tmeroom.member.constant.MemberRole;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.dto.request.*;
 import org.finalproject.tmeroom.member.data.dto.response.MemberCreateResponseDto;
@@ -18,12 +18,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockGuestMember;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockUserMember;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +36,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 @SpringBootTest(classes = {MemberService.class})
+@Import(value = MockMemberProvider.class)
 @DisplayName("인증 서비스 로직 테스트")
 class MemberServiceTest {
 
@@ -41,8 +45,8 @@ class MemberServiceTest {
 
     @MockBean
     private MemberRepository memberRepository;
-    @MockBean
-    private PasswordEncoder passwordEncoder;
+//    @MockBean
+//    private PasswordEncoder passwordEncoder;
     @MockBean
     private EmailConfirmCodeRepository emailConfirmCodeRepository;
     @MockBean
@@ -50,30 +54,6 @@ class MemberServiceTest {
     @MockBean
     private MailService mailService;
 
-
-    private Member getMockGuestMember() {
-        given(passwordEncoder.encode("password")).willReturn("encodedPw");
-        return Member.builder()
-                .id("testGuest")
-                .pw("password")
-                .email("testGuest@test.com")
-                .nickname("testGuest")
-                .role(MemberRole.GUEST)
-                .encoder(passwordEncoder)
-                .build();
-    }
-
-    private Member getMockUserMember() {
-        given(passwordEncoder.encode("password")).willReturn("encodedPw");
-        return Member.builder()
-                .id("testUser")
-                .pw("password")
-                .email("testUser@test.com")
-                .nickname("testUser")
-                .role(MemberRole.USER)
-                .encoder(passwordEncoder)
-                .build();
-    }
 
     private MemberDto getMockGuestMemberDto() {
         return MemberDto.from(getMockGuestMember());
@@ -101,7 +81,6 @@ class MemberServiceTest {
             given(memberRepository.existsById(mockRequestDto.getMemberId())).willReturn(false);
             given(memberRepository.existsByEmail(mockRequestDto.getEmail())).willReturn(false);
             given(memberRepository.save(any(Member.class))).willReturn(mockMember);
-            given(passwordEncoder.encode(mockRequestDto.getPassword())).willReturn(mockMember.getPw());
 
             // When
             MemberCreateResponseDto responseDto = memberService.createMember(mockRequestDto);
@@ -127,7 +106,6 @@ class MemberServiceTest {
             given(memberRepository.existsById(mockRequestDto.getMemberId())).willReturn(true);
             given(memberRepository.existsByEmail(mockRequestDto.getEmail())).willReturn(false);
             given(memberRepository.save(any(Member.class))).willReturn(mockMember);
-            given(passwordEncoder.encode(mockRequestDto.getPassword())).willReturn(mockMember.getPw());
 
             // When
             ApplicationException e =
@@ -149,7 +127,6 @@ class MemberServiceTest {
             given(memberRepository.existsById(mockRequestDto.getMemberId())).willReturn(false);
             given(memberRepository.existsByEmail(mockRequestDto.getEmail())).willReturn(true);
             given(memberRepository.save(any(Member.class))).willReturn(mockMember);
-            given(passwordEncoder.encode(mockRequestDto.getPassword())).willReturn(mockMember.getPw());
 
             // When
             ApplicationException e =
@@ -306,7 +283,7 @@ class MemberServiceTest {
             requestDto.setOldPassword(oldPassword);
             requestDto.setNewPassword(newPassword);
             given(memberRepository.findById(mockMemberDto.getId())).willReturn(Optional.of(mockMember));
-            given(mockMember.isPasswordMatch(eq(passwordEncoder), any(String.class))).willReturn(true);
+            given(mockMember.isPasswordMatch(any(PasswordEncoder.class), any(String.class))).willReturn(true);
 
             // When
             memberService.updatePassword(requestDto, mockMemberDto);
@@ -327,7 +304,7 @@ class MemberServiceTest {
             requestDto.setOldPassword(oldPassword);
             requestDto.setNewPassword(newPassword);
             given(memberRepository.findById(mockMemberDto.getId())).willReturn(Optional.of(mockMember));
-            given(mockMember.isPasswordMatch(eq(passwordEncoder), any(String.class))).willReturn(false);
+            given(mockMember.isPasswordMatch(any(PasswordEncoder.class), any(String.class))).willReturn(false);
 
             // When
             ApplicationException e = assertThrows(ApplicationException.class,
@@ -486,7 +463,7 @@ class MemberServiceTest {
 
             // Then
             then(mockMember).should()
-                    .updatePassword(passwordEncoder, requestDto.getNewPassword());
+                    .updatePassword(any(PasswordEncoder.class), eq(requestDto.getNewPassword()));
             then(passwordResetCodeRepository).should().deleteByCode(requestDto.getResetCode());
         }
 

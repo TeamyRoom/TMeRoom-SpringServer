@@ -1,6 +1,7 @@
 package org.finalproject.TMeRoom.lecture.service;
 
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.finalproject.TMeRoom.common.util.MockMemberProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
@@ -10,7 +11,6 @@ import org.finalproject.tmeroom.lecture.data.entity.Student;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.service.StudentService;
-import org.finalproject.tmeroom.member.constant.MemberRole;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockManagerMember;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockStudentMember;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,6 +43,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @SpringBootTest(classes = {StudentService.class})
+@Import(value = MockMemberProvider.class)
 @ActiveProfiles("test")
 @DisplayName("학생 서비스")
 class StudentServiceTest {
@@ -52,26 +56,6 @@ class StudentServiceTest {
     @MockBean
     private LectureRepository lectureRepository;
 
-    public Member getMockManager() {
-        return Member.builder()
-                .id("manager")
-                .pw("encodedPw")
-                .email("testGuest@test.com")
-                .nickname("manager")
-                .role(MemberRole.USER)
-                .build();
-    }
-
-    public Member getMockStudentMember() {
-        return Member.builder()
-                .id("student")
-                .pw("encodedPw")
-                .email("testGuest@test.com")
-                .nickname("student")
-                .role(MemberRole.USER)
-                .build();
-    }
-
 
     public Student getMockStudent() {
         return Student.builder()
@@ -83,7 +67,7 @@ class StudentServiceTest {
 
     public Lecture getMockLecture() {
         return Lecture.builder()
-                .manager(getMockManager())
+                .manager(getMockManagerMember())
                 .lectureName("강의명")
                 .lectureCode("code")
                 .build();
@@ -137,14 +121,15 @@ class StudentServiceTest {
         @DisplayName("학생이 수강신청 요청시 수강 신청이 된다.")
         void GivenApplyLectureRequest_whenDismissApplicants_ThenApplyLecture() {
             //Given
-            Member manager = getMockManager();
+            Member manager = getMockManagerMember();
+            Member student = getMockStudentMember();
             MemberDto mockStudent = getMockStudentDto();
 
             String lectureCode = "code";
 
             given(lectureRepository.findById(lectureCode)).willReturn(
                     Optional.of(Lecture.builder().lectureCode(lectureCode).lectureName("강의").manager(manager).build()));
-            given(memberRepository.findById("student")).willReturn(Optional.of(Member.builder().id("student").build()));
+            given(memberRepository.findById("student")).willReturn(Optional.of(student));
 
             //When
             studentService.applyLecture(lectureCode, mockStudent);
