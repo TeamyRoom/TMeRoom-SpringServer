@@ -4,8 +4,12 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class LoginResponseDto {
 
     private String accessToken;
+
+    @Builder
+    public LoginResponseDto(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }
