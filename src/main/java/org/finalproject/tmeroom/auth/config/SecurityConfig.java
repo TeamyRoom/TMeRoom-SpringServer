@@ -50,6 +50,9 @@ public class SecurityConfig {
                 // URI 인증, 인가 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("api/v1/lecture/**").authenticated()
+                        .requestMatchers("api/v1/member/email/confirm/resend").authenticated()
+                        .requestMatchers("api/v1/member").authenticated()
+                        .requestMatchers("api/v1/member/password").authenticated()
                         .anyRequest().permitAll())
 
                 // JWT 인증필터 등록
