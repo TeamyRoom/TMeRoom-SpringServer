@@ -5,6 +5,7 @@ import org.finalproject.tmeroom.auth.config.jwt.JwtAuthenticationFilter;
 import org.finalproject.tmeroom.auth.config.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -51,7 +52,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("api/v1/lecture/**").authenticated()
                         .requestMatchers("api/v1/member/email/confirm/resend").authenticated()
-                        .requestMatchers("api/v1/member").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "api/v1/member").authenticated()
+                        .requestMatchers(HttpMethod.GET, "api/v1/member").permitAll()
                         .requestMatchers("api/v1/member/password").authenticated()
                         .anyRequest().permitAll())
 

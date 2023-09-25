@@ -22,13 +22,13 @@ public class MemberController {
         return Response.success();
     }
 
-    @GetMapping("/duplicate/id/{memberId}")
+    @GetMapping("/id/duplicate/{memberId}")
     public Response<Boolean> isIdDuplicate(@PathVariable String memberId) {
         boolean isIdDuplicate = memberService.isIdDuplicate(memberId);
         return Response.success(isIdDuplicate);
     }
 
-    @GetMapping("/duplicate/id/{memberEmail}")
+    @GetMapping("/email/duplicate/{memberEmail}")
     public Response<Boolean> isEmailDuplicate(@PathVariable String memberEmail) {
         boolean isEmailDuplicate = memberService.isEmailDuplicate(memberEmail);
         return Response.success(isEmailDuplicate);
@@ -76,8 +76,10 @@ public class MemberController {
         return Response.success();
     }
 
-    @PostMapping("/id/lost")
-    public Response<Void> sendLostId(@RequestBody MemberFindIdRequestDto requestDto) {
+    @GetMapping("/id/lost")
+    public Response<Void> sendLostId(@RequestParam String email) {
+        MemberFindIdRequestDto requestDto= new MemberFindIdRequestDto();
+        requestDto.setEmail(email);
         memberService.sendId(requestDto);
         return Response.success();
     }
