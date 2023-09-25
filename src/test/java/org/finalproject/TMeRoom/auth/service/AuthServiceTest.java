@@ -33,7 +33,6 @@ class AuthServiceTest {
 
     @Autowired
     private AuthService authService;
-
     @MockBean
     private PasswordEncoder passwordEncoder;
     @MockBean
@@ -49,12 +48,14 @@ class AuthServiceTest {
     }
 
     private Member getMockMember() {
+        given(passwordEncoder.encode(any(String.class))).willReturn("encodedPw");
         return Member.builder()
                 .id("tester00")
-                .pw("encodedPw")
+                .pw("password")
                 .email("tester@test.com")
                 .nickname("tester")
                 .role(MemberRole.USER)
+                .encoder(passwordEncoder)
                 .build();
     }
 
@@ -78,14 +79,13 @@ class AuthServiceTest {
 
             // Then
             then(memberRepository).should().findById(mockRequestDto.getId());
-            then(passwordEncoder).should().matches(mockRequestDto.getPw(), mockMember.getPw());
             then(jwtTokenProvider).should().createToken(mockMember.getId(), TokenType.ACCESS);
             assertThat(responseDto)
                     .hasFieldOrPropertyWithValue("accessToken", mockAccessToken);
         }
 
         @Test
-        @DisplayName("로그인 요청시, 존재하지 않는 유저ID라면, 예외를 발생시킨다.")
+        @DisplayName("로그인 요청시, 존재하지 않는 유저 ID라면, 예외를 발생시킨다.")
         void givenWrongUserId_whenLoggingIn_thenThrowsUserNotFoundException() {
             // Given
             LoginRequestDto mockRequestDto = getMockRequestDto();
@@ -96,11 +96,10 @@ class AuthServiceTest {
                     () -> authService.login(mockRequestDto));
 
             // Then
-            then(memberRepository).should().findById(mockRequestDto.getId());
-            then(passwordEncoder).should().encode(any());
-            then(passwordEncoder).shouldHaveNoMoreInteractions();
-            then(jwtTokenProvider).shouldHaveNoInteractions();
             assertEquals(e.getErrorCode(), ErrorCode.USER_NOT_FOUND);
+            then(memberRepository).should().findById(mockRequestDto.getId());
+            then(memberRepository).shouldHaveNoMoreInteractions();
+            then(jwtTokenProvider).shouldHaveNoInteractions();
         }
 
         @Test
@@ -118,7 +117,6 @@ class AuthServiceTest {
 
             // Then
             then(memberRepository).should().findById(mockRequestDto.getId());
-            then(passwordEncoder).should().matches(mockRequestDto.getPw(), mockMember.getPw());
             then(jwtTokenProvider).shouldHaveNoInteractions();
             assertEquals(e.getErrorCode(), ErrorCode.INVALID_PASSWORD);
         }

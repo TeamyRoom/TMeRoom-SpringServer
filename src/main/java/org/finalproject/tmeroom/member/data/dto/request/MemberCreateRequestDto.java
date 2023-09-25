@@ -29,9 +29,10 @@ public class MemberCreateRequestDto {
     public Member toEntity(PasswordEncoder encoder) {
         return Member.builder()
                 .id(memberId)
-                .pw(encoder.encode(password))
+                .pw(password)
                 .nickname(nickname)
                 .email(email)
+                .encoder(encoder)
                 .build();
     }
 

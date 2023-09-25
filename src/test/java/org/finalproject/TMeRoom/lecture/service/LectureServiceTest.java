@@ -1,5 +1,6 @@
 package org.finalproject.TMeRoom.lecture.service;
 
+import org.finalproject.TMeRoom.common.util.MockMemberProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto;
@@ -17,32 +18,30 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockManagerMember;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 @SpringBootTest(classes = {LectureService.class})
+@Import(value = MockMemberProvider.class)
 @ActiveProfiles("test")
 @DisplayName("강의 서비스")
 public class LectureServiceTest {
+
     @Autowired
     private LectureService lectureService;
     @MockBean
     private LectureRepository lectureRepository;
     @MockBean
     private MemberRepository memberRepository;
-
-    private Member getMockManager() {
-        return Member.builder()
-                .id("manager")
-                .build();
-    }
 
     private Lecture getMockLecture(String 강의명, Member 관리자) {
         return Lecture.builder()
@@ -59,13 +58,14 @@ public class LectureServiceTest {
         @DisplayName("강의 관리자가 강의명을 넘겨주면 강의 생성 후 코드를 반환한다.")
         void givenCreateRequest_whenCreateLecture_thenReturnLectureCode() {
             //Given
-            MemberDto mockManager = MemberDto.builder()
+            MemberDto mockManagerDto = MemberDto.builder()
                     .id("manager")
                     .build();
-            given(memberRepository.findById("manager")).willReturn(Optional.of(Member.builder().id("manager").build()));
+            Member mockManager = getMockManagerMember();
+            given(memberRepository.findById("manager")).willReturn(Optional.of(mockManager));
             LectureCreateRequestDto requestDTO = new LectureCreateRequestDto();
             requestDTO.setLectureName("Hello! World");
-            requestDTO.setMemberDTO(mockManager);
+            requestDTO.setMemberDTO(mockManagerDto);
 
             //When
             LectureCreateResponseDto responseDTO = lectureService.createLecture(requestDTO);
@@ -80,8 +80,9 @@ public class LectureServiceTest {
             //Given
             Lecture mockLecture = mock(Lecture.class);
             MemberDto manager = mock(MemberDto.class);
+            Member mockManager = getMockManagerMember();
             given(manager.getId()).willReturn("manager");
-            given(mockLecture.getManager()).willReturn(Member.builder().id("manager").build());
+            given(mockLecture.getManager()).willReturn(mockManager);
             given(lectureRepository.getReferenceById("1234")).willReturn(mockLecture);
 
             //When
@@ -98,8 +99,9 @@ public class LectureServiceTest {
             //Given
             Lecture mockLecture = mock(Lecture.class);
             MemberDto noManager = mock(MemberDto.class);
+            Member mockManager = getMockManagerMember();
             given(noManager.getId()).willReturn("noManager");
-            given(mockLecture.getManager()).willReturn(Member.builder().id("manager").build());
+            given(mockLecture.getManager()).willReturn(mockManager);
             given(lectureRepository.getReferenceById("1234")).willReturn(mockLecture);
 
             //When
@@ -115,7 +117,7 @@ public class LectureServiceTest {
         @DisplayName("강의 관리자가 강의명 변경을 요청하면 강의명이 변경된다.")
         void givenUpdateRequest_whenUpdateLecture_thenReturnLectureName() {
             //Given
-            Member manager = getMockManager();
+            Member manager = getMockManagerMember();
             MemberDto managerDto = MemberDto.from(manager);
             Lecture mockLecture = getMockLecture("1234", manager);
             given(lectureRepository.findById("1234")).willReturn(Optional.of(mockLecture));
@@ -138,7 +140,7 @@ public class LectureServiceTest {
         @DisplayName("없는 강의코드에 대한 요청이 들어오면 예외를 발생시킨다.")
         void givenNoExistLecture_whenLectureService_thenReturnException() {
             //Given
-            Member manager = getMockManager();
+            Member manager = getMockManagerMember();
             MemberDto managerDto = MemberDto.from(manager);
             Lecture mockLecture = getMockLecture("1234", manager);
             given(memberRepository.findById("manager")).willReturn(Optional.of(manager));
