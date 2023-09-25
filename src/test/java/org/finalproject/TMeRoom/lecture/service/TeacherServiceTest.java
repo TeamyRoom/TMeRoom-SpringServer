@@ -4,6 +4,7 @@ import org.assertj.core.api.AssertionsForClassTypes;
 import org.finalproject.TMeRoom.common.util.MockMemberProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
+import org.finalproject.tmeroom.common.service.MailService;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.TeacherDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
@@ -52,6 +53,8 @@ class TeacherServiceTest {
     private MemberRepository memberRepository;
     @MockBean
     private LectureRepository lectureRepository;
+    @MockBean
+    private MailService mailService;
 
     private Lecture getMockLecture() {
         return Lecture.builder()
@@ -98,7 +101,7 @@ class TeacherServiceTest {
 
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
+            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(studentPage);
 
             //When
             Page<TeacherDetailResponseDto> teagerResponsePage =
@@ -122,7 +125,7 @@ class TeacherServiceTest {
 
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
+            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(studentPage);
 
             //When
             Throwable throwable =
@@ -189,7 +192,7 @@ class TeacherServiceTest {
     class dismissTeacher {
         @Test
         @DisplayName("관리자가 아닌 사람이 강사 해임시 강사가 해임 된다.")
-        void GivenDismissTeacherRequest_whenDismissApplicants_ThenismissTeacher() {
+        void GivenDismissTeacherRequest_whenDismissApplicants_ThenDismissTeacher() {
             //Given
             Lecture lecture = getMockLecture();
             String lectureCode = "code";

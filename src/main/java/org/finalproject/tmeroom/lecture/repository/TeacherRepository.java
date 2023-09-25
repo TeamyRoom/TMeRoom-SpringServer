@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface TeacherRepository extends JpaRepository<Teacher, TeacherPK> {
     Optional<Teacher> findByMemberIdAndLectureCode(String memberId, String lectureCode);
 
-    Page<Teacher> findByLecture(Pageable pageable, Lecture lecture);
+    Page<Teacher> findByLecture(Lecture lecture, Pageable pageable);
 }

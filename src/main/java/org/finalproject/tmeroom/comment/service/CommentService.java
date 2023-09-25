@@ -31,7 +31,7 @@ public class CommentService {
     // 댓글 조회
     public Page<CommentDetailResponseDto> readComments(Long questionId, Pageable pageable) {
         Question question = questionRepository.getReferenceById(questionId);
-        Page<Comment> commentPage = commentRepository.findByQuestion(pageable, question);
+        Page<Comment> commentPage = commentRepository.findByQuestion(question, pageable);
 
         return commentPage.map(CommentDetailResponseDto::from);
     }
