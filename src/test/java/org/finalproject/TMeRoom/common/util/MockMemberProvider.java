@@ -78,4 +78,15 @@ public class MockMemberProvider {
                 .encoder(passwordEncoder)
                 .build();
     }
+
+    public static Member getMockAnonymousMember() {
+        return Member.builder()
+                .id("anonymous")
+                .pw("encodedPw")
+                .email("testGuest@test.com")
+                .nickname("anonymous")
+                .role(MemberRole.USER)
+                .encoder(passwordEncoder)
+                .build();
+    }
 }
