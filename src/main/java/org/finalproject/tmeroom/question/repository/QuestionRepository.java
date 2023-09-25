@@ -12,6 +12,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Page<Question> findByLecture(Lecture lecture, Pageable pageable);
 
-    @Query("SELECT q FROM Question q WHERE q.author = :author OR (q.lecture = :lecture AND q.isPublic = :isPublic)")
-    Page<Question> findByAuthorOrLectureAndIsPublicTrue(Member author, Lecture lecture, Boolean isPublic, Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.lecture = :lecture AND (q.author = :author OR q.isPublic = :isPublic)")
+    Page<Question> findByLectureAndAuthorOrIsPublic(Lecture lecture, Member author, Boolean isPublic, Pageable pageable);
 }
