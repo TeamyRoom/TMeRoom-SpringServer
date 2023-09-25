@@ -12,7 +12,6 @@ import static org.finalproject.tmeroom.common.exception.ValidationMessage.COMMEN
 
 @Getter
 public class CommentCreateRequestDto {
-
     @NotBlank(message = CANNOT_BE_NULL)
     @Max(value = 10000, message = COMMENT_OVER_MAX)
     String content;
