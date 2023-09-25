@@ -137,7 +137,7 @@ public class MemberService {
         passwordResetCodeRepository.save(resetCode, foundMember.getId());
 
         String subject = "[티미룸] 비밀번호 재설정 링크를 보내드립니다.";
-        String content = getResetPasswordMailContent(foundMember.getId());
+        String content = getResetPasswordMailContent(resetCode);
         mailService.sendEmail(foundMember.getEmail(), subject, content, true, false);
     }
 
