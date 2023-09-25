@@ -165,7 +165,6 @@ class StudentServiceTest {
             Student studentEntity = Student.builder()
                     .member(mockStudent)
                     .lecture(mockLecture)
-                    .appliedAt(LocalDateTime.now())
                     .build();
 
 

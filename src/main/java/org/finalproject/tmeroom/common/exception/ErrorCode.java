@@ -29,6 +29,7 @@ public enum ErrorCode {
     INVALID_LECTURE_CODE(HttpStatus.BAD_REQUEST, "존재하지 않는 강의 코드입니다."),
     INVALID_QUESTION_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 질문입니다."),
     INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 댓글입니다."),
+    INVALID_TEACHER_ID(HttpStatus.BAD_REQUEST, "강의에 초빙되지 않은 교사입니다."),
     //    ==== 여기까지 작성 ====
     ;
 

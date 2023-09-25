@@ -15,7 +15,7 @@ public class LectureCreateResponseDto {
 
     public static LectureCreateResponseDto from(Lecture lecture) {
         return LectureCreateResponseDto.builder()
-                .lectureCode(lecture.getLectureName())
+                .lectureCode(lecture.getLectureCode())
                 .build();
     }
 }

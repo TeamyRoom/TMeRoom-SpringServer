@@ -213,8 +213,8 @@ class TeacherServiceTest {
             Teacher teacher = getMockTeacher();
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode)).willReturn(
-                    teacher);
+            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode))
+                    .willReturn(Optional.of(teacher));
 
             //When
             teacherService.dismissTeacher(lectureCode, teacher.getTeacherId(), mockManagerDto);
@@ -233,8 +233,8 @@ class TeacherServiceTest {
             Teacher teacher = getMockTeacher();
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode)).willReturn(
-                    teacher);
+            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode))
+                    .willReturn(Optional.of(teacher));
 
             //When
             Throwable throwable = catchThrowable(

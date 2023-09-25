@@ -65,11 +65,27 @@ public class LectureController {
         return Response.success(dtoList);
     }
 
-    // 강의 강사 임명
+    // 강의 강사 제의
     @PostMapping("/lecture/{lectureCode}/teacher")
     public Response<Void> appointTeacher(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto,
                                          @RequestBody @Valid AppointTeacherRequestDto requestDto) {
         teacherService.appointTeacher(lectureCode, memberDto, requestDto);
+        return Response.success();
+    }
+
+    // 강사 수락
+    @PutMapping("/lecture/{lectureCode}/teacher")
+    public Response<Void> acceptTeacher(@PathVariable String lectureCode,
+                                        @AuthenticationPrincipal MemberDto memberDto) {
+        teacherService.acceptTeacher(lectureCode, memberDto);
+        return Response.success();
+    }
+
+    // 강사 거부
+    @DeleteMapping("/lecture/{lectureCode}/teacher")
+    public Response<Void> rejectTeacher(@PathVariable String lectureCode,
+                                        @AuthenticationPrincipal MemberDto memberDto) {
+        teacherService.rejectTeacher(lectureCode, memberDto);
         return Response.success();
     }
 
