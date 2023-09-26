@@ -44,6 +44,10 @@ import static org.mockito.BDDMockito.then;
 @ActiveProfiles("test")
 @DisplayName("댓글 서비스")
 class CommentServiceTest {
+    private static final Long MOCK_QUESTION_ID = 1L;
+    private static final Long MOCK_COMMENT_ID = 1L;
+    private static final Pageable MOCK_PAGEABLE = PageRequest.of(0, 20);
+
     @Autowired
     private CommentService commentService;
     @MockBean
@@ -63,7 +67,7 @@ class CommentServiceTest {
 
     public Question getMockQuestion() {
         return Question.builder()
-                .id(1l)
+                .id(MOCK_QUESTION_ID)
                 .lecture(getMockLecture())
                 .author(getMockStudentMember())
                 .title("title")
@@ -75,7 +79,7 @@ class CommentServiceTest {
 
     public Comment getMockComment(){
         return Comment.builder()
-                .id(1l)
+                .id(MOCK_COMMENT_ID)
                 .commenter(getMockUserMember())
                 .question(getMockQuestion())
                 .content("content")
@@ -89,17 +93,15 @@ class CommentServiceTest {
         @DisplayName("댓글 조회 요청시 댓글 목록을 반환한다.")
         void success_return_comments() {
             // Given
-            Long questionId = 1l;
-            Pageable pageable = PageRequest.of(0, 20);
             Question question = getMockQuestion();
             Comment returnComment = getMockComment();
-            Page<Comment> questionPage = new PageImpl<>(List.of(returnComment), pageable, 0);
+            Page<Comment> questionPage = new PageImpl<>(List.of(returnComment), MOCK_PAGEABLE, 0);
 
-            given(questionRepository.getReferenceById(questionId)).willReturn(question);
-            given(commentRepository.findByQuestion(question, pageable)).willReturn(questionPage);
+            given(questionRepository.getReferenceById(MOCK_QUESTION_ID)).willReturn(question);
+            given(commentRepository.findByQuestion(question, MOCK_PAGEABLE)).willReturn(questionPage);
 
             // When
-            Page<CommentDetailResponseDto> responseDtoPage = commentService.readComments(questionId, pageable);
+            Page<CommentDetailResponseDto> responseDtoPage = commentService.readComments(MOCK_QUESTION_ID, MOCK_PAGEABLE);
 
             // Then
             assertThat(responseDtoPage.get().findFirst().get().getCommentId()).isEqualTo(
@@ -118,17 +120,16 @@ class CommentServiceTest {
         @DisplayName("댓글 생성 요청시 댓글이 생성된다.")
         void success_return_nothing() {
             // Given
-            Long questionId = 1l;
             CommentCreateRequestDto requestDto = new CommentCreateRequestDto("content");
             Member member = getMockUserMember();
             MemberDto memberDto = MemberDto.from(member);
             Question question = getMockQuestion();
 
-            given(questionRepository.getReferenceById(questionId)).willReturn(question);
+            given(questionRepository.getReferenceById(MOCK_QUESTION_ID)).willReturn(question);
             given(memberRepository.getReferenceById(memberDto.getId())).willReturn(member);
 
             // When
-            commentService.createComment(questionId,requestDto, memberDto);
+            commentService.createComment(MOCK_QUESTION_ID,requestDto, memberDto);
 
             // Then
             then(commentRepository).should().save(any(Comment.class));
@@ -142,16 +143,15 @@ class CommentServiceTest {
         @DisplayName("소유주가 댓글 수정 요청시 댓글이 수정된다.")
         void success_return_nothing() {
             // Given
-            Long commentId = 1l;
             String modifiedContent = "ModifiedContent";
             CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto(modifiedContent);
             MemberDto memberDto = MemberDto.from(getMockUserMember());
             Comment comment = getMockComment();
 
-            given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+            given(commentRepository.findById(MOCK_COMMENT_ID)).willReturn(Optional.of(comment));
 
             // When
-            commentService.updateComment(commentId, requestDto, memberDto);
+            commentService.updateComment(MOCK_COMMENT_ID, requestDto, memberDto);
 
             // Then
             assertThat(comment.getContent()).isEqualTo(modifiedContent);
@@ -161,17 +161,16 @@ class CommentServiceTest {
         @DisplayName("소유주가 아닌 사람이 댓글 수정 요청시 예외가 반환된다.")
         void fail_return_exception() {
             // Given
-            Long commentId = 1l;
             String modifiedContent = "ModifiedContent";
             CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto(modifiedContent);
             MemberDto anonymous = MemberDto.from(getMockAnonymousMember());
             Comment comment = getMockComment();
 
-            given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+            given(commentRepository.findById(MOCK_COMMENT_ID)).willReturn(Optional.of(comment));
 
             // When
             Throwable throwable =
-                    catchThrowable(() -> commentService.updateComment(commentId, requestDto, anonymous));
+                    catchThrowable(() -> commentService.updateComment(MOCK_COMMENT_ID, requestDto, anonymous));
 
             // Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -188,14 +187,13 @@ class CommentServiceTest {
         @DisplayName("소유주가 댓글 삭제 요청시 댓글이 삭제된다.")
         void success_return_nothing() {
             // Given
-            Long commentId = 1l;
             MemberDto memberDto = MemberDto.from(getMockUserMember());
             Comment comment = getMockComment();
 
-            given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+            given(commentRepository.findById(MOCK_COMMENT_ID)).willReturn(Optional.of(comment));
 
             // When
-            commentService.deleteComment(commentId, memberDto);
+            commentService.deleteComment(MOCK_COMMENT_ID, memberDto);
 
             // Then
             then(commentRepository).should().delete(any(Comment.class));
@@ -204,15 +202,14 @@ class CommentServiceTest {
         @Test
         @DisplayName("소유주가 아닌 사람이 댓글 삭제 요청시 예외가 반환된다.")
         void fail_return_exception() {
-            Long commentId = 1l;
             MemberDto anonymous = MemberDto.from(getMockAnonymousMember());
             Comment comment = getMockComment();
 
-            given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+            given(commentRepository.findById(MOCK_COMMENT_ID)).willReturn(Optional.of(comment));
 
             // When
             Throwable throwable =
-                    catchThrowable(() -> commentService.deleteComment(commentId,anonymous));
+                    catchThrowable(() -> commentService.deleteComment(MOCK_COMMENT_ID,anonymous));
 
             // Then
             AssertionsForClassTypes.assertThat(throwable)

@@ -48,6 +48,9 @@ import static org.mockito.BDDMockito.then;
 @ActiveProfiles("test")
 @DisplayName("질문 서비스")
 class QuestionServiceTest {
+    private static final String MOCK_LECTURE_CODE = "code";
+    private static final Long MOCK_QUESTION_ID = 1L;
+    private static final Pageable MOCK_PAGEABLE = PageRequest.of(0, 20);
     @Autowired
     private QuestionService questionService;
     @MockBean
@@ -65,13 +68,13 @@ class QuestionServiceTest {
         return Lecture.builder()
                 .manager(getMockManagerMember())
                 .lectureName("강의명")
-                .lectureCode("code")
+                .lectureCode(MOCK_LECTURE_CODE)
                 .build();
     }
 
     public Question getMockQuestion() {
         return Question.builder()
-                .id(1l)
+                .id(MOCK_QUESTION_ID)
                 .lecture(getMockLecture())
                 .author(getMockStudentMember())
                 .title("title")
@@ -106,18 +109,16 @@ class QuestionServiceTest {
         @DisplayName("관리자가 질문 목록 조회 요청시 전체 질문 목록을 반환한다.")
         void GivenManagerLookupQuestionsRequest_whenLookupQuestions_ThenQuestionListReturn() {
             // Given
-            String lectureCode = "1234";
-            Pageable pageable = PageRequest.of(0, 20);
             Member reader = getMockManagerMember();
             Lecture lecture = getMockLecture();
             Question returnQuestion = getMockQuestion();
-            Page<Question> questionPage = new PageImpl<>(List.of(returnQuestion), pageable, 0);
+            Page<Question> questionPage = new PageImpl<>(List.of(returnQuestion), MOCK_PAGEABLE, 0);
 
-            given(lectureRepository.getReferenceById(lectureCode)).willReturn(lecture);
-            given(questionRepository.findByLecture(lecture, pageable)).willReturn(questionPage);
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
+            given(questionRepository.findByLecture(lecture, MOCK_PAGEABLE)).willReturn(questionPage);
 
             // When
-            Page<QuestionListResponseDto> responseDtoPage = questionService.lookupAllQuestions(lectureCode, pageable,
+            Page<QuestionListResponseDto> responseDtoPage = questionService.lookupAllQuestions(MOCK_LECTURE_CODE, MOCK_PAGEABLE,
                     MemberDto.from(reader));
 
             // Then
@@ -129,21 +130,19 @@ class QuestionServiceTest {
         @DisplayName("강사가 질문 목록 조회 요청시 전체 질문 목록을 반환한다.")
         void GivenTeacherLookupQuestionsRequest_whenLookupQuestions_ThenQuestionListReturn() {
             // Given
-            String lectureCode = "1234";
-            Pageable pageable = PageRequest.of(0, 20);
             Member reader = getMockTeacherMember();
             Lecture lecture = getMockLecture();
             Teacher teacher = Teacher.builder().member(reader).lecture(lecture).build();
             Question returnQuestion = getMockQuestion();
-            Page<Question> questionPage = new PageImpl<>(List.of(returnQuestion), pageable, 0);
+            Page<Question> questionPage = new PageImpl<>(List.of(returnQuestion), MOCK_PAGEABLE, 0);
 
-            given(lectureRepository.getReferenceById(lectureCode)).willReturn(lecture);
-            given(questionRepository.findByLecture(lecture, pageable)).willReturn(questionPage);
-            given(teacherRepository.findByMemberIdAndLectureCode(reader.getId(), lectureCode)).willReturn(
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
+            given(questionRepository.findByLecture(lecture, MOCK_PAGEABLE)).willReturn(questionPage);
+            given(teacherRepository.findByMemberIdAndLectureCode(reader.getId(), MOCK_LECTURE_CODE)).willReturn(
                     Optional.of(teacher));
 
             // When
-            Page<QuestionListResponseDto> responseDtoPage = questionService.lookupAllQuestions(lectureCode, pageable,
+            Page<QuestionListResponseDto> responseDtoPage = questionService.lookupAllQuestions(MOCK_LECTURE_CODE, MOCK_PAGEABLE,
                     MemberDto.from(reader));
 
             // Then
@@ -155,16 +154,14 @@ class QuestionServiceTest {
         @DisplayName("권한이 없는 사용자가 전체 질문 목록 조회 요청시 예외를 반환한다.")
         void GivenPermissionFailRequest_whenLookupAllQuestions_ThenExceptionReturn() {
             // Given
-            String lectureCode = "1234";
-            Pageable pageable = PageRequest.of(0, 20);
             Member reader = getMockAnonymousMember();
             Lecture lecture = getMockLecture();
 
-            given(lectureRepository.getReferenceById(lectureCode)).willReturn(lecture);
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
 
             // When
             Throwable throwable =
-                    catchThrowable(() -> questionService.lookupAllQuestions(lectureCode, pageable,
+                    catchThrowable(() -> questionService.lookupAllQuestions(MOCK_LECTURE_CODE, MOCK_PAGEABLE,
                             MemberDto.from(reader)));
 
             // Then
@@ -177,23 +174,22 @@ class QuestionServiceTest {
         @DisplayName("학생이 질문 목록 조회 요청시 공개 질문 목록을 반환한다.")
         void GivenStudentLookupQuestionsRequest_whenLookupQuestions_ThenQuestionListReturn() {
             // Given
-            String lectureCode = "1234";
-            Pageable pageable = PageRequest.of(0, 20);
             Member reader = getMockStudentMember();
             Lecture lecture = getMockLecture();
             Student student = Student.builder().member(reader).lecture(lecture).build();
             Question returnQuestion = getMockQuestion();
-            Page<Question> questionPage = new PageImpl<>(List.of(returnQuestion), pageable, 0);
+            Page<Question> questionPage = new PageImpl<>(List.of(returnQuestion), MOCK_PAGEABLE, 0);
 
-            given(lectureRepository.getReferenceById(lectureCode)).willReturn(lecture);
+            given(lectureRepository.getReferenceById(MOCK_LECTURE_CODE)).willReturn(lecture);
             given(questionRepository.findByLectureAndAuthorOrIsPublic(lecture, student.getMember(), true,
-                    pageable)).willReturn(questionPage);
-            given(studentRepository.findByMemberIdAndLectureCode(reader.getId(), lectureCode)).willReturn(
+                    MOCK_PAGEABLE)).willReturn(questionPage);
+            given(studentRepository.findByMemberIdAndLectureCode(reader.getId(), MOCK_LECTURE_CODE)).willReturn(
                     Optional.of(student));
 
             // When
-            Page<QuestionListResponseDto> responseDtoPage = questionService.lookupPublicQuestions(lectureCode, pageable,
-                    MemberDto.from(reader));
+            Page<QuestionListResponseDto> responseDtoPage =
+                    questionService.lookupPublicQuestions(MOCK_LECTURE_CODE, MOCK_PAGEABLE,
+                            MemberDto.from(reader));
 
             // Then
             assertThat(responseDtoPage.get().findFirst().get().getQuestionId()).isEqualTo(
@@ -204,16 +200,14 @@ class QuestionServiceTest {
         @DisplayName("강의에 없는 사용자가 질문 목록 조회 요청시 예외를 반환한다.")
         void GivenPermissionFailRequest_whenLookupQuestions_ThenExceptionReturn() {
             // Given
-            String lectureCode = "1234";
-            Pageable pageable = PageRequest.of(0, 20);
             Member reader = getMockAnonymousMember();
             Lecture lecture = getMockLecture();
 
-            given(lectureRepository.getReferenceById(lectureCode)).willReturn(lecture);
+            given(lectureRepository.getReferenceById(MOCK_LECTURE_CODE)).willReturn(lecture);
 
             // When
             Throwable throwable =
-                    catchThrowable(() -> questionService.lookupPublicQuestions(lectureCode, pageable,
+                    catchThrowable(() -> questionService.lookupPublicQuestions(MOCK_LECTURE_CODE, MOCK_PAGEABLE,
                             MemberDto.from(reader)));
 
             // Then
@@ -230,17 +224,15 @@ class QuestionServiceTest {
         @DisplayName("공개 질문 상세 내용 요청시 상세 내용을 반환한다.")
         void GivenReadPublicQuestionRequest_whenReadQuestion_ThenQuestionDetailReturn() {
             // Given
-            String lectureCode = "1234";
-            Long questionId = 1l;
             Member reader = getMockStudentMember();
             Question question = getMockQuestion();
             question.makePublic();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             // When
             QuestionDetailResponseDto responseDto =
-                    questionService.readQuestion(lectureCode, questionId, MemberDto.from(reader));
+                    questionService.readQuestion(MOCK_LECTURE_CODE, MOCK_QUESTION_ID, MemberDto.from(reader));
 
             // Then
             assertThat(responseDto.getQuestionId()).isEqualTo(question.getId());
@@ -253,27 +245,23 @@ class QuestionServiceTest {
         @DisplayName("작성자가 비공개 질문 상세 내용 요청시 상세 내용을 반환한다.")
         void GivenAuthorReadPrivateQuestionRequest_whenReadQuestion_ThenQuestionDetailReturn() {
             // Given
-            String lectureCode = "1234";
-            Long questionId = 1l;
             Member author = getMockStudentMember();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             // When
             QuestionDetailResponseDto responseDto =
-                    questionService.readQuestion(lectureCode, questionId, MemberDto.from(author));
+                    questionService.readQuestion(MOCK_LECTURE_CODE, MOCK_QUESTION_ID, MemberDto.from(author));
 
             // Then
-            assertThat(responseDto.getQuestionId()).isEqualTo(questionId);
+            assertThat(responseDto.getQuestionId()).isEqualTo(MOCK_QUESTION_ID);
         }
 
         @Test
         @DisplayName("강사가 비공개 질문 상세 내용 요청시 상세 내용을 반환한다.")
         void GivenTeacherReadPrivateQuestionRequest_whenReadQuestion_ThenQuestionDetailReturn() {
             // Given
-            String lectureCode = "1234";
-            Long questionId = 1l;
             Member teacherMember = getMockTeacherMember();
             Teacher teacher = Teacher.builder()
                     .lecture(getMockLecture())
@@ -281,51 +269,48 @@ class QuestionServiceTest {
                     .build();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
-            given(teacherRepository.findByMemberIdAndLectureCode(teacherMember.getId(), lectureCode)).willReturn(
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
+            given(teacherRepository.findByMemberIdAndLectureCode(teacherMember.getId(), MOCK_LECTURE_CODE)).willReturn(
                     Optional.of(teacher));
 
             // When
             QuestionDetailResponseDto responseDto =
-                    questionService.readQuestion(lectureCode, questionId, MemberDto.from(teacherMember));
+                    questionService.readQuestion(MOCK_LECTURE_CODE, MOCK_QUESTION_ID, MemberDto.from(teacherMember));
 
             // Then
-            assertThat(responseDto.getQuestionId()).isEqualTo(questionId);
+            assertThat(responseDto.getQuestionId()).isEqualTo(MOCK_QUESTION_ID);
         }
 
         @Test
         @DisplayName("관리자가 비공개 질문 상세 내용 요청시 상세 내용을 반환한다.")
         void GivenManagerReadPrivateQuestionRequest_whenReadQuestion_ThenQuestionDetailReturn() {
             // Given
-            String lectureCode = "1234";
-            Long questionId = 1l;
             Member manager = getMockManagerMember();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             // When
             QuestionDetailResponseDto responseDto =
-                    questionService.readQuestion(lectureCode, questionId, MemberDto.from(manager));
+                    questionService.readQuestion(MOCK_LECTURE_CODE, MOCK_QUESTION_ID, MemberDto.from(manager));
 
             // Then
-            assertThat(responseDto.getQuestionId()).isEqualTo(questionId);
+            assertThat(responseDto.getQuestionId()).isEqualTo(MOCK_QUESTION_ID);
         }
 
         @Test
         @DisplayName("권한이 없는 사람이 비공개 질문 상세 내용 요청시 예외를 반환한다.")
         void GivenFailPermissionRequest_whenReadQuestion_ThenExceptionReturn() {
             // Given
-            String lectureCode = "1234";
-            Long questionId = 1l;
             Member reader = getMockAnonymousMember();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             // When
             Throwable throwable =
-                    catchThrowable(() -> questionService.readQuestion(lectureCode, questionId, MemberDto.from(reader)));
+                    catchThrowable(
+                            () -> questionService.readQuestion(MOCK_LECTURE_CODE, MOCK_QUESTION_ID, MemberDto.from(reader)));
 
             // Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -341,7 +326,6 @@ class QuestionServiceTest {
         @DisplayName("소유자가 질문 수정 요청시 질문이 수정된다.")
         void GivenUpdateQuestionRequest_whenUpdateQuestion_ThenUpdateQuestion() {
             // Given
-            Long questionId = 1l;
             Member author = getMockStudentMember();
             Question question = getMockQuestion();
             QuestionUpdateRequestDto requestDto =
@@ -351,10 +335,10 @@ class QuestionServiceTest {
             requestDto.setTitle(modifiedTitle);
             requestDto.setContent(modifiedContent);
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             // When
-            questionService.updateQuestion(questionId, MemberDto.from(author), requestDto);
+            questionService.updateQuestion(MOCK_QUESTION_ID, MemberDto.from(author), requestDto);
 
             // Then
             assertThat(question.getTitle()).isEqualTo(modifiedTitle);
@@ -365,17 +349,16 @@ class QuestionServiceTest {
         @DisplayName("소유자가 아닌 사람이 질문 수정 요청시 예외 반환.")
         void GivenPermissionFailRequest_whenUpdateQuestion_ThenExceptionReturn() {
             // Given
-            Long questionId = 1l;
             Member author = getMockAnonymousMember();
             Question question = getMockQuestion();
             QuestionUpdateRequestDto requestDto =
                     new QuestionUpdateRequestDto(question.getTitle(), question.getContent(), true);
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             //When
             Throwable throwable = catchThrowable(
-                    () -> questionService.updateQuestion(questionId, MemberDto.from(author), requestDto));
+                    () -> questionService.updateQuestion(MOCK_QUESTION_ID, MemberDto.from(author), requestDto));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -392,14 +375,13 @@ class QuestionServiceTest {
         @DisplayName("소유자가 삭제 요청시 질문이 삭제된다.")
         void GivenDeleteQuestionRequest_whenDeleteQuestion_ThenDeleteQuestion() {
             // Given
-            Long questionId = 1l;
             Member author = getMockStudentMember();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             //When
-            questionService.deleteQuestion(questionId, MemberDto.from(author));
+            questionService.deleteQuestion(MOCK_QUESTION_ID, MemberDto.from(author));
 
             //Then
             then(questionRepository).should().delete(question);
@@ -409,15 +391,14 @@ class QuestionServiceTest {
         @DisplayName("소유자가 아닌 사람이 삭제 요청시 예외 반환.")
         void GivenPermissionFailRequest_whenDeleteQuestion_ThenExceptionReturn() {
             // Given
-            Long questionId = 1l;
             Member author = getMockAnonymousMember();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             //When
             Throwable throwable =
-                    catchThrowable(() -> questionService.deleteQuestion(questionId, MemberDto.from(author)));
+                    catchThrowable(() -> questionService.deleteQuestion(MOCK_QUESTION_ID, MemberDto.from(author)));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -434,14 +415,13 @@ class QuestionServiceTest {
         @DisplayName("소유자가 공개 요청시 질문이 공개된다.")
         void GivenOpenQuestionRequest_whenOpenQuestion_ThenOpenQuestion() {
             // Given
-            Long questionId = 1l;
             Member author = getMockStudentMember();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             //When
-            questionService.openQuestion(questionId, MemberDto.from(author));
+            questionService.openQuestion(MOCK_QUESTION_ID, MemberDto.from(author));
 
             //Then
             assertThat(question.getIsPublic()).isEqualTo(true);
@@ -451,15 +431,14 @@ class QuestionServiceTest {
         @DisplayName("소유자가 아닌 사람이 공개 요청시 예외 반환.")
         void GivenPermissionFailRequest_whenOpenQuestion_ThenExceptionReturn() {
             // Given
-            Long questionId = 1l;
             Member author = getMockAnonymousMember();
             Question question = getMockQuestion();
 
-            given(questionRepository.findById(questionId)).willReturn(Optional.of(question));
+            given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
             //When
             Throwable throwable =
-                    catchThrowable(() -> questionService.openQuestion(questionId, MemberDto.from(author)));
+                    catchThrowable(() -> questionService.openQuestion(MOCK_QUESTION_ID, MemberDto.from(author)));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)

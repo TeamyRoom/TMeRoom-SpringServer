@@ -45,6 +45,8 @@ import static org.mockito.BDDMockito.then;
 @ActiveProfiles("test")
 @DisplayName("강사 서비스")
 class TeacherServiceTest {
+    private static final String MOCK_LECTURE_CODE = "code";
+    private static final Pageable MOCK_PAGEABLE = PageRequest.of(0, 20);
     @Autowired
     private TeacherService teacherService;
     @MockBean
@@ -60,7 +62,7 @@ class TeacherServiceTest {
         return Lecture.builder()
                 .manager(getMockManagerMember())
                 .lectureName("강의명")
-                .lectureCode("code")
+                .lectureCode(MOCK_LECTURE_CODE)
                 .build();
     }
 
@@ -92,20 +94,18 @@ class TeacherServiceTest {
         @DisplayName("관리자강사 목록 조회 요청시 강사 목록을 반환한다.")
         void GivenLookupTeachersRequest_whenDismissApplicants_ThenReturnTeacherList() {
             //Given
-            String lectureCode = "code";
             MemberDto mockManagerDto = getMockManagerDto();
             Lecture lecture = getMockLecture();
             Teacher teacher = getMockTeacher();
-            Pageable pageable = PageRequest.of(0, 20);
-            Page<Teacher> studentPage = new PageImpl<>(List.of(teacher), pageable, 0);
+            Page<Teacher> mockPage = new PageImpl<>(List.of(teacher), MOCK_PAGEABLE, 0);
 
 
-            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(studentPage);
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
+            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(mockPage);
 
             //When
             Page<TeacherDetailResponseDto> teagerResponsePage =
-                    teacherService.lookupTeachers(lectureCode, mockManagerDto, pageable);
+                    teacherService.lookupTeachers(MOCK_LECTURE_CODE, mockManagerDto, MOCK_PAGEABLE);
 
             //Then
             assertThat(teagerResponsePage.get().findFirst().get().getNickName()).isEqualTo(
@@ -116,20 +116,19 @@ class TeacherServiceTest {
         @DisplayName("관리자가 아닌 사람이 강사 목록 조회 요청시 예외를 발생시킨다")
         void GivenPermissionFail_whenLookupTeachers_ThenReturnException() {
             //Given
-            String lectureCode = "code";
             MemberDto mockAnonymousDto = getMockAnonymousDto();
             Lecture lecture = getMockLecture();
             Teacher teacher = getMockTeacher();
-            Pageable pageable = PageRequest.of(0, 20);
-            Page<Teacher> studentPage = new PageImpl<>(List.of(teacher), pageable, 0);
+            Page<Teacher> mockPage = new PageImpl<>(List.of(teacher), MOCK_PAGEABLE, 0);
 
 
-            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(studentPage);
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
+            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(mockPage);
 
             //When
             Throwable throwable =
-                    catchThrowable(() -> teacherService.lookupTeachers(lectureCode, mockAnonymousDto, pageable));
+                    catchThrowable(
+                            () -> teacherService.lookupTeachers(MOCK_LECTURE_CODE, mockAnonymousDto, MOCK_PAGEABLE));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -146,17 +145,16 @@ class TeacherServiceTest {
         void GivenAppointTeacherRequest_whenDismissApplicants_ThenAppointTeacher() {
             //Given
             Lecture lecture = getMockLecture();
-            String lectureCode = "code";
             MemberDto mockManagerDto = getMockManagerDto();
             Member teacher = getMockTeacherMember();
             AppointTeacherRequestDto dto = new AppointTeacherRequestDto();
             dto.setTeacherId("teacher");
 
-            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
             given(memberRepository.findById(dto.getTeacherId())).willReturn(Optional.of(teacher));
 
             //When
-            teacherService.appointTeacher(lectureCode, mockManagerDto, dto);
+            teacherService.appointTeacher(MOCK_LECTURE_CODE, mockManagerDto, dto);
 
             //Then
             then(teacherRepository).should().save(any(Teacher.class));
@@ -167,18 +165,17 @@ class TeacherServiceTest {
         void GivenPermissionFail_whenAppointTeacher_ThenReturnException() {
             //Given
             Lecture lecture = getMockLecture();
-            String lectureCode = "code";
             MemberDto mockAnonymousDto = getMockAnonymousDto();
             Member teacher = getMockTeacherMember();
             AppointTeacherRequestDto dto = new AppointTeacherRequestDto();
             dto.setTeacherId("teacher");
 
-            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
             given(memberRepository.findById(dto.getTeacherId())).willReturn(Optional.of(teacher));
 
             //When
             Throwable throwable =
-                    catchThrowable(() -> teacherService.appointTeacher(lectureCode, mockAnonymousDto, dto));
+                    catchThrowable(() -> teacherService.appointTeacher(MOCK_LECTURE_CODE, mockAnonymousDto, dto));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)
@@ -195,16 +192,15 @@ class TeacherServiceTest {
         void GivenDismissTeacherRequest_whenDismissApplicants_ThenDismissTeacher() {
             //Given
             Lecture lecture = getMockLecture();
-            String lectureCode = "code";
             MemberDto mockManagerDto = getMockManagerDto();
             Teacher teacher = getMockTeacher();
 
-            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode))
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
+            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), MOCK_LECTURE_CODE))
                     .willReturn(Optional.of(teacher));
 
             //When
-            teacherService.dismissTeacher(lectureCode, teacher.getTeacherId(), mockManagerDto);
+            teacherService.dismissTeacher(MOCK_LECTURE_CODE, teacher.getTeacherId(), mockManagerDto);
 
             //Then
             then(teacherRepository).should().delete(teacher);
@@ -215,17 +211,16 @@ class TeacherServiceTest {
         void GivenPermissionFail_whenDismissTeacher_ThenReturnException() {
             //Given
             Lecture lecture = getMockLecture();
-            String lectureCode = "code";
             MemberDto mockAnonymousDto = getMockAnonymousDto();
             Teacher teacher = getMockTeacher();
 
-            given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), lectureCode))
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
+            given(teacherRepository.findByMemberIdAndLectureCode(teacher.getTeacherId(), MOCK_LECTURE_CODE))
                     .willReturn(Optional.of(teacher));
 
             //When
             Throwable throwable = catchThrowable(
-                    () -> teacherService.dismissTeacher(lectureCode, teacher.getTeacherId(), mockAnonymousDto));
+                    () -> teacherService.dismissTeacher(MOCK_LECTURE_CODE, teacher.getTeacherId(), mockAnonymousDto));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)

@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.mock;
 @ActiveProfiles("test")
 @DisplayName("강의 서비스")
 public class LectureServiceTest {
+    private static final String MOCK_LECTURE_CODE = "code";
 
     @Autowired
     private LectureService lectureService;
@@ -45,7 +48,7 @@ public class LectureServiceTest {
 
     private Lecture getMockLecture(String 강의명, Member 관리자) {
         return Lecture.builder()
-                .lectureCode("1234")
+                .lectureCode(MOCK_LECTURE_CODE)
                 .lectureName(강의명)
                 .manager(관리자)
                 .build();
@@ -83,10 +86,10 @@ public class LectureServiceTest {
             Member mockManager = getMockManagerMember();
             given(manager.getId()).willReturn("manager");
             given(mockLecture.getManager()).willReturn(mockManager);
-            given(lectureRepository.getReferenceById("1234")).willReturn(mockLecture);
+            given(lectureRepository.getReferenceById(MOCK_LECTURE_CODE)).willReturn(mockLecture);
 
             //When
-            lectureService.deleteLecture("1234", manager);
+            lectureService.deleteLecture(MOCK_LECTURE_CODE, manager);
 
             //Then
             then(lectureRepository).should().delete(mockLecture);
@@ -102,10 +105,10 @@ public class LectureServiceTest {
             Member mockManager = getMockManagerMember();
             given(noManager.getId()).willReturn("noManager");
             given(mockLecture.getManager()).willReturn(mockManager);
-            given(lectureRepository.getReferenceById("1234")).willReturn(mockLecture);
+            given(lectureRepository.getReferenceById(MOCK_LECTURE_CODE)).willReturn(mockLecture);
 
             //When
-            Throwable throwable = catchThrowable(() -> lectureService.deleteLecture("1234", noManager));
+            Throwable throwable = catchThrowable(() -> lectureService.deleteLecture(MOCK_LECTURE_CODE, noManager));
 
             //Then
             assertThat(throwable)
@@ -119,15 +122,15 @@ public class LectureServiceTest {
             //Given
             Member manager = getMockManagerMember();
             MemberDto managerDto = MemberDto.from(manager);
-            Lecture mockLecture = getMockLecture("1234", manager);
-            given(lectureRepository.findById("1234")).willReturn(Optional.of(mockLecture));
+            Lecture mockLecture = getMockLecture(MOCK_LECTURE_CODE, manager);
+            given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(mockLecture));
             given(memberRepository.findById("manager")).willReturn(Optional.of(manager));
 
             LectureUpdateRequestDto requestDTO = new LectureUpdateRequestDto();
             String modifiedName = "Hello! World2";
             requestDTO.setLectureName(modifiedName);
             requestDTO.setMemberDTO(managerDto);
-            requestDTO.setLectureCode("1234");
+            requestDTO.setLectureCode(MOCK_LECTURE_CODE);
 
             //When
             lectureService.updateLecture(requestDTO);
@@ -142,14 +145,14 @@ public class LectureServiceTest {
             //Given
             Member manager = getMockManagerMember();
             MemberDto managerDto = MemberDto.from(manager);
-            Lecture mockLecture = getMockLecture("1234", manager);
+            Lecture mockLecture = getMockLecture(MOCK_LECTURE_CODE, manager);
             given(memberRepository.findById("manager")).willReturn(Optional.of(manager));
 
             LectureUpdateRequestDto requestDTO = new LectureUpdateRequestDto();
             String modifiedName = "Hello! World2";
             requestDTO.setLectureName(modifiedName);
             requestDTO.setMemberDTO(managerDto);
-            requestDTO.setLectureCode("1234");
+            requestDTO.setLectureCode(MOCK_LECTURE_CODE);
 
             //When
             Throwable throwable = catchThrowable(() -> lectureService.updateLecture(requestDTO));
