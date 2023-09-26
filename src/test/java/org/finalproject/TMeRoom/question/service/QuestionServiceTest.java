@@ -243,7 +243,10 @@ class QuestionServiceTest {
                     questionService.readQuestion(lectureCode, questionId, MemberDto.from(reader));
 
             // Then
-            assertThat(responseDto.getQuestionId()).isEqualTo(questionId);
+            assertThat(responseDto.getQuestionId()).isEqualTo(question.getId());
+            assertThat(responseDto.getQuestionContent()).isEqualTo(question.getContent());
+            assertThat(responseDto.getQuestionTitle()).isEqualTo(question.getTitle());
+            assertThat(responseDto.getAuthorNickname()).isEqualTo(question.getAuthorNickname());
         }
 
         @Test

@@ -36,7 +36,8 @@ public class QuestionService {
     // 질문 목록 조회(선생용, 관리자용)
     public Page<QuestionListResponseDto> lookupAllQuestions(String lectureCode, Pageable pageable,
                                                             MemberDto memberDto) {
-        Lecture lecture = lectureRepository.getReferenceById(lectureCode);
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
         Teacher teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .orElse(null);
