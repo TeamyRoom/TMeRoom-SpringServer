@@ -487,7 +487,7 @@ class MemberControllerTest {
         }
 
         @Test
-        @DisplayName("정상적인 요청이라면, 비밀번호 재설정시, 성공 코드를 반환한다.")
+        @DisplayName("유효하지 않은 재설정코드라면, 비밀번호 재설정시, 실패 코드를 반환한다.")
         void givenInvalidResetCode_whenResettingPassword_thenReturnsErrorCode() throws Exception {
 
             // Given
