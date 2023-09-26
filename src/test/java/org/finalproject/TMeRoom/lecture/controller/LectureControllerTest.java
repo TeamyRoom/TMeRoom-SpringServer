@@ -1,7 +1,7 @@
 package org.finalproject.TMeRoom.lecture.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.finalproject.TMeRoom.config.TestSecurityConfig;
+import org.finalproject.TMeRoom.common.config.TestSecurityConfig;
 import org.finalproject.tmeroom.lecture.controller.LectureController;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
