@@ -31,8 +31,8 @@ public class StudentService extends LectureCommon {
     public Page<LectureDetailResponseDto> lookupMyLectures(MemberDto memberDTO, Pageable pageable) {
         Member member = memberRepository.getReferenceById(memberDTO.getId());
 
-        Page<Student> myLectures = studentRepository.findByMember(pageable, member);
-        return myLectures.map(student -> LectureDetailResponseDto.from(student));
+        Page<Student> myLectures = studentRepository.findByMember(member, pageable);
+        return myLectures.map(LectureDetailResponseDto::from);
     }
 
     //수강 신청
@@ -53,7 +53,8 @@ public class StudentService extends LectureCommon {
 
     //수강 신청 철회
     public void cancelApplication(String lectureCode, MemberDto memberDTO) {
-        Student student = studentRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode);
+        Student student = studentRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
 
         studentRepository.delete(student);
     }
@@ -64,7 +65,7 @@ public class StudentService extends LectureCommon {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
-        Page<Student> applicants = studentRepository.findByLecture(pageable, lecture);
+        Page<Student> applicants = studentRepository.findByLecture(lecture, pageable);
         return applicants.map(StudentDetailResponseDto::from);
     }
 
@@ -74,7 +75,8 @@ public class StudentService extends LectureCommon {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
-        Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode);
+        Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
 
         student.acceptStudent();
     }
@@ -85,7 +87,8 @@ public class StudentService extends LectureCommon {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
-        Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode);
+        Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
 
         studentRepository.delete(student);
     }

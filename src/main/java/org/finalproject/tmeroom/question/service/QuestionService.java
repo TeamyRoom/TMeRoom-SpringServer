@@ -4,7 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
+import org.finalproject.tmeroom.lecture.data.entity.Student;
+import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
+import org.finalproject.tmeroom.lecture.repository.StudentRepository;
+import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
@@ -26,19 +30,56 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final LectureRepository lectureRepository;
     private final MemberRepository memberRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
 
-    // 질문 목록 조회
-    public Page<QuestionListResponseDto> lookupQuestions(String lectureCode, Pageable pageable) {
+    // 질문 목록 조회(선생용, 관리자용)
+    public Page<QuestionListResponseDto> lookupAllQuestions(String lectureCode, Pageable pageable,
+                                                            MemberDto memberDto) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+
+        Teacher teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+                .orElse(null);
+
+        if (teacher == null && !lecture.getManager().isIdMatch(memberDto.getId())) {
+            throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
+        }
+
+        Page<Question> questions = questionRepository.findByLecture(lecture, pageable);
+
+        return questions.map(QuestionListResponseDto::from);
+    }
+
+
+    // 질문 목록 조회(학생용)
+    public Page<QuestionListResponseDto> lookupPublicQuestions(String lectureCode, Pageable pageable,
+                                                               MemberDto memberDto) {
         Lecture lecture = lectureRepository.getReferenceById(lectureCode);
-        Page<Question> questions = questionRepository.findByLecture(pageable, lecture);
+        Student student = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
+
+        Page<Question> questions =
+                questionRepository.findByLectureAndAuthorOrIsPublic(lecture, student.getMember(), true, pageable);
 
         return questions.map(QuestionListResponseDto::from);
     }
 
     // 질문 단일 조회
-    public QuestionDetailResponseDto readQuestion(Long questionId) {
+    public QuestionDetailResponseDto readQuestion(String lectureCode, Long questionId, MemberDto memberDto) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
+
+        if (!question.getIsPublic()) {
+            Teacher teacher =
+                    teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode).orElse(null);
+            Member author = question.getAuthor();
+            Lecture lecture = question.getLecture();
+            if (teacher == null && !author.isIdMatch(memberDto.getId()) && !lecture.getManager().isIdMatch(
+                    memberDto.getId())) {
+                throw new ApplicationException(ErrorCode.INVALID_READ_QUESTION_PERMISSION);
+            }
+        }
 
         return QuestionDetailResponseDto.from(question);
     }

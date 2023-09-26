@@ -61,7 +61,6 @@ class StudentServiceTest {
         return Student.builder()
                 .member(getMockStudentMember())
                 .lecture(getMockLecture())
-                .appliedAt(LocalDateTime.now())
                 .build();
     }
 
@@ -105,7 +104,7 @@ class StudentServiceTest {
         Page<Student> studentPage = new PageImpl<>(List.of(student), pageable, 0);
 
         given(memberRepository.getReferenceById("student")).willReturn(student.getMember());
-        given(studentRepository.findByMember(any(Pageable.class), eq(student.getMember()))).willReturn(studentPage);
+        given(studentRepository.findByMember(eq(student.getMember()), any(Pageable.class))).willReturn(studentPage);
 
         //When
         Page<LectureDetailResponseDto> lectureResponsePage = studentService.lookupMyLectures(mockStudentDto, pageable);
@@ -153,8 +152,8 @@ class StudentServiceTest {
                     .build();
 
 
-            given(studentRepository.findByMemberIdAndLectureCode(mockStudentDto.getId(), lectureCode)).willReturn(
-                    studentEntity);
+            given(studentRepository.findByMemberIdAndLectureCode(mockStudentDto.getId(), lectureCode))
+                    .willReturn(Optional.of(studentEntity));
 
             //When
             studentService.cancelApplication(lectureCode, mockStudentDto);
@@ -180,7 +179,7 @@ class StudentServiceTest {
 
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
+            given(studentRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(studentPage);
 
             //When
             Page<StudentDetailResponseDto> studentResponsePage =
@@ -204,7 +203,7 @@ class StudentServiceTest {
 
 
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByLecture(any(Pageable.class), eq(lecture))).willReturn(studentPage);
+            given(studentRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(studentPage);
 
             //When
             Throwable throwable =
@@ -230,8 +229,8 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto managerDto = getMockManagerDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
-                    student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode))
+                    .willReturn(Optional.of(student));
 
             //When
             studentService.acceptApplicant(lectureCode, student.getStudentId(), managerDto);
@@ -250,8 +249,8 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto mockAnonymousDto = getMockAnonymousDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
-                    student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode))
+                    .willReturn(Optional.of(student));
 
             //When
             Throwable throwable = catchThrowable(
@@ -276,8 +275,8 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto managerDto = getMockManagerDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
-                    student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode))
+                    .willReturn(Optional.of(student));
 
             //When
             studentService.rejectApplicant(lectureCode, student.getStudentId(), managerDto);
@@ -295,8 +294,8 @@ class StudentServiceTest {
             String lectureCode = "code";
             MemberDto mockAnonymousDto = getMockAnonymousDto();
             given(lectureRepository.findById(lectureCode)).willReturn(Optional.of(lecture));
-            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode)).willReturn(
-                    student);
+            given(studentRepository.findByMemberIdAndLectureCode(student.getStudentId(), lectureCode))
+                    .willReturn(Optional.of(student));
 
             //When
             Throwable throwable = catchThrowable(

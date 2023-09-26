@@ -20,19 +20,20 @@ public enum ErrorCode {
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰"),
     AUTHORIZATION_ERROR(HttpStatus.FORBIDDEN, "권한 필요"),
     INVALID_PERMISSION(HttpStatus.FORBIDDEN, "소유자 불일치"),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    INVALID_ACCESS_PERMISSION(HttpStatus.FORBIDDEN, "접근 권한 없음"),
+    INVALID_READ_QUESTION_PERMISSION(HttpStatus.FORBIDDEN, "질문을 볼 수 있는 권한이 없음"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 유저 없음"),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 불일치"),
     DUPLICATE_ID(HttpStatus.BAD_REQUEST, "입력한 유저 정보 중복"),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "입력한 유저 정보 중복"),
     EMAIL_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, "이메일 인증 이미 완료"),
     CODE_NOT_VALID(HttpStatus.BAD_REQUEST, "유효하지 않은 코드"),
     INVALID_ID(HttpStatus.BAD_REQUEST, "아이디 불일치"),
-    INVALID_LECTURE_CODE(HttpStatus.BAD_REQUEST, "존재하지 않는 강의 코드입니다."),
-    INVALID_QUESTION_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 질문입니다."),
-    INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 댓글입니다."),
-    INVALID_TEACHER_ID(HttpStatus.BAD_REQUEST, "강의에 초빙되지 않은 교사입니다."),
-    //    ==== 여기까지 작성 ====
-    ;
+    INVALID_LECTURE_CODE(HttpStatus.BAD_REQUEST, "존재하지 않는 강의 코드"),
+    INVALID_QUESTION_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 질문"),
+    INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 댓글"),
+    INVALID_TEACHER_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 교사"),
+    INVALID_STUDENT_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 학생");
 
     private final HttpStatus status;
     private final String message;

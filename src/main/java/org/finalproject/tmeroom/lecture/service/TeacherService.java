@@ -37,7 +37,7 @@ public class TeacherService extends LectureCommon {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDto);
 
-        Page<Teacher> teachers = teacherRepository.findByLecture(pageable, lecture);
+        Page<Teacher> teachers = teacherRepository.findByLecture(lecture, pageable);
 
         return teachers.map(TeacherDetailResponseDto::from);
     }

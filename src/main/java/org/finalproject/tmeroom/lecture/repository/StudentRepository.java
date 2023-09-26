@@ -8,10 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface StudentRepository extends JpaRepository<Student, StudentPK> {
-    Student findByMemberIdAndLectureCode(String memberId, String lectureCode);
+    Optional<Student> findByMemberIdAndLectureCode(String memberId, String lectureCode);
 
-    Page<Student> findByLecture(Pageable pageable, Lecture lecture);
+    Page<Student> findByLecture(Lecture lecture, Pageable pageable);
 
-    Page<Student> findByMember(Pageable pageable, Member member);
+    Page<Student> findByMember(Member member, Pageable pageable);
 }

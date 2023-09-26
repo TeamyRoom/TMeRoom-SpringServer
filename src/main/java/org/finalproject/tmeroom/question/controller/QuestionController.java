@@ -19,16 +19,28 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/")
 @RequiredArgsConstructor
-public class questionController {
+public class QuestionController {
     private final QuestionService questionService;
 
-    // 질문 목록 조회
+    // 질문 목록 조회(선생용)
     @GetMapping("/lecture/{lectureCode}/questions")
-    public Response<Page<QuestionListResponseDto>> lookupQuestions(@PathVariable String lectureCode,
+    public Response<Page<QuestionListResponseDto>> lookupAllQuestions(@PathVariable String lectureCode,
                                                                    @PageableDefault(sort = "createdAt",
                                                                            direction = Sort.Direction.DESC)
-                                                                   Pageable pageable) {
-        Page<QuestionListResponseDto> dtoList = questionService.lookupQuestions(lectureCode, pageable);
+                                                                   Pageable pageable,
+                                                                      @AuthenticationPrincipal MemberDto memberDto) {
+        Page<QuestionListResponseDto> dtoList = questionService.lookupAllQuestions(lectureCode, pageable, memberDto);
+        return Response.success(dtoList);
+    }
+
+    // 질문 목록 조회(학생용)
+    @GetMapping("/lecture/{lectureCode}/questions/permitted-only")
+    public Response<Page<QuestionListResponseDto>> lookupPublicQuestions(@PathVariable String lectureCode,
+                                                                   @PageableDefault(sort = "createdAt",
+                                                                           direction = Sort.Direction.DESC)
+                                                                   Pageable pageable,
+                                                                   @AuthenticationPrincipal MemberDto memberDto) {
+        Page<QuestionListResponseDto> dtoList = questionService.lookupPublicQuestions(lectureCode, pageable, memberDto);
         return Response.success(dtoList);
     }
 
@@ -36,10 +48,8 @@ public class questionController {
     @GetMapping("/lecture/{lectureCode}/question/{questionId}")
     public Response<QuestionDetailResponseDto> readQuestion(@PathVariable String lectureCode,
                                                             @PathVariable Long questionId,
-                                                            @PageableDefault(sort = "createdAt",
-                                                                    direction = Sort.Direction.DESC)
-                                                            Pageable pageable) {
-        QuestionDetailResponseDto dto = questionService.readQuestion(questionId);
+                                                            @AuthenticationPrincipal MemberDto memberDto) {
+        QuestionDetailResponseDto dto = questionService.readQuestion(lectureCode, questionId, memberDto);
         return Response.success(dto);
     }
 
