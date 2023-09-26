@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/")
 @RequiredArgsConstructor
-public class questionController {
+public class QuestionController {
     private final QuestionService questionService;
 
     // 질문 목록 조회(선생용)
