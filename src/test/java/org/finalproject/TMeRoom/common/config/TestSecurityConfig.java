@@ -22,4 +22,7 @@ import org.springframework.security.web.FilterChainProxy;
 @Import({SecurityConfig.class, JwtTokenProvider.class, TokenAuthenticationService.class,
         CustomAccessDeniedHandler.class, CustomAuthenticationEntryPoint.class})
 public class TestSecurityConfig {
+
+    @MockBean
+    private MemberRepository memberRepository;
 }

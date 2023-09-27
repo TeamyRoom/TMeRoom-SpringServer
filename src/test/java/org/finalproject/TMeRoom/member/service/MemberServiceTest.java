@@ -45,14 +45,14 @@ class MemberServiceTest {
 
     @MockBean
     private MemberRepository memberRepository;
-//    @MockBean
-//    private PasswordEncoder passwordEncoder;
     @MockBean
     private EmailConfirmCodeRepository emailConfirmCodeRepository;
     @MockBean
     private PasswordResetCodeRepository passwordResetCodeRepository;
     @MockBean
     private MailService mailService;
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
 
     private MemberDto getMockGuestMemberDto() {
@@ -275,21 +275,25 @@ class MemberServiceTest {
         @DisplayName("정상적인 요청이라면, 비밀번호 수정시, 새로운 인코딩된 비밀번호로 수정된다.")
         public void givenProperRequest_whenUpdatingPassword_thenUpdatesPassword() {
             // Given
-            String oldPassword = "oldPassworkd";
-            String newPassword = "changedPassword";
+            String oldPassword = "oldPassword";
+            String newPassword = "newPassword";
+            String encodedNewPassword = "encodedNewPassword";
             Member mockMember = mock(Member.class);
             MemberDto mockMemberDto = MemberDto.from(getMockUserMember());
             PasswordUpdateRequestDto requestDto = new PasswordUpdateRequestDto();
             requestDto.setOldPassword(oldPassword);
             requestDto.setNewPassword(newPassword);
+
+            given(mockMember.getPw()).willReturn(oldPassword);
             given(memberRepository.findById(mockMemberDto.getId())).willReturn(Optional.of(mockMember));
-            given(mockMember.isPasswordMatch(any(PasswordEncoder.class), any(String.class))).willReturn(true);
+            given(passwordEncoder.matches(eq(oldPassword), any(String.class))).willReturn(true);
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
 
             // When
             memberService.updatePassword(requestDto, mockMemberDto);
 
             // Then
-            then(mockMember).should().updatePassword(any(), any());
+            then(mockMember).should().updatePassword(encodedNewPassword);
         }
 
         @Test
@@ -298,13 +302,17 @@ class MemberServiceTest {
             // Given
             String oldPassword = "wrongPassword";
             String newPassword = "changedPassword";
+            String encodedNewPassword = "encodedNewPassword";
             Member mockMember = mock(Member.class);
             MemberDto mockMemberDto = MemberDto.from(getMockUserMember());
             PasswordUpdateRequestDto requestDto = new PasswordUpdateRequestDto();
             requestDto.setOldPassword(oldPassword);
             requestDto.setNewPassword(newPassword);
+
+            given(mockMember.getPw()).willReturn(oldPassword);
             given(memberRepository.findById(mockMemberDto.getId())).willReturn(Optional.of(mockMember));
-            given(mockMember.isPasswordMatch(any(PasswordEncoder.class), any(String.class))).willReturn(false);
+            given(passwordEncoder.matches(eq(oldPassword), any(String.class))).willReturn(false);
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
 
             // When
             ApplicationException e = assertThrows(ApplicationException.class,
@@ -312,7 +320,7 @@ class MemberServiceTest {
 
             // Then
             assertEquals(e.getErrorCode(), ErrorCode.INVALID_PASSWORD);
-            then(mockMember).should().isPasswordMatch(any(), any());
+            then(mockMember).should().getPw();
             then(mockMember).shouldHaveNoMoreInteractions();
 
         }
@@ -449,21 +457,24 @@ class MemberServiceTest {
             // Given
             String mockResetCode = "resetCode";
             String mockMemberId = "testUser";
+            String newPassword = "newPassword";
+            String encodedNewPassword = "encodedNewPassword";
             Member mockMember = mock(Member.class);
             PasswordResetRequestDto requestDto = new PasswordResetRequestDto();
-            requestDto.setNewPassword("newPassword");
+            requestDto.setNewPassword(newPassword);
             requestDto.setResetCode(mockResetCode);
+
             given(mockMember.getId()).willReturn(mockMemberId);
             given(passwordResetCodeRepository.findMemberIdByCode(requestDto.getResetCode())).willReturn(
                     Optional.of(mockMemberId));
             given(memberRepository.findById(mockMemberId)).willReturn(Optional.of(mockMember));
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
 
             // When
             memberService.resetPassword(requestDto);
 
             // Then
-            then(mockMember).should()
-                    .updatePassword(any(PasswordEncoder.class), eq(requestDto.getNewPassword()));
+            then(mockMember).should().updatePassword(encodedNewPassword);
             then(passwordResetCodeRepository).should().deleteByCode(requestDto.getResetCode());
         }
 
@@ -474,14 +485,17 @@ class MemberServiceTest {
             // Given
             String mockResetCode = "invalidResetCode";
             String mockMemberId = "testUser";
+            String newPassword = "newPassword";
+            String encodedNewPassword = "encodedNewPassword";
             Member mockMember = mock(Member.class);
             PasswordResetRequestDto requestDto = new PasswordResetRequestDto();
-            requestDto.setNewPassword("newPassword");
+            requestDto.setNewPassword(newPassword);
             requestDto.setResetCode(mockResetCode);
             given(mockMember.getId()).willReturn(mockMemberId);
             given(passwordResetCodeRepository.findMemberIdByCode(requestDto.getResetCode())).willReturn(
                     Optional.empty());
             given(memberRepository.findById(mockMemberId)).willReturn(Optional.of(mockMember));
+            given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
 
             // When
             ApplicationException e = assertThrows(ApplicationException.class,

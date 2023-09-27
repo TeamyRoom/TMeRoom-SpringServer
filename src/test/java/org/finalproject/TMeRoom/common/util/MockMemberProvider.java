@@ -1,28 +1,11 @@
 package org.finalproject.TMeRoom.common.util;
 
-import jakarta.annotation.PostConstruct;
 import org.finalproject.tmeroom.member.constant.MemberRole;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 @TestConfiguration
 public class MockMemberProvider {
-
-    @MockBean
-    private PasswordEncoder encoderBean;
-
-    private static PasswordEncoder passwordEncoder;
-
-    @PostConstruct
-    private void init() {
-        given(encoderBean.encode(any(String.class))).willReturn("encodedPassword");
-        passwordEncoder = encoderBean;
-    }
 
     public static Member getMockGuestMember() {
         return Member.builder()
@@ -31,7 +14,6 @@ public class MockMemberProvider {
                 .email("testGuest@test.com")
                 .nickname("testGuest")
                 .role(MemberRole.GUEST)
-                .encoder(passwordEncoder)
                 .build();
     }
 
@@ -42,7 +24,6 @@ public class MockMemberProvider {
                 .email("testUser@test.com")
                 .nickname("testUser")
                 .role(MemberRole.USER)
-                .encoder(passwordEncoder)
                 .build();
     }
 
@@ -53,7 +34,6 @@ public class MockMemberProvider {
                 .email("testManager@test.com")
                 .nickname("manager")
                 .role(MemberRole.USER)
-                .encoder(passwordEncoder)
                 .build();
     }
 
@@ -64,7 +44,6 @@ public class MockMemberProvider {
                 .email("testStudent@test.com")
                 .nickname("student")
                 .role(MemberRole.USER)
-                .encoder(passwordEncoder)
                 .build();
     }
 
@@ -75,7 +54,6 @@ public class MockMemberProvider {
                 .email("testGuest@test.com")
                 .nickname("teacher")
                 .role(MemberRole.USER)
-                .encoder(passwordEncoder)
                 .build();
     }
 
@@ -86,7 +64,6 @@ public class MockMemberProvider {
                 .email("testGuest@test.com")
                 .nickname("anonymous")
                 .role(MemberRole.USER)
-                .encoder(passwordEncoder)
                 .build();
     }
 }

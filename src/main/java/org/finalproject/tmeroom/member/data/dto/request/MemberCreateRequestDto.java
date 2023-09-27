@@ -26,13 +26,12 @@ public class MemberCreateRequestDto {
     @Email(message = UNMATCHED_EMAIL)
     private String email;
 
-    public Member toEntity(PasswordEncoder encoder) {
+    public Member toEntity() {
         return Member.builder()
                 .id(memberId)
                 .pw(password)
                 .nickname(nickname)
                 .email(email)
-                .encoder(encoder)
                 .build();
     }
 

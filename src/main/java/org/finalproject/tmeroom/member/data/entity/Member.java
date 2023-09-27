@@ -46,9 +46,9 @@ public class Member extends BaseTimeEntity {
     private MemberRole role;
 
     @Builder
-    public Member(String id, String pw, String nickname, String email, MemberRole role, PasswordEncoder encoder) {
+    public Member(String id, String pw, String nickname, String email, MemberRole role) {
         this.id = id;
-        this.pw = encoder.encode(pw);
+        this.pw = pw;
         this.nickname = nickname;
         this.email = email;
         this.role = role == null ? MemberRole.GUEST : role;
@@ -62,15 +62,11 @@ public class Member extends BaseTimeEntity {
     }
 
     public boolean isIdMatch(String id) {
-        return id.equals(this.id);
+        return this.id.equals(id);
     }
 
-    public boolean isPasswordMatch(PasswordEncoder encoder, String pw) {
-        return encoder.matches(pw, this.pw);
-    }
-
-    public void updatePassword(PasswordEncoder encoder, String pw) {
-        this.pw = encoder.encode(pw);
+    public void updatePassword(String pw) {
+        this.pw = pw;
     }
 
     public void updateInfo(MemberUpdateRequestDto requestDto) {
