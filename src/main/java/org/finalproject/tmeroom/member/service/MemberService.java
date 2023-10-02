@@ -47,7 +47,10 @@ public class MemberService {
             throw new ApplicationException(ErrorCode.DUPLICATE_EMAIL);
         }
 
-        Member savedMember = memberRepository.save(requestDto.toEntity());
+        Member newMember = requestDto.toEntity();
+        newMember.updatePassword(passwordEncoder.encode(requestDto.getPassword()));
+
+        Member savedMember = memberRepository.save(newMember);
         sendConfirmMail(MemberDto.from(savedMember));
         return MemberCreateResponseDto.from(savedMember);
     }
