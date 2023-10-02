@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockUserMember;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,18 +48,6 @@ class AuthServiceTest {
         return dto;
     }
 
-    private Member getMockMember() {
-        given(passwordEncoder.encode(any(String.class))).willReturn("encodedPw");
-        return Member.builder()
-                .id("tester00")
-                .pw("password")
-                .email("tester@test.com")
-                .nickname("tester")
-                .role(MemberRole.USER)
-                .encoder(passwordEncoder)
-                .build();
-    }
-
     @Nested
     @DisplayName("로그인 기능 테스트")
     class aboutLogin {
@@ -68,7 +57,7 @@ class AuthServiceTest {
         void givenProperRequestDto_whenLoggingIn_thenReturnsToken() {
             // Given
             LoginRequestDto mockRequestDto = getMockRequestDto();
-            Member mockMember = getMockMember();
+            Member mockMember = getMockUserMember();
             String mockAccessToken = "mockAccessToken";
             given(memberRepository.findById(mockRequestDto.getId())).willReturn(Optional.of(mockMember));
             given(passwordEncoder.matches(mockRequestDto.getPw(), mockMember.getPw())).willReturn(true);
@@ -107,7 +96,7 @@ class AuthServiceTest {
         void givenWrongPassword_whenLoggingIn_thenThrowsUserNotFoundException() {
             // Given
             LoginRequestDto mockRequestDto = getMockRequestDto();
-            Member mockMember = getMockMember();
+            Member mockMember = getMockUserMember();
             given(memberRepository.findById(mockRequestDto.getId())).willReturn(Optional.of(mockMember));
             given(passwordEncoder.matches(mockRequestDto.getPw(), mockMember.getPw())).willReturn(false);
 

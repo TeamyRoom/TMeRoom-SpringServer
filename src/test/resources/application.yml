@@ -1,9 +1,0 @@
-jwt:
-  secret:
-    key: LongLongLongLongLongLongLongLongTestJWTKey
-
-spring:
-  data:
-    redis:
-      host: localhost
-      port: 6379

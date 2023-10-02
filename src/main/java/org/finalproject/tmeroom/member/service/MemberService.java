@@ -47,7 +47,7 @@ public class MemberService {
             throw new ApplicationException(ErrorCode.DUPLICATE_EMAIL);
         }
 
-        Member savedMember = memberRepository.save(requestDto.toEntity(passwordEncoder));
+        Member savedMember = memberRepository.save(requestDto.toEntity());
         sendConfirmMail(MemberDto.from(savedMember));
         return MemberCreateResponseDto.from(savedMember);
     }
@@ -99,11 +99,11 @@ public class MemberService {
         Member foundMember = memberRepository.findById(memberDto.getId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
-        if (!foundMember.isPasswordMatch(passwordEncoder, requestDto.getOldPassword())) {
+        if (!passwordEncoder.matches(foundMember.getPw(), requestDto.getOldPassword())) {
             throw new ApplicationException(ErrorCode.INVALID_PASSWORD);
         }
 
-        foundMember.updatePassword(passwordEncoder, requestDto.getNewPassword());
+        foundMember.updatePassword(passwordEncoder.encode(requestDto.getNewPassword()));
     }
 
     public void deleteMember(MemberDto memberDto) {
@@ -149,7 +149,7 @@ public class MemberService {
         Member foundMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
-        foundMember.updatePassword(passwordEncoder, requestDto.getNewPassword());
+        foundMember.updatePassword(passwordEncoder.encode(requestDto.getNewPassword()));
 
         passwordResetCodeRepository.deleteByCode(requestDto.getResetCode());
     }
