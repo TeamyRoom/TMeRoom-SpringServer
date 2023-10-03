@@ -106,7 +106,7 @@ class StudentServiceTest {
         Page<Student> mockPage = new PageImpl<>(List.of(student), MOCK_PAGEABLE, 0);
 
         given(memberRepository.getReferenceById("student")).willReturn(student.getMember());
-        given(studentRepository.findByMember(eq(student.getMember()), any(Pageable.class))).willReturn(mockPage);
+        given(studentRepository.findAllByMember(eq(student.getMember()), any(Pageable.class))).willReturn(mockPage);
 
         //When
         Page<LectureDetailResponseDto> lectureResponsePage = studentService.lookupMyLectures(mockStudentDto, MOCK_PAGEABLE);
