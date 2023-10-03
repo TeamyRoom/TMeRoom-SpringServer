@@ -41,6 +41,7 @@ public class MemberDto {
                 .nickname(member.getNickname())
                 .email(member.getEmail())
                 .pw(member.getPw())
+                .role(member.getRole())
                 .build();
     }
 
@@ -48,5 +49,9 @@ public class MemberDto {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add((GrantedAuthority) () -> role.getName());
         return authorities;
+    }
+
+    public boolean isAdmin() {
+        return role.equals(MemberRole.ADMIN);
     }
 }
