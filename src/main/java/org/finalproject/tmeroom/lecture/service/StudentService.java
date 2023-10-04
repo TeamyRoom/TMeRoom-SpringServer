@@ -31,7 +31,7 @@ public class StudentService extends LectureCommon {
     public Page<LectureDetailResponseDto> lookupMyLectures(MemberDto memberDTO, Pageable pageable) {
         Member member = memberRepository.getReferenceById(memberDTO.getId());
 
-        Page<Student> myLectures = studentRepository.findByMember(member, pageable);
+        Page<Student> myLectures = studentRepository.findAllByMember(member, pageable);
         return myLectures.map(LectureDetailResponseDto::from);
     }
 

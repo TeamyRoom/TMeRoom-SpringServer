@@ -1,9 +1,11 @@
 package org.finalproject.tmeroom.common.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.finalproject.tmeroom.common.data.dto.Response;
 import org.finalproject.tmeroom.common.data.dto.ValidationMessageDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,6 +35,12 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> applicationExceptionHandler(ApplicationException e) {
         return ResponseEntity.status(e.getStatus())
                 .body(Response.error(e.getErrorCode().name(), e.getMessage()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> entityNotFoundExceptionHandler(EntityNotFoundException e) {
+        return ResponseEntity.status(ErrorCode.ENTITY_NOT_FOUND.getStatus())
+                .body(Response.error(ErrorCode.ENTITY_NOT_FOUND.name(), e.getMessage()));
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})

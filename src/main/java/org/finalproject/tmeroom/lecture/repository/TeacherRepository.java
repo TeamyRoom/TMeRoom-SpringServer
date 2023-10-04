@@ -13,4 +13,6 @@ public interface TeacherRepository extends JpaRepository<Teacher, TeacherPK> {
     Optional<Teacher> findByMemberIdAndLectureCode(String memberId, String lectureCode);
 
     Page<Teacher> findByLecture(Lecture lecture, Pageable pageable);
+
+    Page<Teacher> findAllByMemberId(String memberId, Pageable pageable);
 }
