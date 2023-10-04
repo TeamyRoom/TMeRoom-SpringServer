@@ -43,10 +43,11 @@ public class File extends BaseTimeEntity {
     private String uploaderNickname;
 
     @Column
-    private String fileType;
+    @Enumerated(EnumType.STRING)
+    private FileType fileType;
 
     @Builder
-    public File(Lecture lecture, String fileName, String uuidFileName, String fileLink, String uploaderNickname, String fileType) {
+    public File(Lecture lecture, String fileName, String uuidFileName, String fileLink, String uploaderNickname, FileType fileType) {
         this.lecture = lecture;
         this.fileName = fileName;
         this.uuidFileName = uuidFileName;

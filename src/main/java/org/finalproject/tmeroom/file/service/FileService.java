@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.file.data.dto.response.FileDetailResponseDto;
-import org.finalproject.tmeroom.file.data.dto.response.FileUploadResponseDto;
 import org.finalproject.tmeroom.file.data.entity.File;
+import org.finalproject.tmeroom.file.data.entity.FileType;
 import org.finalproject.tmeroom.file.repository.FileRepository;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.lecture.data.entity.Student;
@@ -18,7 +18,6 @@ import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
-import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -30,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -39,27 +37,15 @@ import java.util.UUID;
 @Transactional
 public class FileService {
     private final FileRepository fileRepository;
-    private final MemberRepository memberRepository;
     private final LectureRepository lectureRepository;
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
-
+    private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final AmazonS3 amazonS3;
-
-    // 파일 조회
-    public Page<FileDetailResponseDto> lookupFiles(String lectureCode, MemberDto memberDto, Pageable pageable){
-        Lecture lecture = lectureRepository.getReferenceById(lectureCode);
-        checkPermission(lecture, memberDto);
-
-        Page<File> filePage = fileRepository.findByLecture(lecture, pageable);
-
-        return filePage.map(FileDetailResponseDto::from);
-    }
 
     // 파일 등록
-    public void registerFile(String lectureCode, MemberDto memberDto, List<MultipartFile> multipartFiles){
+    public void registerFile(String lectureCode, MemberDto memberDto, List<MultipartFile> multipartFiles) {
         Lecture lecture = lectureRepository.getReferenceById(lectureCode);
         checkPermission(lecture, memberDto);
 
@@ -67,7 +53,7 @@ public class FileService {
     }
 
     // 파일 s3 업로드
-    public void uploadAndSaveFiles(List<MultipartFile> multipartFiles,Lecture lecture, MemberDto memberDto){
+    public void uploadAndSaveFiles(List<MultipartFile> multipartFiles, Lecture lecture, MemberDto memberDto) {
         if (multipartFiles == null) {
             throw new ApplicationException(ErrorCode.NO_FILE_ERROR); //발생할 가능성 없어 보임
         }
@@ -80,13 +66,14 @@ public class FileService {
             }
             String originalFileName = multipartFile.getOriginalFilename();
             String uuidFileName = getUuidFileName(originalFileName);
+            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
             uploadFile(multipartFile, uuidFileName);
 
             File uploadedFile = File.builder()
                     .fileName(originalFileName)
                     .uuidFileName(uuidFileName)
                     .fileLink(amazonS3.getUrl(bucket, uuidFileName).toString())
-                    .fileType(originalFileName.substring(originalFileName.lastIndexOf(".")))
+                    .fileType(FileType.fromExtension(fileExtension))
                     .uploaderNickname(memberDto.getNickname())
                     .lecture(lecture)
                     .build();
@@ -113,18 +100,8 @@ public class FileService {
         }
     }
 
-    // 파일 다운로드
-    public UrlResource getUrlResource(String lectureCode, Long fileId, MemberDto memberDto) {
-        File downloadFile = fileRepository.findById(fileId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NO_FILE_ERROR));
-
-        String originalFilename = downloadFile.getUuidFileName();
-
-        return new UrlResource(amazonS3.getUrl(bucket, originalFilename));
-    }
-
     // 파일 삭제
-    public void deleteFile(String lectureCode, Long fileId, MemberDto memberDto){
+    public void deleteFile(String lectureCode, Long fileId, MemberDto memberDto) {
         File deleteFile = fileRepository.findById(fileId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NO_FILE_ERROR));
 
@@ -135,12 +112,25 @@ public class FileService {
     }
 
     // 파일 검색
-    public Page<FileDetailResponseDto> findFilesByKeywordAndLecture(String keyword, String lectureCode, Pageable pageable){
+    public Page<FileDetailResponseDto> findFilesByKeywordAndLecture(String keyword, String lectureCode,
+                                                                    String fileType, Pageable pageable,
+                                                                    MemberDto memberDto) {
         Lecture lecture = lectureRepository.getReferenceById(lectureCode);
-        Page<File> files = fileRepository.findFilesByKeywordAndLecture(keyword, lecture, pageable);
+        checkPermission(lecture, memberDto);
+        Page<File> files;
+        //TODO: Converter로 Refactoring하자
+        try{
+            FileType type = FileType.valueOf(fileType);
+            files =
+                    fileRepository.findAllByFileNameContainingAndLectureAndFileType(keyword, lecture, type, pageable);
+        }catch (Exception e){
+            files =
+                    fileRepository.findAllByFileNameContainingAndLecture(keyword, lecture, pageable);
+        }
 
         return files.map(FileDetailResponseDto::from);
     }
+
 
     private void checkPermission(Lecture lecture, MemberDto memberDto) {
         String lectureCode = lecture.getLectureCode();
@@ -150,13 +140,13 @@ public class FileService {
 
         Student student = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .orElse(null);
-        if(student != null) return;
+        if (student != null) return;
 
         Teacher teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .orElse(null);
-        if(teacher != null) return;
+        if (teacher != null) return;
 
-        if(lecture.getManager().isIdMatch(memberDto.getId())) return;
+        if (lecture.getManager().isIdMatch(memberDto.getId())) return;
 
         throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
     }
