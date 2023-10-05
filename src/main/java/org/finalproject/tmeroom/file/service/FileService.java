@@ -12,8 +12,6 @@ import org.finalproject.tmeroom.file.data.entity.File;
 import org.finalproject.tmeroom.file.data.entity.FileType;
 import org.finalproject.tmeroom.file.repository.FileRepository;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
-import org.finalproject.tmeroom.lecture.data.entity.Student;
-import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
@@ -46,10 +44,30 @@ public class FileService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    // 파일 조회 및 검색
+    public Page<FileDetailResponseDto> findFilesByKeywordAndLecture(String keyword, String lectureCode,
+                                                                    String fileType, Pageable pageable,
+                                                                    MemberDto memberDto) {
+        Lecture lecture = lectureRepository.getReferenceById(lectureCode);
+        checkPermission(lecture, memberDto, AccessPermission.READ);
+        Page<File> files;
+        //TODO: Converter로 Refactoring하자
+        try {
+            FileType type = FileType.valueOf(fileType);
+            files =
+                    fileRepository.findAllByFileNameContainingAndLectureAndFileType(keyword, lecture, type, pageable);
+        } catch (Exception e) {
+            files =
+                    fileRepository.findAllByFileNameContainingAndLecture(keyword, lecture, pageable);
+        }
+
+        return files.map(FileDetailResponseDto::from);
+    }
+
     // 파일 등록
     public void registerFile(String lectureCode, MemberDto memberDto, List<MultipartFile> multipartFiles) {
         Lecture lecture = lectureRepository.getReferenceById(lectureCode);
-        checkPermission(lecture, memberDto);
+        checkPermission(lecture, memberDto, AccessPermission.WRITE);
 
         uploadAndSaveFiles(multipartFiles, lecture, memberDto);
     }
@@ -107,48 +125,53 @@ public class FileService {
         File deleteFile = fileRepository.findById(fileId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NO_FILE_ERROR));
 
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+
+        checkPermission(lecture, memberDto, AccessPermission.DELETE);
+
         String originalFilename = deleteFile.getUuidFileName();
 
         amazonS3.deleteObject(bucket, originalFilename);
         fileRepository.delete(deleteFile);
     }
 
-    // 파일 검색
-    public Page<FileDetailResponseDto> findFilesByKeywordAndLecture(String keyword, String lectureCode,
-                                                                    String fileType, Pageable pageable,
-                                                                    MemberDto memberDto) {
-        Lecture lecture = lectureRepository.getReferenceById(lectureCode);
-        checkPermission(lecture, memberDto);
-        Page<File> files;
-        //TODO: Converter로 Refactoring하자
-        try {
-            FileType type = FileType.valueOf(fileType);
-            files =
-                    fileRepository.findAllByFileNameContainingAndLectureAndFileType(keyword, lecture, type, pageable);
-        } catch (Exception e) {
-            files =
-                    fileRepository.findAllByFileNameContainingAndLecture(keyword, lecture, pageable);
-        }
-
-        return files.map(FileDetailResponseDto::from);
-    }
-
-
-    private void checkPermission(Lecture lecture, MemberDto memberDto) {
+    private void checkPermission(Lecture lecture, MemberDto memberDto, AccessPermission requiredPermission) {
         if (memberDto == null) {
             throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
         }
 
         Member member = memberRepository.getReferenceById(memberDto.getId());
 
-        if (studentRepository.existsByMemberAndLecture(member, lecture) ||
-                teacherRepository.existsByMemberAndLecture(member, lecture) ||
-                lecture.getManager().isIdMatch(memberDto.getId())) {
+        boolean hasPermission = false;
+
+        switch (requiredPermission) {
+            case READ:
+                hasPermission = studentRepository.existsByMemberAndLecture(member, lecture) ||
+                        teacherRepository.existsByMemberAndLecture(member, lecture) ||
+                        lecture.getManager().isIdMatch(memberDto.getId());
+                break;
+            case WRITE:
+                hasPermission = teacherRepository.existsByMemberAndLecture(member, lecture) ||
+                        lecture.getManager().isIdMatch(memberDto.getId());
+                break;
+            case DELETE:
+                hasPermission = lecture.getManager().isIdMatch(memberDto.getId());
+                break;
+            default:
+                // Do nothing
+        }
+
+        if (hasPermission) {
             return;
         }
 
         throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
     }
 
-
+    public enum AccessPermission {
+        READ,
+        WRITE,
+        DELETE
+    }
 }
