@@ -1,7 +1,9 @@
 package org.finalproject.tmeroom.file.data.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
@@ -32,11 +34,25 @@ public class File extends BaseTimeEntity {
     private String fileName;
 
     @NotNull
+    private String uuidFileName;
+
+    @NotNull
     private String fileLink;
 
     @Column
     private String uploaderNickname;
 
     @Column
-    private String fileType;
+    @Enumerated(EnumType.STRING)
+    private FileType fileType;
+
+    @Builder
+    public File(Lecture lecture, String fileName, String uuidFileName, String fileLink, String uploaderNickname, FileType fileType) {
+        this.lecture = lecture;
+        this.fileName = fileName;
+        this.uuidFileName = uuidFileName;
+        this.fileLink = fileLink;
+        this.uploaderNickname = uploaderNickname;
+        this.fileType = fileType;
+    }
 }

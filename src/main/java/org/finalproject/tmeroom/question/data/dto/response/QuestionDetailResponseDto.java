@@ -31,7 +31,7 @@ public class QuestionDetailResponseDto {
                 .questionTitle(question.getTitle())
                 .questionContent(question.getContent())
                 .authorNickname(question.getAuthorNickname())
-                .createdAt(question.getCreateAt())
+                .createdAt(question.getCreatedAt())
                 .build();
     }
 }

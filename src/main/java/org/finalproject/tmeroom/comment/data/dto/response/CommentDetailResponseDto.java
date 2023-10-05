@@ -27,7 +27,7 @@ public class CommentDetailResponseDto {
                 .commentId(comment.getId())
                 .commenterNickname(comment.getCommenter().getNickname())
                 .content(comment.getContent())
-                .createdAt(comment.getCreateAt())
+                .createdAt(comment.getCreatedAt())
                 .build();
     }
 }
