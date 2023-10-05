@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, StudentPK> {
     Optional<Student> findByMemberIdAndLectureCode(String memberId, String lectureCode);
 
+    Boolean existsByMemberAndLecture(Member member, Lecture lecture);
+
     Page<Student> findByLecture(Lecture lecture, Pageable pageable);
 
     Page<Student> findAllByMember(Member member, Pageable pageable);

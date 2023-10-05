@@ -18,8 +18,9 @@ import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
+import org.finalproject.tmeroom.member.data.entity.Member;
+import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,7 @@ public class FileService {
     private final LectureRepository lectureRepository;
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
+    private final MemberRepository memberRepository;
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -64,6 +66,8 @@ public class FileService {
             if (multipartFile.isEmpty()) {
                 throw new ApplicationException(ErrorCode.EMPTY_FILE_ERROR); //이미지가 비어 있으면 예외 발생
             }
+        }
+        for (MultipartFile multipartFile : multipartFiles) {
             String originalFileName = multipartFile.getOriginalFilename();
             String uuidFileName = getUuidFileName(originalFileName);
             String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
@@ -80,8 +84,6 @@ public class FileService {
 
             uploadedFiles.add(fileRepository.save(uploadedFile));
         }
-
-//        return FileUploadResponseDto.from(uploadedFiles);
     }
 
     private String getUuidFileName(String originalFileName) {
@@ -119,11 +121,11 @@ public class FileService {
         checkPermission(lecture, memberDto);
         Page<File> files;
         //TODO: Converter로 Refactoring하자
-        try{
+        try {
             FileType type = FileType.valueOf(fileType);
             files =
                     fileRepository.findAllByFileNameContainingAndLectureAndFileType(keyword, lecture, type, pageable);
-        }catch (Exception e){
+        } catch (Exception e) {
             files =
                     fileRepository.findAllByFileNameContainingAndLecture(keyword, lecture, pageable);
         }
@@ -133,20 +135,17 @@ public class FileService {
 
 
     private void checkPermission(Lecture lecture, MemberDto memberDto) {
-        String lectureCode = lecture.getLectureCode();
         if (memberDto == null) {
             throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
         }
 
-        Student student = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
-                .orElse(null);
-        if (student != null) return;
+        Member member = memberRepository.getReferenceById(memberDto.getId());
 
-        Teacher teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
-                .orElse(null);
-        if (teacher != null) return;
-
-        if (lecture.getManager().isIdMatch(memberDto.getId())) return;
+        if (studentRepository.existsByMemberAndLecture(member, lecture) ||
+                teacherRepository.existsByMemberAndLecture(member, lecture) ||
+                lecture.getManager().isIdMatch(memberDto.getId())) {
+            return;
+        }
 
         throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
     }

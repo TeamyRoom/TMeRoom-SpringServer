@@ -1,10 +1,12 @@
 package org.finalproject.tmeroom.file.data.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 @Getter
 public enum FileType {
@@ -14,10 +16,15 @@ public enum FileType {
     VIDEO("flv", "mov", "mp4", "mpg", "mkv", "avi", "swf", "ts"),
     ARCHIVE("zip", "apk", "rar", "7z", "tar"),
     CODE("c", "c++", "cpp", "class", "cxx", "js", "pl", "py", "rb", "java", "h", "hxx", "css", "less", "scss", "sass", "json", "html", "htm", "xml", "toml", "yaml", "yml", "dev", "dsp", "dsw", "vcproj", "vcxproj", "sln", "classpath", "project", "vsix"),
-    EXE("bat", "exe", "com", "apk", "dll", "iso", "lnk", "sys", "resx"),
+    EXE("bat", "exe", "com", "dll", "iso", "lnk", "sys", "resx"),
     ETC;
 
     private final List<String> extensions;
+    private static final Map<String, FileType> stringFileTypeMap =
+            Stream.of(values())
+                    .flatMap(type -> type.extensions.stream()
+                            .map(extension-> new SimpleEntry<>(extension, type)))
+                    .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
     FileType(String... extensions) {
         this.extensions = Arrays.asList(extensions);
@@ -28,11 +35,6 @@ public enum FileType {
     }
 
     public static FileType fromExtension(String extension) {
-        for (FileType type : FileType.values()) {
-            if (type.extensions.contains(extension)) {
-                return type;
-            }
-        }
-        return FileType.ETC; // 일치하는 유형을 찾지 못한 경우 기본값 반환
+        return stringFileTypeMap.getOrDefault(extension, ETC);
     }
 }
