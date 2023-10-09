@@ -73,7 +73,7 @@ public class FileService {
     }
 
     // 파일 s3 업로드
-    public void uploadAndSaveFiles(List<MultipartFile> multipartFiles, Lecture lecture, MemberDto memberDto) {
+    private void uploadAndSaveFiles(List<MultipartFile> multipartFiles, Lecture lecture, MemberDto memberDto) {
         if (multipartFiles == null) {
             throw new ApplicationException(ErrorCode.NO_FILE_ERROR); //발생할 가능성 없어 보임
         }
@@ -123,7 +123,7 @@ public class FileService {
     // 파일 삭제
     public void deleteFile(String lectureCode, Long fileId, MemberDto memberDto) {
         File deleteFile = fileRepository.findById(fileId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NO_FILE_ERROR));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_FILE_ID));
 
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
@@ -138,7 +138,7 @@ public class FileService {
 
     private void checkPermission(Lecture lecture, MemberDto memberDto, AccessPermission requiredPermission) {
         if (memberDto == null) {
-            throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
+            throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
         }
 
         Member member = memberRepository.getReferenceById(memberDto.getId());
@@ -146,27 +146,21 @@ public class FileService {
         boolean hasPermission = false;
 
         switch (requiredPermission) {
-            case READ:
-                hasPermission = studentRepository.existsByMemberAndLecture(member, lecture) ||
-                        teacherRepository.existsByMemberAndLecture(member, lecture) ||
-                        lecture.getManager().isIdMatch(memberDto.getId());
-                break;
-            case WRITE:
-                hasPermission = teacherRepository.existsByMemberAndLecture(member, lecture) ||
-                        lecture.getManager().isIdMatch(memberDto.getId());
-                break;
-            case DELETE:
-                hasPermission = lecture.getManager().isIdMatch(memberDto.getId());
-                break;
-            default:
-                // Do nothing
+            case READ -> hasPermission = studentRepository.existsByMemberAndLecture(member, lecture) ||
+                    teacherRepository.existsByMemberAndLecture(member, lecture) ||
+                    lecture.getManager().isIdMatch(memberDto.getId());
+            case WRITE -> hasPermission = teacherRepository.existsByMemberAndLecture(member, lecture) ||
+                    lecture.getManager().isIdMatch(memberDto.getId());
+            case DELETE -> hasPermission = lecture.getManager().isIdMatch(memberDto.getId());
+            default -> {
+            }
         }
 
         if (hasPermission) {
             return;
         }
 
-        throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
+        throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
     }
 
     public enum AccessPermission {
