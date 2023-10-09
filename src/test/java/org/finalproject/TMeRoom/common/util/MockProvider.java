@@ -1,11 +1,12 @@
 package org.finalproject.TMeRoom.common.util;
 
+import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.member.constant.MemberRole;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.springframework.boot.test.context.TestConfiguration;
 
 @TestConfiguration
-public class MockMemberProvider {
+public class MockProvider {
 
     public static Member getMockGuestMember() {
         return Member.builder()
@@ -105,6 +106,14 @@ public class MockMemberProvider {
                 .email("testAnonymous@test.com")
                 .nickname("anonymous")
                 .role(MemberRole.USER)
+                .build();
+    }
+
+    public static Lecture getMockLecture(String 강의명, Member 관리자) {
+        return Lecture.builder()
+                .lectureCode("code")
+                .lectureName(강의명)
+                .manager(관리자)
                 .build();
     }
 }

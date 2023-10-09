@@ -1,7 +1,7 @@
 package org.finalproject.TMeRoom.lecture.service;
 
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.finalproject.TMeRoom.common.util.MockMemberProvider;
+import org.finalproject.TMeRoom.common.util.MockProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.common.service.MailService;
@@ -33,15 +33,15 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockManagerMember;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockTeacherMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockManagerMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockTeacherMember;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @SpringBootTest(classes = {TeacherService.class})
-@Import(value = MockMemberProvider.class)
+@Import(value = MockProvider.class)
 @ActiveProfiles("test")
 @DisplayName("강사 서비스")
 class TeacherServiceTest {

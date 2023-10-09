@@ -34,6 +34,7 @@ public enum ErrorCode {
     INVALID_COMMENT_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 댓글"),
     INVALID_TEACHER_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 교사"),
     INVALID_STUDENT_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 학생"),
+    INVALID_FILE_ID(HttpStatus.BAD_REQUEST, "존재하지 않는 파일"),
     TYPE_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, "검색 타입 미설정"),
     NO_FILE_ERROR(HttpStatus.BAD_REQUEST, "파일이 전달되지 않았습니다."),
     EMPTY_FILE_ERROR(HttpStatus.BAD_REQUEST, "비어 있는 파일입니다."),

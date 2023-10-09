@@ -1,7 +1,7 @@
 package org.finalproject.TMeRoom.question.service;
 
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.finalproject.TMeRoom.common.util.MockMemberProvider;
+import org.finalproject.TMeRoom.common.util.MockProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
@@ -38,13 +38,13 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.*;
+import static org.finalproject.TMeRoom.common.util.MockProvider.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @SpringBootTest(classes = {QuestionService.class})
-@Import(value = MockMemberProvider.class)
+@Import(value = MockProvider.class)
 @ActiveProfiles("test")
 @DisplayName("질문 서비스")
 class QuestionServiceTest {
