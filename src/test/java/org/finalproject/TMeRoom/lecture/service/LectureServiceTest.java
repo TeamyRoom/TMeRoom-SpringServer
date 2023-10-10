@@ -1,6 +1,6 @@
 package org.finalproject.TMeRoom.lecture.service;
 
-import org.finalproject.TMeRoom.common.util.MockMemberProvider;
+import org.finalproject.TMeRoom.common.util.MockProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto;
@@ -19,21 +19,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockManagerMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockManagerMember;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 @SpringBootTest(classes = {LectureService.class})
-@Import(value = MockMemberProvider.class)
+@Import(value = MockProvider.class)
 @ActiveProfiles("test")
 @DisplayName("강의 서비스")
 public class LectureServiceTest {

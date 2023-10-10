@@ -1,6 +1,6 @@
 package org.finalproject.TMeRoom.admin.service;
 
-import org.finalproject.TMeRoom.common.util.MockMemberProvider;
+import org.finalproject.TMeRoom.common.util.MockProvider;
 import org.finalproject.tmeroom.admin.constant.LectureSearchType;
 import org.finalproject.tmeroom.admin.constant.MemberRoleSearchType;
 import org.finalproject.tmeroom.admin.constant.MemberSearchType;
@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.*;
+import static org.finalproject.TMeRoom.common.util.MockProvider.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +52,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 @SpringBootTest(classes = AdminService.class)
-@Import(value = MockMemberProvider.class)
+@Import(value = MockProvider.class)
 @DisplayName("어드민 관련 기능 테스트")
 class AdminServiceTest {
 

@@ -1,6 +1,6 @@
 package org.finalproject.TMeRoom.member.service;
 
-import org.finalproject.TMeRoom.common.util.MockMemberProvider;
+import org.finalproject.TMeRoom.common.util.MockProvider;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.common.service.MailService;
@@ -25,8 +25,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockGuestMember;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockUserMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockGuestMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockUserMember;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,7 +36,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 @SpringBootTest(classes = {MemberService.class})
-@Import(value = MockMemberProvider.class)
+@Import(value = MockProvider.class)
 @DisplayName("인증 서비스 로직 테스트")
 class MemberServiceTest {
 

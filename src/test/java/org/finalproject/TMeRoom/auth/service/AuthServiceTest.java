@@ -7,7 +7,6 @@ import org.finalproject.tmeroom.auth.data.dto.response.LoginResponseDto;
 import org.finalproject.tmeroom.auth.service.AuthService;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
-import org.finalproject.tmeroom.member.constant.MemberRole;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockUserMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockUserMember;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

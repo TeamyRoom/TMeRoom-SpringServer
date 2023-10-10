@@ -1,7 +1,7 @@
 package org.finalproject.TMeRoom.comment.service;
 
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.finalproject.TMeRoom.common.util.MockMemberProvider;
+import org.finalproject.TMeRoom.common.util.MockProvider;
 import org.finalproject.tmeroom.comment.data.dto.request.CommentCreateRequestDto;
 import org.finalproject.tmeroom.comment.data.dto.request.CommentUpdateRequestDto;
 import org.finalproject.tmeroom.comment.data.dto.response.CommentDetailResponseDto;
@@ -34,13 +34,13 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.*;
+import static org.finalproject.TMeRoom.common.util.MockProvider.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @SpringBootTest(classes = {CommentService.class})
-@Import(value = MockMemberProvider.class)
+@Import(value = MockProvider.class)
 @ActiveProfiles("test")
 @DisplayName("댓글 서비스")
 class CommentServiceTest {
