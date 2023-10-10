@@ -25,15 +25,15 @@ public class MemberTestController {
 
     private final MemberService memberService;
 
-    @PostConstruct
-    private void makeTesterMember() {
-        MemberCreateRequestDto requestDto = new MemberCreateRequestDto();
-        requestDto.setMemberId("tester00");
-        requestDto.setNickname("tester");
-        requestDto.setPassword("test");
-        requestDto.setEmail("tester@test.com");
-        memberService.createMember(requestDto);
-    }
+//    @PostConstruct
+//    private void makeTesterMember() {
+//        MemberCreateRequestDto requestDto = new MemberCreateRequestDto();
+//        requestDto.setMemberId("tester00");
+//        requestDto.setNickname("tester");
+//        requestDto.setPassword("test");
+//        requestDto.setEmail("tester@test.com");
+//        memberService.createMember(requestDto);
+//    }
 
     @GetMapping("/email/confirm/{confirmCode}")
     public Response<Void> confirmMailTemp(@PathVariable String confirmCode) {

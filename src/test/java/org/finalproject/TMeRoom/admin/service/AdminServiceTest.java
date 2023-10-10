@@ -268,7 +268,7 @@ class AdminServiceTest {
                     () -> adminService.searchLectures(requestDto, nonAdminMemberDto));
 
             // Then
-            assertEquals(e.getErrorCode(), ErrorCode.INVALID_ACCESS_PERMISSION);
+            assertEquals(e.getErrorCode(), ErrorCode.AUTHORIZATION_ERROR);
             then(lectureRepository).shouldHaveNoInteractions();
         }
     }
@@ -317,7 +317,7 @@ class AdminServiceTest {
                     () -> adminService.readMemberDetailProfile(requestDto, nonAdminMemberDto));
 
             // Then
-            assertEquals(e.getErrorCode(), ErrorCode.INVALID_ACCESS_PERMISSION);
+            assertEquals(e.getErrorCode(), ErrorCode.AUTHORIZATION_ERROR);
             then(lectureRepository).shouldHaveNoInteractions();
         }
 
@@ -497,7 +497,7 @@ class AdminServiceTest {
                     () -> adminService.readMemberDetailLecture(requestDto, nonAdminMemberDto));
 
             // Then
-            assertEquals(e.getErrorCode(), ErrorCode.INVALID_ACCESS_PERMISSION);
+            assertEquals(e.getErrorCode(), ErrorCode.AUTHORIZATION_ERROR);
             then(lectureRepository).shouldHaveNoInteractions();
         }
     }
@@ -552,7 +552,7 @@ class AdminServiceTest {
                     () -> adminService.readLectureInfo(requestDto, nonAdminMemberDto));
 
             // Then
-            assertEquals(e.getErrorCode(), ErrorCode.INVALID_ACCESS_PERMISSION);
+            assertEquals(e.getErrorCode(), ErrorCode.AUTHORIZATION_ERROR);
         }
 
         @Test
@@ -607,7 +607,7 @@ class AdminServiceTest {
                     () -> adminService.deleteMember(memberId, nonAdminMemberDto));
 
             // Then
-            assertEquals(e.getErrorCode(), ErrorCode.INVALID_ACCESS_PERMISSION);
+            assertEquals(e.getErrorCode(), ErrorCode.AUTHORIZATION_ERROR);
             then(memberRepository).shouldHaveNoInteractions();
         }
     }
@@ -644,7 +644,7 @@ class AdminServiceTest {
                     () -> adminService.deleteLecture(mockLectureCode, nonAdminMemberDto));
 
             // Then
-            assertEquals(e.getErrorCode(), ErrorCode.INVALID_ACCESS_PERMISSION);
+            assertEquals(e.getErrorCode(), ErrorCode.AUTHORIZATION_ERROR);
             then(memberRepository).shouldHaveNoInteractions();
         }
     }

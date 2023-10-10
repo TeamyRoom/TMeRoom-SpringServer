@@ -101,7 +101,7 @@ class AuthControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(requestDto))
                     ).andDo(print())
-                    .andExpect(status().isNotFound())
+                    .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.[?(@.resultCode == 'USER_NOT_FOUND')]").exists());
         }
 

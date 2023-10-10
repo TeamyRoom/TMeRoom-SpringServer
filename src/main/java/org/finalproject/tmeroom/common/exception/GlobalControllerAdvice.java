@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -53,6 +54,12 @@ public class GlobalControllerAdvice {
 
         return ResponseEntity.status(ErrorCode.REQUEST_PARSE_ERROR.getStatus())
                 .body(Response.error(ErrorCode.REQUEST_PARSE_ERROR.name(), messages));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> enumConversionExceptionHandler(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.status(ErrorCode.PARAM_CONVERSION_FAILURE.getStatus())
+                .body(Response.error(ErrorCode.PARAM_CONVERSION_FAILURE.name(), ErrorCode.PARAM_CONVERSION_FAILURE.getMessage() + ": " + e.getName()));
     }
 }
 

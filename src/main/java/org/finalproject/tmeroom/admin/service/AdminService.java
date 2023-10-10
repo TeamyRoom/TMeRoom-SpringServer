@@ -43,7 +43,7 @@ public class AdminService {
 
     private void checkAdmin(MemberDto loginMember) {
         if (!loginMember.isAdmin()) {
-            throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
+            throw new ApplicationException(ErrorCode.AUTHORIZATION_ERROR);
         }
     }
 
