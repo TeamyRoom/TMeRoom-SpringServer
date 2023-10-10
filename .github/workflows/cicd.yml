@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: TeamyRoom/TMeRoom-SpringServerEnv
+          ref: master
           token: ${{ secrets.ACTION_TOKEN }}
 
       - name: Upload env files
