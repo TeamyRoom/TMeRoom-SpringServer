@@ -90,7 +90,10 @@ class QuestionServiceTest {
         // Given
         Lecture lecture = getMockLecture();
         Member member = getMockStudentMember();
-        QuestionCreateRequestDto requestDto = new QuestionCreateRequestDto("title", "content", true);
+        QuestionCreateRequestDto requestDto = new QuestionCreateRequestDto();
+        requestDto.setIsPublic(true);
+        requestDto.setTitle("Title");
+        requestDto.setContent("Content");
 
         given(lectureRepository.findById(lecture.getLectureCode())).willReturn(Optional.of(lecture));
         given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
@@ -329,11 +332,12 @@ class QuestionServiceTest {
             Member author = getMockStudentMember();
             Question question = getMockQuestion();
             QuestionUpdateRequestDto requestDto =
-                    new QuestionUpdateRequestDto(question.getTitle(), question.getContent(), true);
+                    new QuestionUpdateRequestDto();
             String modifiedTitle = "modifiedTitle";
             String modifiedContent = "modifiedContent";
             requestDto.setTitle(modifiedTitle);
             requestDto.setContent(modifiedContent);
+            requestDto.setIsPublic(true);
 
             given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
@@ -352,7 +356,7 @@ class QuestionServiceTest {
             Member author = getMockAnonymousMember();
             Question question = getMockQuestion();
             QuestionUpdateRequestDto requestDto =
-                    new QuestionUpdateRequestDto(question.getTitle(), question.getContent(), true);
+                    new QuestionUpdateRequestDto();
 
             given(questionRepository.findById(MOCK_QUESTION_ID)).willReturn(Optional.of(question));
 
