@@ -17,7 +17,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         }
 )
 @TestPropertySource(properties = {
-        "JWT_KEY=LongLongLongLongLongLongLongLongTestJWTKey"
+        "JWT_KEY=LongLongLongLongLongLongLongLongTestJWTKey",
+        "AWS_ACCESS_KEY_ID=mockAccessKeyId",
+        "AWS_SECRET_ACCESS_KEY=mockSecretAccessKey",
+        "BUCKET_NAME=mockBucketName"
 })
 @ActiveProfiles("test")
 class TMeRoomApplicationTests {
