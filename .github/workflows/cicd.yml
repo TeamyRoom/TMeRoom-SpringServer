@@ -133,10 +133,10 @@ jobs:
         uses: haythem/public-ip@v1.3
 
       # ec2 IAM 계정의 access key, secret key의 계정정보 등록
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
@@ -151,6 +151,8 @@ jobs:
           
       - name: SSH Commands
         uses: appleboy/ssh-action@v0.1.6
+        env:
+          IMAGE_TAG: ${{ github.run_number }}
         with:
           host: ${{ secrets.AWS_SSH_HOST }}
           username: ${{ secrets.AWS_SSH_USERNAME }}
@@ -161,9 +163,9 @@ jobs:
           # 변경해야 할 값
           # script에 작성된 명령어를 도커 허브에 push한 이미지를 받도록 변경해야 함
           script: |
-            sudo docker pull 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:latest
+            sudo docker pull 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:$IMAGE_TAG
             sudo docker rm -f tmeroom-app
-            sudo docker run -p 8080:8080 -itd --name tmeroom-app 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:latest
+            sudo docker run -p 8080:8080 -itd --name tmeroom-app 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:$IMAGE_TAG
 
       # 등록했던 인바운드 규칙을 삭제하기
       - name: Remove Github Actions IP From Security Group
