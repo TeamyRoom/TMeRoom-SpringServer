@@ -29,8 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockManagerMember;
-import static org.finalproject.TMeRoom.common.util.MockMemberProvider.getMockUserMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockManagerMember;
+import static org.finalproject.TMeRoom.common.util.MockProvider.getMockUserMember;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
