@@ -23,7 +23,7 @@ public class CommentController {
 
     // 댓글 조회
     @GetMapping("/lecture/{lectureCode}/question/{questionId}/comments")
-    public Response<Page<CommentDetailResponseDto>> readComments(@PathVariable Long lectureCode,
+    public Response<Page<CommentDetailResponseDto>> readComments(@PathVariable String lectureCode,
                                                                  @PathVariable Long questionId,
                                                                  @PageableDefault(sort = "createdAt",
                                                                          direction = Sort.Direction.DESC)

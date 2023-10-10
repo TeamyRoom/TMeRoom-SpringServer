@@ -120,7 +120,8 @@ class CommentServiceTest {
         @DisplayName("댓글 생성 요청시 댓글이 생성된다.")
         void success_return_nothing() {
             // Given
-            CommentCreateRequestDto requestDto = new CommentCreateRequestDto("content");
+            CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
+            requestDto.setContent("content");
             Member member = getMockUserMember();
             MemberDto memberDto = MemberDto.from(member);
             Question question = getMockQuestion();
@@ -144,7 +145,8 @@ class CommentServiceTest {
         void success_return_nothing() {
             // Given
             String modifiedContent = "ModifiedContent";
-            CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto(modifiedContent);
+            CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto();
+            requestDto.setContent(modifiedContent);
             MemberDto memberDto = MemberDto.from(getMockUserMember());
             Comment comment = getMockComment();
 
@@ -161,8 +163,7 @@ class CommentServiceTest {
         @DisplayName("소유주가 아닌 사람이 댓글 수정 요청시 예외가 반환된다.")
         void fail_return_exception() {
             // Given
-            String modifiedContent = "ModifiedContent";
-            CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto(modifiedContent);
+            CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto();
             MemberDto anonymous = MemberDto.from(getMockAnonymousMember());
             Comment comment = getMockComment();
 
