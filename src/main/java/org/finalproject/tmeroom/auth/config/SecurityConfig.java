@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "api/v1/member").authenticated()
                         .requestMatchers(HttpMethod.GET, "api/v1/member").permitAll()
                         .requestMatchers("api/v1/member/password").authenticated()
+                        .requestMatchers("api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll())
 
                 // JWT 인증필터 등록

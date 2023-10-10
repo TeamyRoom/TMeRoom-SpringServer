@@ -38,7 +38,7 @@ public enum ErrorCode {
     NO_FILE_ERROR(HttpStatus.BAD_REQUEST, "파일이 전달되지 않았습니다."),
     EMPTY_FILE_ERROR(HttpStatus.BAD_REQUEST, "비어 있는 파일입니다."),
     S3_ERROR(HttpStatus.FORBIDDEN, "S3 업로드에 실패했습니다."),
-    ;
+    PARAM_CONVERSION_FAILURE(HttpStatus.BAD_REQUEST, "잘못된 파라미터");
 
 
     private final HttpStatus status;
