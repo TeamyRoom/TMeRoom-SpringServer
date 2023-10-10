@@ -381,7 +381,7 @@ class MemberControllerTest {
             // When & Then
             mockMvc.perform(get("/api/v1/member/id/lost?email=" + email)
                     ).andDo(print())
-                    .andExpect(status().isNotFound())
+                    .andExpect(status().isBadRequest())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$[?(@.resultCode != 'SUCCESS')]").exists());
         }
@@ -431,7 +431,7 @@ class MemberControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(requestDto))
                     ).andDo(print())
-                    .andExpect(status().isNotFound())
+                    .andExpect(status().isBadRequest())
                     .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$[?(@.resultCode != 'SUCCESS')]").exists());
             ;
