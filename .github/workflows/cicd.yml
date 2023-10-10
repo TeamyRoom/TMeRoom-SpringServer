@@ -58,7 +58,9 @@ jobs:
 
       # gradle로 빌드하여 jar 파일 생성하기
       - name: Execute Gradle build
-        run: ./gradlew bootJar
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bootJar
 
       # job은 별도의 가상환경에서 실행되므로
       # job 사이에 파일 공유를 위해 빌드 결과물인 jar 파일을 upload함
