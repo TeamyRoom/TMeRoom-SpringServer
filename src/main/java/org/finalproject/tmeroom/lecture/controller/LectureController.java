@@ -65,7 +65,7 @@ public class LectureController {
         return Response.success(dtoList);
     }
 
-    // 강의 강사 제의
+    // 강의 강사 임명
     @PostMapping("/lecture/{lectureCode}/teacher")
     public Response<Void> appointTeacher(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto,
                                          @RequestBody @Valid AppointTeacherRequestDto requestDto) {
