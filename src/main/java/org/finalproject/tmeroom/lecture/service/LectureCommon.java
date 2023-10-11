@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public abstract class LectureCommon {
     protected void checkPermission(Lecture lecture, MemberDto memberDTO) {
-        if (memberDTO == null || !Objects.equals(lecture.getManager().getId(), memberDTO.getId())) {
+        if (memberDTO == null || !lecture.getManager().isIdMatch(memberDTO.getId())) {
             throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
         }
     }

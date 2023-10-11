@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.finalproject.TMeRoom.common.util.MockProvider.getMockManagerMember;
 import static org.finalproject.TMeRoom.common.util.MockProvider.getMockStudentMember;
+import static org.finalproject.tmeroom.common.exception.ValidationMessage.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -75,8 +76,8 @@ class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 조회")
-    void readComments() throws Exception {
+    @DisplayName("정상적인 요청이라면, 댓글 조회시, 성공 코드와 댓글들을 반환한다.")
+    void successReadComments() throws Exception {
         // Given
         Comment comment = getMockComment();
         List<CommentDetailResponseDto> dtoList = List.of(CommentDetailResponseDto.from(comment));
@@ -100,8 +101,8 @@ class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 생성")
-    void createComment() throws Exception {
+    @DisplayName("정상적인 요청이라면, 댓글 생성시, 성공 코드를 반환한다.")
+    void successCreateComment() throws Exception {
         // Given
         CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
         requestDto.setContent("content");
@@ -117,8 +118,25 @@ class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 수정")
-    void updateComment() throws Exception {
+    @DisplayName("댓글 내용이 2글자 이하일 때, 댓글 생성시, 실패 코드를 반환한다.")
+    void failCreateComment() throws Exception {
+        // Given
+        CommentCreateRequestDto requestDto = new CommentCreateRequestDto();
+        requestDto.setContent("");
+
+        // When & Then
+        mockMvc.perform(post("/api/v1/lecture/code/question/1/comment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(requestDto))
+                ).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.result[0].message").value(equalTo(COMMENT_UNDER_MIN)));
+    }
+
+    @Test
+    @DisplayName("정상적인 요청이라면, 댓글 수정시, 성공 코드를 반환한다.")
+    void successUpdateComment() throws Exception {
         // Given
         CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto();
         requestDto.setContent("content");
@@ -134,8 +152,25 @@ class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 삭제")
-    void deleteComment() throws Exception {
+    @DisplayName("댓글 내용이 2글자 이하일 때, 댓글 수정시, 실패 코드를 반환한다.")
+    void failUpdateComment() throws Exception {
+        // Given
+        CommentUpdateRequestDto requestDto = new CommentUpdateRequestDto();
+        requestDto.setContent("c");
+
+        // When & Then
+        mockMvc.perform(post("/api/v1/lecture/code/question/1/comment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(requestDto))
+                ).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.result[0].message").value(equalTo(COMMENT_UNDER_MIN)));
+    }
+
+    @Test
+    @DisplayName("정상적인 요청이라면, 댓글 삭제시, 성공 코드를 반환한다.")
+    void successDeleteComment() throws Exception {
         // Given
 
         // When & Then

@@ -2,6 +2,8 @@ package org.finalproject.TMeRoom.file.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finalproject.TMeRoom.common.config.TestSecurityConfig;
+import org.finalproject.tmeroom.common.exception.ApplicationException;
+import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.file.controller.FileController;
 import org.finalproject.tmeroom.file.data.dto.response.FileDetailResponseDto;
 import org.finalproject.tmeroom.file.data.entity.File;
@@ -30,6 +32,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.finalproject.TMeRoom.common.util.MockProvider.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -48,9 +51,6 @@ class FileControllerTest {
     @MockBean
     private FileService fileService;
 
-    private static final String MOCK_LECTURE_CODE = "code";
-    private static final Pageable MOCK_PAGEABLE = PageRequest.of(0, 20);
-
     private File getMockFile() {
         return File.builder()
                 .fileLink("localhost")
@@ -67,8 +67,8 @@ class FileControllerTest {
     }
 
     @Test
-    @DisplayName("파일 등록")
-    void registerFile() throws Exception {
+    @DisplayName("정상적인 요청이라면, 파일 등록시, 성공 코드를 반환한다.")
+    void successRegisterFile() throws Exception {
         // Given
         MockMultipartFile mockMultiPartFile = getMockMultiPartFile();
 
@@ -79,12 +79,11 @@ class FileControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[?(@.resultCode == 'SUCCESS')]").exists());
-
     }
 
     @Test
-    @DisplayName("파일 삭제")
-    void deleteFile() throws Exception {
+    @DisplayName("정상적인 요청이라면, 파일 삭제시, 성공 코드를 반환한다.")
+    void successDeleteFile() throws Exception {
         // Given
 
         // When & Then
@@ -97,7 +96,7 @@ class FileControllerTest {
     }
 
     @Test
-    @DisplayName("파일 검색")
+    @DisplayName("정상적인 요청이라면, 파일 검색시, 성공 코드와 검색 결과를 반환한다.")
     void searchFiles() throws Exception {
         // Given
         File mockFile = getMockFile();

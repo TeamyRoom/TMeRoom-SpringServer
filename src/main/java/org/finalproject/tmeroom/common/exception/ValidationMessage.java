@@ -8,4 +8,5 @@ public class ValidationMessage {
     public static final String UNMATCHED_NICKNAME = "닉네임은 20자 이하이어야 합니다.";
     public static final String COMMENT_OVER_MAX = "댓글은 만 자 이상 적을 수 없습니다.";
     public static final String COMMENT_UNDER_MIN = "댓글은 1 자 이상 적어야 합니다.";
+    public static final String LECTURE_UNDER_MIN = "제목은 비어있을 수 없습니다.";
 }

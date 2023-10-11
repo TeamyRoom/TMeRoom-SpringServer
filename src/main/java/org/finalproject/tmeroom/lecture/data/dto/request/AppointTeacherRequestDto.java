@@ -9,7 +9,6 @@ import static org.finalproject.tmeroom.common.exception.ValidationMessage.CANNOT
 @Getter
 @Setter
 public class AppointTeacherRequestDto {
-
     @NotBlank(message = CANNOT_BE_NULL)
     String teacherId;
 }
