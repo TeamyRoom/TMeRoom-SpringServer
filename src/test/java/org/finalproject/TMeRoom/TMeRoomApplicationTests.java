@@ -9,19 +9,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(
-        properties = {
-                "spring.config.additional-location=classpath:config/*/",
-                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration",
-                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration"
-        }
-)
-@TestPropertySource(properties = {
-        "JWT_KEY=LongLongLongLongLongLongLongLongTestJWTKey",
-        "AWS_ACCESS_KEY_ID=mockAccessKeyId",
-        "AWS_SECRET_ACCESS_KEY=mockSecretAccessKey",
-        "BUCKET_NAME=mockBucketName"
-})
+@SpringBootTest()
 @ActiveProfiles("test")
 class TMeRoomApplicationTests {
 

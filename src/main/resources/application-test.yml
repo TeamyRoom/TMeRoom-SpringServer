@@ -1,0 +1,64 @@
+jwt:
+  secret:
+    key: LongLongLongLongLongLongLongLongTestJWTKey
+
+spring:
+  config:
+    proxy: testUrl
+  jpa:
+    defer-datasource-initialization: false
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL;
+    username: SA
+    password:
+
+  sql:
+    init:
+      mode: never
+
+# 메일 관련 설정
+  mail:
+    host: localhost
+    port: 3025
+    username: tester@test.com
+    password: tester
+    transport:
+      protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+# Redis 설정
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # S3 설정
+cloud:
+  aws:
+    credentials:
+      accessKey: AWS_ACCESS_KEY_ID
+      secretKey: AWS_SECRET_ACCESS_KEY
+    s3:
+      bucket: BUCKET_NAME
+      dir: /image
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
