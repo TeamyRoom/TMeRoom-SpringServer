@@ -161,6 +161,7 @@ jobs:
           # 변경해야 할 값
           # script에 작성된 명령어를 도커 허브에 push한 이미지를 받도록 변경해야 함
           script: |
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com
             sudo docker pull 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:${{ github.run_number }}
             sudo docker rm -f tmeroom-app
             sudo docker run -p 8080:8080 -itd --name tmeroom-app 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:${{ github.run_number }}
