@@ -13,7 +13,7 @@ import static org.finalproject.tmeroom.common.exception.ValidationMessage.*;
 public class CommentCreateRequestDto {
     @NotBlank(message = CANNOT_BE_NULL)
     @Size(max = 10000, message = COMMENT_OVER_MAX)
-    @Size(min = 5, message = COMMENT_UNDER_MIN)
+    @Size(min = 2, message = COMMENT_UNDER_MIN)
     String content;
 
     public Comment toEntity(Member commenter, Question question) {

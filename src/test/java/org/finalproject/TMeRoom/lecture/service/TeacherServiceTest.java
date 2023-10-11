@@ -141,8 +141,8 @@ class TeacherServiceTest {
     @DisplayName("강사 임명")
     class appointTeacher {
         @Test
-        @DisplayName("관리자가 강사 임명시 강사가 임명된다.")
-        void GivenAppointTeacherRequest_whenDismissApplicants_ThenAppointTeacher() {
+        @DisplayName("관리자가 강사 임명 요청시 강사 임명 요청이 진행된다.")
+        void GivenAppointTeacherRequest_whenAppointTeacher_ThenAppointTeacher() {
             //Given
             Lecture lecture = getMockLecture();
             MemberDto mockManagerDto = getMockManagerDto();
@@ -161,7 +161,7 @@ class TeacherServiceTest {
         }
 
         @Test
-        @DisplayName("관리자가 아닌 사람이 강사 임명시 예외를 발생시킨다")
+        @DisplayName("관리자가 아닌 사람이 강사 임명 요청시 예외를 발생시킨다")
         void GivenPermissionFail_whenAppointTeacher_ThenReturnException() {
             //Given
             Lecture lecture = getMockLecture();

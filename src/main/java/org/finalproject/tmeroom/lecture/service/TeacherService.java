@@ -42,7 +42,7 @@ public class TeacherService extends LectureCommon {
         return teachers.map(TeacherDetailResponseDto::from);
     }
 
-    //강의 강사 임명
+    //강의 강사 임명(관리자 요청)
     public void appointTeacher(String lectureCode, MemberDto memberDTO, AppointTeacherRequestDto requestDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
@@ -61,21 +61,7 @@ public class TeacherService extends LectureCommon {
         sendConfirmMail(lecture.getLectureName(), lecture.getLectureCode(), MemberDto.from(appointedMember));
     }
 
-    public void acceptTeacher(String lectureCode, MemberDto memberDTO) {
-        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
-
-        suggestedTeacher.accept();
-    }
-
-    public void rejectTeacher(String lectureCode, MemberDto memberDTO) {
-        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
-
-        teacherRepository.delete(suggestedTeacher);
-    }
-
-    //강의 강사 해임
+    //강의 강사 해임(관리자 요청)
     public void dismissTeacher(String lectureCode, String teacherId, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
@@ -85,6 +71,22 @@ public class TeacherService extends LectureCommon {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
 
         teacherRepository.delete(dismissedTeacher);
+    }
+
+    // 강사 임명 수락(강사 요청)
+    public void acceptTeacher(String lectureCode, MemberDto memberDTO) {
+        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
+
+        suggestedTeacher.accept();
+    }
+
+    // 강사 임명 거부(강사 요청)
+    public void rejectTeacher(String lectureCode, MemberDto memberDTO) {
+        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
+
+        teacherRepository.delete(suggestedTeacher);
     }
 
     //강사 확인 메일
