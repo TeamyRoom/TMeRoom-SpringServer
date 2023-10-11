@@ -1,0 +1,3 @@
+spring:
+  config:
+      proxy: ${REACT_APP_URL}
