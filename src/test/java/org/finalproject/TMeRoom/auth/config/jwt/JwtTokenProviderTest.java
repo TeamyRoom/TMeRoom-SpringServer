@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -21,7 +22,7 @@ import static org.mockito.BDDMockito.given;
 
 
 @SpringBootTest(classes = {JwtTokenProvider.class})
-@TestPropertySource(properties = {"JWT_KEY=LongLongLongLongLongLongLongLongTestJWTKey"})
+@ActiveProfiles("test")
 @DisplayName("JWT 관련 테스트")
 class JwtTokenProviderTest {
 
