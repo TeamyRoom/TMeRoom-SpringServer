@@ -21,9 +21,9 @@ jobs:
       - name: Upload env files
         uses: actions/upload-artifact@master
         with:
-          name: env-files
-          # 프로젝트의 설정 파일을 가져올 상위 폴더 지정
-          path: ./
+          name: env-file
+          # 가져올 프로젝트의 설정 파일을 지정
+          path: ./application-prod.yml
           
   build:
     runs-on: ubuntu-latest
@@ -36,14 +36,8 @@ jobs:
       - name: Download env files
         uses: actions/download-artifact@master
         with:
-          name: env-files
-          path: ./
-
-      # 시스템 환경 변수 설정
-      - name: Setting Env
-        run: |
-          chmod +x init.sh
-          source ./init.sh
+          name: env-file
+          path: src/main/resources
           
       # github action의 가상환경에 빌드를 위해 jdk 17 설치하기
       - name: Set up JDK 17
@@ -118,7 +112,6 @@ jobs:
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "Pushing image to ECR..."
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
 
   deploy:
     runs-on: ubuntu-latest
