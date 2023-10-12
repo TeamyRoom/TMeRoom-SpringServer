@@ -24,6 +24,7 @@ public enum TokenType {
                 .httpOnly(true)
                 .secure(true)
                 .maxAge(getValidTimeSec())
+                .path("/api/v1")
                 .build();
     }
 
