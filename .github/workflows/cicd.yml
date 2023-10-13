@@ -14,7 +14,7 @@ jobs:
       - name: Check out env files
         uses: actions/checkout@v3
         with:
-          repository: TeamyRoom/TMeRoom-SpringServerEnv
+          repository: TeamyRoom/TMeRoom-ServerEnv
           ref: master
           token: ${{ secrets.ACTION_TOKEN }}
 
@@ -23,7 +23,7 @@ jobs:
         with:
           name: env-file
           # 가져올 프로젝트의 설정 파일을 지정
-          path: ./application-prod.yml
+          path: ./spring/application-prod.yml
           
   build:
     runs-on: ubuntu-latest
