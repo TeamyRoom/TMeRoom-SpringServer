@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LectureRepository extends JpaRepository<Lecture, String> {
     @Query("select l.lectureCode from Lecture l")
@@ -17,4 +18,6 @@ public interface LectureRepository extends JpaRepository<Lecture, String> {
     Page<Lecture> findAllByManagerIdContaining(String managerId, Pageable pageable);
 
     Page<Lecture> findAllByManagerId(String managerId, Pageable pageable);
+
+//    Optional<Lecture> findById(String id);
 }

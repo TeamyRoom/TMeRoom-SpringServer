@@ -6,10 +6,7 @@ import org.finalproject.tmeroom.common.data.dto.Response;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
-import org.finalproject.tmeroom.lecture.data.dto.response.LectureCreateResponseDto;
-import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
-import org.finalproject.tmeroom.lecture.data.dto.response.StudentDetailResponseDto;
-import org.finalproject.tmeroom.lecture.data.dto.response.TeacherDetailResponseDto;
+import org.finalproject.tmeroom.lecture.data.dto.response.*;
 import org.finalproject.tmeroom.lecture.service.LectureService;
 import org.finalproject.tmeroom.lecture.service.StudentService;
 import org.finalproject.tmeroom.lecture.service.TeacherService;
@@ -36,6 +33,12 @@ public class LectureController {
         lectureCreateRequestDto.setMemberDTO(memberDto);
         LectureCreateResponseDto lectureCreateResponseDto = lectureService.createLecture(lectureCreateRequestDto);
         return Response.success(lectureCreateResponseDto);
+    }
+
+    @GetMapping("/lecture/{lectureCode}")
+    public Response<LectureAccessResponseDTO> accessLecture(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto) {
+        LectureAccessResponseDTO lectureAccessResponseDTO = lectureService.accessLecture(lectureCode, memberDto.getId());
+        return Response.success(lectureAccessResponseDTO);
     }
 
     @PutMapping("/lecture/{lectureCode}")
