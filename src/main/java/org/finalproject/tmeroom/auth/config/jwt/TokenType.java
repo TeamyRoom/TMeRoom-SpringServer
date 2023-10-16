@@ -21,10 +21,10 @@ public enum TokenType {
 
     public ResponseCookie createHttpOnlyCookieFrom(String token) {
         return ResponseCookie.from(getName(), token)
-                .httpOnly(true)
+                .httpOnly(false)
                 .secure(true)
                 .maxAge(getValidTimeSec())
-                .path("/api/v1")
+                .path("/")
                 .build();
     }
 
