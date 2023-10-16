@@ -171,3 +171,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+
+      # 업로드한 artifacts를 삭제하기
+      - name: Remove Github Actions Artifacts
+        uses: GeekyEggo/delete-artifact@v2.0.0
+        with:
+          # The name of the artifact to delete; multiple names can be supplied on new lines.
+          name: |
+            env-file
+            build-result
+            Dockerfile
