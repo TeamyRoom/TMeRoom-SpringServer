@@ -37,7 +37,7 @@ public class LectureController {
 
     @GetMapping("/lecture/{lectureCode}")
     public Response<LectureAccessResponseDTO> accessLecture(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto) {
-        LectureAccessResponseDTO lectureAccessResponseDTO = lectureService.accessLecture(lectureCode, memberDto.getId());
+        LectureAccessResponseDTO lectureAccessResponseDTO = lectureService.accessLecture(lectureCode, memberDto);
         return Response.success(lectureAccessResponseDTO);
     }
 

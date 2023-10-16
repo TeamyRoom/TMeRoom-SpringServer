@@ -73,11 +73,11 @@ public class LectureService extends LectureCommon {
         return lectureCodes.contains(hashCode);
     }
 
-    public LectureAccessResponseDTO accessLecture(String lectureCode, String memberId) {
+    public LectureAccessResponseDTO accessLecture(String lectureCode, MemberDto memberDto) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        Optional<Student> student = studentRepository.findByMemberIdAndLectureCode(memberId, lectureCode);
+        Optional<Student> student = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
         if(student.isPresent()) {
             return LectureAccessResponseDTO.builder()
                     .lectureName(lecture.getLectureName())
@@ -86,7 +86,7 @@ public class LectureService extends LectureCommon {
                     .build();
         }
 
-        Optional<Teacher> teacher = teacherRepository.findByMemberIdAndLectureCode(memberId, lectureCode);
+        Optional<Teacher> teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
         if(teacher.isPresent()) {
             return LectureAccessResponseDTO.builder()
                     .lectureName(lecture.getLectureName())

@@ -19,5 +19,4 @@ public interface LectureRepository extends JpaRepository<Lecture, String> {
 
     Page<Lecture> findAllByManagerId(String managerId, Pageable pageable);
 
-//    Optional<Lecture> findById(String id);
 }
