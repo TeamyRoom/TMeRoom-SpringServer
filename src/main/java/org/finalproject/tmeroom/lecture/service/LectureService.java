@@ -8,8 +8,6 @@ import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureAccessResponseDTO;
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureCreateResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
-import org.finalproject.tmeroom.lecture.data.entity.Student;
-import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
@@ -19,7 +17,6 @@ import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -77,24 +74,33 @@ public class LectureService extends LectureCommon {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        Optional<Student> student = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
-        if(student.isPresent()) {
-            return LectureAccessResponseDTO.builder()
-                    .lectureName(lecture.getLectureName())
-                    .nickName(student.get().getMember().getNickname())
-                    .role("student")
-                    .build();
+        Member member = memberRepository.findById(memberDto.getId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        Role userRole = getUserRole(lecture, member);
+
+        return LectureAccessResponseDTO.builder()
+                .lectureName(lecture.getLectureName())
+                .nickName(member.getNickname())
+                .role(userRole.toString().toLowerCase())
+                .build();
+    }
+
+    private Role getUserRole(Lecture lecture, Member member) {
+        if (lecture.getManager().isIdMatch(member.getId())) {
+            return Role.MANAGER;
+        } else if (teacherRepository.existsByMemberAndLecture(member, lecture)) {
+            return Role.TEACHER;
+        } else if (studentRepository.existsByMemberAndLecture(member, lecture)) {
+            return Role.STUDENT;
         }
 
-        Optional<Teacher> teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
-        if(teacher.isPresent()) {
-            return LectureAccessResponseDTO.builder()
-                    .lectureName(lecture.getLectureName())
-                    .nickName(teacher.get().getMember().getNickname())
-                    .role("teacher")
-                    .build();
-        }
+        throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
+    }
 
-        return null;
+    public enum Role {
+        MANAGER,
+        TEACHER,
+        STUDENT
     }
 }
