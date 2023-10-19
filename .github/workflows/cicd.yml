@@ -139,40 +139,35 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      # 보안 그룹 ID를 입력하여 github action이 EC2에 접근할 수 있도록 설정
-      - name: Add Github Actions IP to Security group
-        run: |
-          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-        env:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-          
-      - name: SSH Commands
-        uses: appleboy/ssh-action@v0.1.6
+      - name: Checkout for Kustomize repository
+        uses: actions/checkout@v2
         with:
-          host: ${{ secrets.AWS_SSH_HOST }}
-          username: ${{ secrets.AWS_SSH_USERNAME }}
-          key: ${{ secrets.AWS_SSH_KEY }}
+          # kubernetes yaml 파일 저장
+          repository: TeamyRoom/TMeRoom-k8s-manifest # k8s yaml 파일이 있는 repo
+          ref: main  # branch 이름
+          # 내 repository에 push 하기 위한 Personal Access Token이 필요
+          token: ${{ secrets.ACTION_TOKEN }} # Github Action token을 발급받아서 repo secrect에 등록해줘야한다
+          path: TMeRoom-k8s-manifest # 최상위 경로로 repository와 동일하게 설정
 
-          # 스크립트 중간에 실패하면 다음 스크립트를 실행하지 않는 옵션 true로 주기
-          script_stop: true
-          # 변경해야 할 값
-          # script에 작성된 명령어를 도커 허브에 push한 이미지를 받도록 변경해야 함
-          script: |
-            aws ecr get-login-password --region ap-northeast-2 | sudo docker login --username AWS --password-stdin 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com
-            sudo docker pull 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:${{ github.run_number }}
-            sudo docker rm -f tmeroom-app
-            sudo docker run -p 8080:8080 -itd --name tmeroom-app 135685504741.dkr.ecr.ap-northeast-2.amazonaws.com/tmeroom-spring:${{ github.run_number }}
-
-      # 등록했던 인바운드 규칙을 삭제하기
-      - name: Remove Github Actions IP From Security Group
+          # 새 이미지 버전으로 파일의 태그값 수정
+          # cd path 수정
+          # kustomize로 image tag 값 변경
+      - name: Update Kubernetes resources
         run: |
-          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-        env:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+          pwd
+          ls
+          cd TMeRoom-k8s-manifest/overlays/prd/ 
+          kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/tmeroom-spring=${{ steps.login-ecr.outputs.registry }}/tmeroom-spring:${{ github.run_number }}
+          cat kustomization.yaml
+      # 수정된 kustomization.yaml 파일 commit push
+      - name: Commit and Push manfiest files
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: yslee96
+          author_email: dbstn322@gmail.com
+          message: "🔧   : 스프링 서버 이미지 태그 업데이트 #${{ github.run_number }}"
+          cwd: './TMeRoom-k8s-manifest'
+          push: true
 
       # 업로드한 artifacts를 삭제하기
       - name: Remove Github Actions Artifacts
@@ -183,3 +178,4 @@ jobs:
             env-file
             build-result
             Dockerfile
+          
