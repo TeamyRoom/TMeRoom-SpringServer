@@ -172,6 +172,7 @@ jobs:
       # 업로드한 artifacts를 삭제하기
       - name: Remove Github Actions Artifacts
         uses: GeekyEggo/delete-artifact@v2.0.0
+        if: ${{ always() }}
         with:
           # The name of the artifact to delete; multiple names can be supplied on new lines.
           name: |
