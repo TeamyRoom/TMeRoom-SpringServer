@@ -15,11 +15,13 @@ import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class LectureService extends LectureCommon {
     private final LectureRepository lectureRepository;

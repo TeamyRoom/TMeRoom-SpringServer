@@ -11,7 +11,6 @@ import static org.finalproject.tmeroom.common.exception.ValidationMessage.LECTUR
 
 @Data
 public class LectureUpdateRequestDto {
-    @NotBlank
     String lectureCode;
     @NotBlank(message = LECTURE_UNDER_MIN)
     String lectureName;

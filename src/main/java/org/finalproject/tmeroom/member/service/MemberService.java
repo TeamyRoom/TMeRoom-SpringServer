@@ -12,6 +12,7 @@ import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.EmailConfirmCodeRepository;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.finalproject.tmeroom.member.repository.PasswordResetCodeRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,12 +31,13 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class MemberService {
-
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final EmailConfirmCodeRepository emailConfirmCodeRepository;
     private final PasswordResetCodeRepository passwordResetCodeRepository;
     private final MailService mailService;
+    @Value("${spring.config.host}")
+    private String host_url;
 
     public MemberCreateResponseDto createMember(MemberCreateRequestDto requestDto) {
 
@@ -70,7 +72,7 @@ public class MemberService {
         emailConfirmCodeRepository.save(confirmCode, memberDto.getId());
 
         String subject = "[티미룸] 인증 링크를 발송해 드립니다.";
-        String content = getConfirmMailContent(confirmCode);
+        String content = getConfirmMailContent(confirmCode, memberDto);
         mailService.sendEmail(memberDto.getEmail(), subject, content, true, false);
     }
 
@@ -157,27 +159,31 @@ public class MemberService {
         passwordResetCodeRepository.deleteByCode(requestDto.getResetCode());
     }
 
-    // TODO: 요청을 백엔드로 직접 보내도록 했는데, 프론트가 짜여지면 링크를 수정해야 함.
-    private String getConfirmMailContent(String confirmCode) {
+    public void isValidResetCode(String resetCode) {
+        if (!passwordResetCodeRepository.existsByCode(resetCode))
+            throw new ApplicationException(ErrorCode.CODE_NOT_VALID);
+    }
+
+    private String getConfirmMailContent(String confirmCode, MemberDto memberDto) {
         String sb = "<div style='margin:20px;'>" +
-                "<p>티미룸 인증 링크를 보내드립니다.</p>" +
-                "<br>" +
                 "<div align='center' style='border:1px solid black; font-family:verdana'>" +
-                "<h3>인증 링크</h3>" +
+                "<h3>안녕하세요 <strong style = 'color:#DB4455'>티미룸</strong> 입니다.</h3>" +
+                "<h3>" + memberDto.getNickname() + " 님의 회원가입을 축하드립니다.</h3>" +
+                "<h5>하기 인증확인 버튼을 누르시면 회원가입이 완료됩니다.</h5>" +
                 "<div style='font-size:130%'>" +
-                "<strong>" +
-                "localhost:8080/api/v1/email/member/confirm/" + confirmCode +
-                "</strong></div><br/></div></br></br>" +
+                "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
+                "href='" + host_url + "/email-confirm/" + confirmCode + "'> 인증 확인</a>" +
                 "<p>감사합니다.</p>" +
+                "</div><br/></div></br></br>" +
                 "</div>";
         return sb;
     }
 
     private String getFindIdMailContent(String memberId) {
         String sb = "<div style='margin:20px;'>" +
-                "<p>요청하신 티미룸 아이디 찾기 결과입니다.</p>" +
                 "<br>" +
                 "<div align='center' style='border:1px solid black; font-family:verdana'>" +
+                "<p>요청하신 티미룸 아이디 찾기 결과입니다.</p>" +
                 "<h3>아이디</h3>" +
                 "<div style='font-size:130%'>" +
                 "<strong>" +
@@ -188,18 +194,17 @@ public class MemberService {
         return sb;
     }
 
-    // TODO: 요청을 백엔드로 직접 보내도록 했는데, 프론트가 짜여지면 링크를 수정해야 함.
     private String getResetPasswordMailContent(String resetCode) {
         String sb = "<div style='margin:20px;'>" +
-                "<p>요청하신 티미룸 비밀번호 재설정 링크입니다.</p>" +
                 "<br>" +
                 "<div align='center' style='border:1px solid black; font-family:verdana'>" +
+                "<p>요청하신 티미룸 비밀번호 재설정 링크입니다.</p>" +
                 "<h3>비밀번호 재설정 링크</h3>" +
                 "<div style='font-size:130%'>" +
-                "<strong>" +
-                "localhost:8080/api/v1/member/lost/password/" + resetCode +
-                "</strong></div><br/></div></br></br>" +
+                "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
+                "href='" + host_url + "/pw-reset/" + resetCode + "'> 비밀번호 변경</a>" +
                 "<p>감사합니다.</p>" +
+                "</div><br/></div></br></br>" +
                 "</div>";
         return sb;
     }

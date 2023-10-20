@@ -41,4 +41,10 @@ public abstract class AbstractCodeRedisRepository implements CodeRepository {
         String key = makeKeyFrom(confirmCode);
         redisTemplate.delete(key);
     }
+
+    @Override
+    public boolean existsByCode(String confirmCode){
+        String key = makeKeyFrom(confirmCode);
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key)).isPresent();
+    }
 }
