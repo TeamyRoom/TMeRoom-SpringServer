@@ -6,10 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.finalproject.tmeroom.common.data.entity.BaseTimeEntity;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
@@ -23,7 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
  */
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Lecture extends BaseTimeEntity {

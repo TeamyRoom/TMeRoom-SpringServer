@@ -84,6 +84,12 @@ public class MemberController {
         return Response.success();
     }
 
+    @GetMapping("/password/checking/{resetCode}")
+    public Response<Void> isValidResetCode(@PathVariable String resetCode) {
+        memberService.isValidResetCode(resetCode);
+        return Response.success();
+    }
+
     @PostMapping("/password/lost")
     public Response<Void> sendPasswordResetCode(@RequestBody MemberSendResetCodeRequestDto requestDto) {
         memberService.sendPasswordResetCode(requestDto);

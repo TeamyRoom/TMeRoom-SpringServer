@@ -15,4 +15,5 @@ public interface CodeRepository {
 
     void deleteByCode(String Code);
 
+    boolean existsByCode(String Code);
 }

@@ -13,6 +13,7 @@ import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,6 +31,8 @@ public class TeacherService extends LectureCommon {
     private final MemberRepository memberRepository;
     private final LectureRepository lectureRepository;
     private final MailService mailService;
+    @Value("${spring.config.host}")
+    private String host_url;
 
     //강의 강사 조회
     public Page<TeacherDetailResponseDto> lookupTeachers(String lectureCode, MemberDto memberDto, Pageable pageable) {
@@ -97,21 +100,20 @@ public class TeacherService extends LectureCommon {
         mailService.sendEmail(memberDto.getEmail(), subject, content, true, false);
     }
 
-    // TODO: 요청을 백엔드로 직접 보내도록 했는데, 프론트가 짜여지면 링크를 수정해야 함.
     private String getConfirmMailContent(String confirmCode) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<div style='margin:20px;'>");
-        sb.append("<p>티미룸 강사 제의 수락하시겠습니까?</p>");
-        sb.append("<br>");
-        sb.append("<div align='center' style='border:1px solid black; font-family:verdana'>");
-        sb.append("<h3>수락 / 거부</h3>");
-        sb.append("<div style='font-size:130%'>");
-        sb.append("<strong>localhost:8080/api/v1/email/member/confirm/" + confirmCode + "</strong></div><br/>");
-        sb.append("<strong>localhost:8080/api/v1/email/member/confirm/" + confirmCode + "</strong></div><br/>");
-        sb.append("</div></br></br>");
-        sb.append("<p>감사합니다.</p>");
-        sb.append("</div>");
-        return sb.toString();
+        String sb = "<div style='margin:20px;'>" +
+                "<br>" +
+                "<div align='center' style='border:1px solid black; font-family:verdana'>" +
+                "<p>티미룸 강사 제의를 수락하시겠습니까?</p>" +
+                "<div style='font-size:130%'>" +
+                "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
+                "href='" + host_url + "/accpet-teacher-request/" + confirmCode + "'> 수락 </a>" +
+                "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
+                "href='" + host_url + "/denied-teacher-request/" + confirmCode + "'> 거부 </a>" +
+                "<p>감사합니다.</p>" +
+                "</div><br/></div></br></br>" +
+                "</div>";
+        return sb;
     }
 
 }
