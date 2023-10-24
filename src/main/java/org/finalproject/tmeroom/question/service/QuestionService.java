@@ -40,9 +40,9 @@ public class QuestionService {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
         Teacher teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
-                .orElse(null);
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
 
-        if (teacher == null && !lecture.getManager().isIdMatch(memberDto.getId())) {
+        if (!teacher.isAccepted() && !lecture.getManager().isIdMatch(memberDto.getId())) {
             throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
         }
 
@@ -59,6 +59,10 @@ public class QuestionService {
         Student student = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
 
+        if (!student.isAccepted()) {
+            throw new ApplicationException(ErrorCode.COURSE_REGISTRATION_NOT_COMPLETED);
+        }
+
         Page<Question> questions =
                 questionRepository.findByLectureAndAuthorOrIsPublic(lecture, student.getMember(), true, pageable);
 
@@ -70,13 +74,20 @@ public class QuestionService {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
 
+        boolean teacherAccepted = isTeacherAndAccepted(memberDto, lectureCode);
+        Member author = question.getAuthor();
+        Lecture lecture = question.getLecture();
+
         if (!question.getIsPublic()) {
-            Teacher teacher =
-                    teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode).orElse(null);
-            Member author = question.getAuthor();
-            Lecture lecture = question.getLecture();
-            if (teacher == null && !author.isIdMatch(memberDto.getId()) && !lecture.getManager().isIdMatch(
+            if (!teacherAccepted && !author.isIdMatch(memberDto.getId()) && !lecture.getManager().isIdMatch(
                     memberDto.getId())) {
+                throw new ApplicationException(ErrorCode.INVALID_READ_QUESTION_PERMISSION);
+            }
+        } else {
+            boolean studentAccepted = isStudentAndAccepted(memberDto, lectureCode);
+            if (studentAccepted ||
+                    teacherAccepted && author.isIdMatch(memberDto.getId()) && lecture.getManager().isIdMatch(
+                            memberDto.getId())) {
                 throw new ApplicationException(ErrorCode.INVALID_READ_QUESTION_PERMISSION);
             }
         }
@@ -90,6 +101,14 @@ public class QuestionService {
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         Member member = memberRepository.findById(memberDto.getId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        boolean studentAccepted = isStudentAndAccepted(memberDto, lectureCode);
+        boolean teacherAccepted = isTeacherAndAccepted(memberDto, lectureCode);
+
+        if (!studentAccepted && !teacherAccepted) {
+            throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
+        }
+
         Question question = requestDto.toEntity(lecture, member);
 
         questionRepository.save(question);
@@ -127,5 +146,17 @@ public class QuestionService {
         if (memberDto == null || !Objects.equals(question.getAuthor().getId(), memberDto.getId())) {
             throw new ApplicationException(ErrorCode.INVALID_PERMISSION);
         }
+    }
+
+    private boolean isTeacherAndAccepted(MemberDto memberDto, String lectureCode) {
+        return teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+                .filter(Teacher::isAccepted)
+                .isPresent();
+    }
+
+    private boolean isStudentAndAccepted(MemberDto memberDto, String lectureCode) {
+        return studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+                .filter(Student::isAccepted)
+                .isPresent();
     }
 }

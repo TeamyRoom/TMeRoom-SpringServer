@@ -8,27 +8,26 @@ import java.time.LocalDateTime;
 
 @Getter
 public class StudentDetailResponseDto {
-    String memberNickname;
-    String lectureCode;
-    String lectureName;
-    LocalDateTime appliedAt;
-    LocalDateTime acceptedAt;
+    private final String id;
+    private final String nickName;
+    private final String email;
+    private final LocalDateTime appliedAt;
+    private final LocalDateTime acceptedAt;
 
     @Builder
-    public StudentDetailResponseDto(String memberNickname, String lectureCode, String lectureName,
+    public StudentDetailResponseDto(String id, String nickName, String email,
                                     LocalDateTime appliedAt, LocalDateTime acceptedAt) {
-        this.memberNickname = memberNickname;
-        this.lectureCode = lectureCode;
-        this.lectureName = lectureName;
+        this.id = id;
+        this.nickName = nickName;
+        this.email = email;
         this.appliedAt = appliedAt;
-        if (acceptedAt != null) this.acceptedAt = acceptedAt;
+        this.acceptedAt = acceptedAt;
     }
 
     public static StudentDetailResponseDto from(Student student) {
         return StudentDetailResponseDto.builder()
-                .memberNickname(student.getMember().getNickname())
-                .lectureCode(student.getLectureCode())
-                .lectureName(student.getLecture().getLectureName())
+                .id(student.getMember().getId())
+                .nickName(student.getMember().getNickname())
                 .appliedAt(student.getAppliedAt())
                 .acceptedAt(student.getAcceptedAt())
                 .build();

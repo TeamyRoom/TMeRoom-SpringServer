@@ -12,6 +12,8 @@ import org.finalproject.tmeroom.file.data.entity.File;
 import org.finalproject.tmeroom.file.data.entity.FileType;
 import org.finalproject.tmeroom.file.repository.FileRepository;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
+import org.finalproject.tmeroom.lecture.data.entity.Student;
+import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
@@ -28,7 +30,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import static org.finalproject.tmeroom.file.service.FileService.AccessPermission.READ;
 
 @Slf4j
 @Service
@@ -49,7 +54,7 @@ public class FileService {
                                                                     String fileType, Pageable pageable,
                                                                     MemberDto memberDto) {
         Lecture lecture = lectureRepository.getReferenceById(lectureCode);
-        checkPermission(lecture, memberDto, AccessPermission.READ);
+        checkPermission(lecture, memberDto, READ);
         Page<File> files;
         //TODO: Converter로 Refactoring하자
         try {
@@ -142,18 +147,30 @@ public class FileService {
         }
 
         Member member = memberRepository.getReferenceById(memberDto.getId());
+        Optional<Student> optionalStudent;
+        Optional<Teacher> optionalTeacher;
 
         boolean hasPermission = false;
 
         switch (requiredPermission) {
-            case READ -> hasPermission = studentRepository.existsByMemberAndLecture(member, lecture) ||
-                    teacherRepository.existsByMemberAndLecture(member, lecture) ||
-                    lecture.getManager().isIdMatch(memberDto.getId());
-            case WRITE -> hasPermission = teacherRepository.existsByMemberAndLecture(member, lecture) ||
-                    lecture.getManager().isIdMatch(memberDto.getId());
-            case DELETE -> hasPermission = lecture.getManager().isIdMatch(memberDto.getId());
-            default -> {
-            }
+            case READ:
+                optionalStudent =
+                        studentRepository.findByMemberIdAndLectureCode(member.getId(), lecture.getLectureCode());
+                optionalTeacher =
+                        teacherRepository.findByMemberIdAndLectureCode(member.getId(), lecture.getLectureCode());
+                hasPermission = (optionalStudent.isPresent() && optionalStudent.get().isAccepted()) ||
+                        (optionalTeacher.isPresent() && optionalTeacher.get().isAccepted()) ||
+                        lecture.getManager().isIdMatch(memberDto.getId());
+                break;
+            case WRITE:
+                optionalTeacher =
+                        teacherRepository.findByMemberIdAndLectureCode(member.getId(), lecture.getLectureCode());
+                hasPermission = (optionalTeacher.isPresent() && optionalTeacher.get().isAccepted()) ||
+                        lecture.getManager().isIdMatch(memberDto.getId());
+                break;
+            case DELETE:
+                hasPermission = lecture.getManager().isIdMatch(memberDto.getId());
+                break;
         }
 
         if (hasPermission) {
@@ -163,9 +180,15 @@ public class FileService {
         throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
     }
 
-    public enum AccessPermission {
+    protected enum AccessPermission {
         READ,
         WRITE,
         DELETE
+    }
+
+    public enum AccessType {
+        FILE,
+        QUESTION,
+        COMMENT
     }
 }

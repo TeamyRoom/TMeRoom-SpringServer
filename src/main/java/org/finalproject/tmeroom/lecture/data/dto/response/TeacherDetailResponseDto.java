@@ -11,7 +11,7 @@ public class TeacherDetailResponseDto {
     private final String nickName;
     private final String Email;
     private final LocalDateTime suggestedAt;
-    private final LocalDateTime acceptedAt;;
+    private final LocalDateTime acceptedAt;
 
     private TeacherDetailResponseDto(Teacher teacher) {
         this.nickName = teacher.getMember().getNickname();
