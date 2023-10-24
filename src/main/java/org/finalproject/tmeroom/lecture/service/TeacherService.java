@@ -164,16 +164,16 @@ public class TeacherService extends LectureCommon {
         mailService.sendEmail(memberDto.getEmail(), subject, content, true, false);
     }
 
-    private String getConfirmMailContent(String confirmCode) {
+    private String getConfirmMailContent(String lectureCode) {
         String sb = "<div style='margin:20px;'>" +
                 "<br>" +
                 "<div align='center' style='border:1px solid black; font-family:verdana'>" +
                 "<p>티미룸 강사 제의를 수락하시겠습니까?</p>" +
                 "<div style='font-size:130%'>" +
                 "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
-                "href='" + host_url + "/accpet-teacher-request/" + confirmCode + "'> 수락 </a>" +
+                "href='" + host_url + "/teacher-accept/" + lectureCode + "/yes'> 수락 </a>" +
                 "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
-                "href='" + host_url + "/denied-teacher-request/" + confirmCode + "'> 거부 </a>" +
+                "href='" + host_url + "/teacher-accept/" + lectureCode + "/no'> 거부 </a>" +
                 "<p>감사합니다.</p>" +
                 "</div><br/></div></br></br>" +
                 "</div>";

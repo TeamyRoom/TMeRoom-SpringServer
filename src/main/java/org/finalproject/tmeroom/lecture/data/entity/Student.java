@@ -59,4 +59,8 @@ public class Student {
     public void acceptStudent() {
         this.acceptedAt = LocalDateTime.now();
     }
+
+    public boolean isAccepted() {
+        return acceptedAt != null;
+    }
 }

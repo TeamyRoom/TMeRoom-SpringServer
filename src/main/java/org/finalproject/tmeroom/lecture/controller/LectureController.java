@@ -3,7 +3,6 @@ package org.finalproject.tmeroom.lecture.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.admin.constant.MemberSearchType;
-import org.finalproject.tmeroom.admin.data.dto.response.AdminMemberPageReadResponseDto;
 import org.finalproject.tmeroom.common.data.dto.Response;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto;

@@ -10,6 +10,7 @@ import org.finalproject.tmeroom.lecture.data.dto.response.LectureCreateResponseD
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.lecture.data.entity.Student;
+import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
@@ -28,8 +29,8 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class LectureService extends LectureCommon {
-    private final LectureRepository lectureRepository;
     private final MemberRepository memberRepository;
+    private final LectureRepository lectureRepository;
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
 
@@ -90,7 +91,7 @@ public class LectureService extends LectureCommon {
         Member member = memberRepository.findById(memberDto.getId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
-        Role userRole = getUserRole(lecture, member);
+        Role userRole = getUserRole(lecture, memberDto);
 
         return LectureAccessResponseDTO.builder()
                 .lectureName(lecture.getLectureName())
@@ -99,12 +100,12 @@ public class LectureService extends LectureCommon {
                 .build();
     }
 
-    private Role getUserRole(Lecture lecture, Member member) {
+    private Role getUserRole(Lecture lecture, MemberDto member) {
         if (lecture.getManager().isIdMatch(member.getId())) {
             return Role.MANAGER;
-        } else if (teacherRepository.existsByMemberAndLecture(member, lecture)) {
+        } else if (isTeacherAndAccepted(member, lecture.getLectureCode())) {
             return Role.TEACHER;
-        } else if (studentRepository.existsByMemberAndLecture(member, lecture)) {
+        } else if (isStudentAndAccepted(member, lecture.getLectureCode())) {
             return Role.STUDENT;
         }
 
@@ -115,5 +116,17 @@ public class LectureService extends LectureCommon {
         MANAGER,
         TEACHER,
         STUDENT
+    }
+
+    private boolean isTeacherAndAccepted(MemberDto memberDto, String lectureCode) {
+        return teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+                .filter(Teacher::isAccepted)
+                .isPresent();
+    }
+
+    private boolean isStudentAndAccepted(MemberDto memberDto, String lectureCode) {
+        return studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+                .filter(Student::isAccepted)
+                .isPresent();
     }
 }

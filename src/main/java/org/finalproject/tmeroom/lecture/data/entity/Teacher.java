@@ -61,4 +61,7 @@ public class Teacher extends BaseTimeEntity {
         this.acceptedAt = LocalDateTime.now();
     }
 
+    public boolean isAccepted() {
+        return acceptedAt != null;
+    }
 }
