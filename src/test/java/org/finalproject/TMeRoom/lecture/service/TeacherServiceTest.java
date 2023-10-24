@@ -101,11 +101,11 @@ class TeacherServiceTest {
 
 
             given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(mockPage);
+            given(teacherRepository.findByLectureAndAcceptedAtNotNull(eq(lecture), any(Pageable.class))).willReturn(mockPage);
 
             //When
             Page<TeacherDetailResponseDto> teagerResponsePage =
-                    teacherService.lookupTeachers(MOCK_LECTURE_CODE, mockManagerDto, MOCK_PAGEABLE);
+                    teacherService.lookupAcceptedTeachers(MOCK_LECTURE_CODE, mockManagerDto, MOCK_PAGEABLE);
 
             //Then
             assertThat(teagerResponsePage.get().findFirst().get().getNickName()).isEqualTo(
@@ -123,12 +123,12 @@ class TeacherServiceTest {
 
 
             given(lectureRepository.findById(MOCK_LECTURE_CODE)).willReturn(Optional.of(lecture));
-            given(teacherRepository.findByLecture(eq(lecture), any(Pageable.class))).willReturn(mockPage);
+            given(teacherRepository.findByLectureAndAcceptedAtNotNull(eq(lecture), any(Pageable.class))).willReturn(mockPage);
 
             //When
             Throwable throwable =
                     catchThrowable(
-                            () -> teacherService.lookupTeachers(MOCK_LECTURE_CODE, mockAnonymousDto, MOCK_PAGEABLE));
+                            () -> teacherService.lookupAcceptedTeachers(MOCK_LECTURE_CODE, mockAnonymousDto, MOCK_PAGEABLE));
 
             //Then
             AssertionsForClassTypes.assertThat(throwable)

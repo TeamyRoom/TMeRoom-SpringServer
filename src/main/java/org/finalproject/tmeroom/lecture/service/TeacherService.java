@@ -1,11 +1,15 @@
 package org.finalproject.tmeroom.lecture.service;
 
 import lombok.RequiredArgsConstructor;
+import org.finalproject.tmeroom.admin.constant.MemberSearchType;
+import org.finalproject.tmeroom.admin.data.dto.response.AdminMemberPageReadResponseDto;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.common.service.MailService;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
+import org.finalproject.tmeroom.lecture.data.dto.request.TeacherSearchRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.TeacherDetailResponseDto;
+import org.finalproject.tmeroom.lecture.data.dto.response.TeacherMemberPageReadResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
 import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
@@ -34,13 +38,63 @@ public class TeacherService extends LectureCommon {
     @Value("${spring.config.host}")
     private String host_url;
 
-    //강의 강사 조회
-    public Page<TeacherDetailResponseDto> lookupTeachers(String lectureCode, MemberDto memberDto, Pageable pageable) {
+    //강의에 임명될 강사 검색
+    public TeacherMemberPageReadResponseDto searchMembers(TeacherSearchRequestDto requestDto, MemberDto memberDto) {
+        Lecture lecture = lectureRepository.findById(requestDto.getLectureCode())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+
+        checkPermission(lecture, memberDto);
+
+        MemberSearchType searchType = requestDto.getSearchType();
+        String keyword = requestDto.getKeyword();
+        Pageable pageable = requestDto.getPageable();
+
+        Page<Member> members = findMembersByKeyword(lecture, searchType, keyword, pageable);
+        return TeacherMemberPageReadResponseDto.of(members);
+    }
+
+    private Page<Member> findMembersByKeyword(Lecture lecture, MemberSearchType searchType, String keyword,
+                                              Pageable pageable) {
+        //TODO: Teacher랑 조인해서 Teacher Table에 존재하지 않는 멤버만 가져오도록 변경해야함
+        return switch (searchType) {
+            case ID -> memberRepository.findAllByIdContaining(keyword, pageable);
+            case EMAIL -> memberRepository.findAllByEmailContaining(keyword, pageable);
+            default -> throw new ApplicationException(ErrorCode.TYPE_NOT_CONFIGURED);
+        };
+    }
+
+    //전체 강사 조회
+    public Page<TeacherDetailResponseDto> lookupTeachers(String lectureCode, MemberDto memberDto,
+                                                                 Pageable pageable) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDto);
 
         Page<Teacher> teachers = teacherRepository.findByLecture(lecture, pageable);
+
+        return teachers.map(TeacherDetailResponseDto::from);
+    }
+
+    //강의에 임명된 강사 조회
+    public Page<TeacherDetailResponseDto> lookupAcceptedTeachers(String lectureCode, MemberDto memberDto,
+                                                                 Pageable pageable) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+        checkPermission(lecture, memberDto);
+
+        Page<Teacher> teachers = teacherRepository.findByLectureAndAcceptedAtNotNull(lecture, pageable);
+
+        return teachers.map(TeacherDetailResponseDto::from);
+    }
+
+    //강의에 초대중인 강사 조회
+    public Page<TeacherDetailResponseDto> lookupUnAcceptedTeachers(String lectureCode, MemberDto memberDto,
+                                                                   Pageable pageable) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+        checkPermission(lecture, memberDto);
+
+        Page<Teacher> teachers = teacherRepository.findByLectureAndAcceptedAtIsNull(lecture, pageable);
 
         return teachers.map(TeacherDetailResponseDto::from);
     }

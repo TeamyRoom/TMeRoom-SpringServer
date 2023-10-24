@@ -17,6 +17,10 @@ public interface StudentRepository extends JpaRepository<Student, StudentPK> {
 
     Page<Student> findByLecture(Lecture lecture, Pageable pageable);
 
+    Page<Student> findByLectureAndAcceptedAtNotNull(Lecture lecture, Pageable pageable);
+
+    Page<Student> findByLectureAndAcceptedAtIsNull(Lecture lecture, Pageable pageable);
+
     Page<Student> findAllByMember(Member member, Pageable pageable);
 
     Page<Student> findAllByMemberId(String memberId, Pageable pageable);
