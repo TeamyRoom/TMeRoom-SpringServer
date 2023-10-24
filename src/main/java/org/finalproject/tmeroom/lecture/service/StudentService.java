@@ -59,13 +59,36 @@ public class StudentService extends LectureCommon {
         studentRepository.delete(student);
     }
 
-    //강의 수강 신청 인원 목록 조회
-    public Page<StudentDetailResponseDto> checkApplicants(String lectureCode, MemberDto memberDTO, Pageable pageable) {
+    //전체 학생 조회
+    public Page<StudentDetailResponseDto> lookupApplicants(String lectureCode, MemberDto memberDTO,
+                                                                     Pageable pageable) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         checkPermission(lecture, memberDTO);
 
         Page<Student> applicants = studentRepository.findByLecture(lecture, pageable);
+        return applicants.map(StudentDetailResponseDto::from);
+    }
+
+    //수강 신청 인원 목록 조회
+    public Page<StudentDetailResponseDto> lookupUnAcceptedApplicants(String lectureCode, MemberDto memberDTO,
+                                                                     Pageable pageable) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+        checkPermission(lecture, memberDTO);
+
+        Page<Student> applicants = studentRepository.findByLectureAndAcceptedAtIsNull(lecture, pageable);
+        return applicants.map(StudentDetailResponseDto::from);
+    }
+
+    //수강중인 인원 목록 조회
+    public Page<StudentDetailResponseDto> lookupAcceptedApplicants(String lectureCode, MemberDto memberDTO,
+                                                                   Pageable pageable) {
+        Lecture lecture = lectureRepository.findById(lectureCode)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
+        checkPermission(lecture, memberDTO);
+
+        Page<Student> applicants = studentRepository.findByLectureAndAcceptedAtNotNull(lecture, pageable);
         return applicants.map(StudentDetailResponseDto::from);
     }
 

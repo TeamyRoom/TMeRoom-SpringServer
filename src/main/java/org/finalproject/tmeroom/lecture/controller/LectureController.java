@@ -2,10 +2,13 @@ package org.finalproject.tmeroom.lecture.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.finalproject.tmeroom.admin.constant.MemberSearchType;
+import org.finalproject.tmeroom.admin.data.dto.response.AdminMemberPageReadResponseDto;
 import org.finalproject.tmeroom.common.data.dto.Response;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
+import org.finalproject.tmeroom.lecture.data.dto.request.TeacherSearchRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.*;
 import org.finalproject.tmeroom.lecture.service.LectureService;
 import org.finalproject.tmeroom.lecture.service.StudentService;
@@ -36,7 +39,8 @@ public class LectureController {
     }
 
     @GetMapping("/lecture/{lectureCode}")
-    public Response<LectureAccessResponseDTO> accessLecture(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto) {
+    public Response<LectureAccessResponseDTO> accessLecture(@PathVariable String lectureCode,
+                                                            @AuthenticationPrincipal MemberDto memberDto) {
         LectureAccessResponseDTO lectureAccessResponseDTO = lectureService.accessLecture(lectureCode, memberDto);
         return Response.success(lectureAccessResponseDTO);
     }
@@ -57,14 +61,59 @@ public class LectureController {
         return Response.success();
     }
 
-    // 강의에 임명된 강사 조회
+    @GetMapping("lecture/{lectureCode}/members")
+    public Response<TeacherMemberPageReadResponseDto> searchMembers(@AuthenticationPrincipal MemberDto memberDto,
+                                                                    @PathVariable String lectureCode,
+                                                                    @RequestParam MemberSearchType searchType,
+                                                                    @RequestParam String keyword,
+                                                                    @PageableDefault(
+                                                                            direction = Sort.Direction.DESC,
+                                                                            size = 20)
+                                                                    Pageable pageable) {
+        TeacherSearchRequestDto requestDto = TeacherSearchRequestDto.builder()
+                .lectureCode(lectureCode)
+                .searchType(searchType)
+                .keyword(keyword)
+                .pageable(pageable)
+                .build();
+
+        TeacherMemberPageReadResponseDto responseDto = teacherService.searchMembers(requestDto, memberDto);
+        return Response.success(responseDto);
+    }
+
+    // 전체 강사 조회
     @GetMapping("/lecture/{lectureCode}/teachers")
     public Response<Page<TeacherDetailResponseDto>> readTeachers(@PathVariable String lectureCode,
                                                                  @AuthenticationPrincipal MemberDto memberDto,
                                                                  @PageableDefault(sort = "createdAt",
-                                                                         direction = Sort.Direction.DESC)
+                                                                         direction = Sort.Direction.DESC, size = 10)
                                                                  Pageable pageable) {
-        Page<TeacherDetailResponseDto> dtoList = teacherService.lookupTeachers(lectureCode, memberDto, pageable);
+        Page<TeacherDetailResponseDto> dtoList =
+                teacherService.lookupTeachers(lectureCode, memberDto, pageable);
+        return Response.success(dtoList);
+    }
+
+    // 강의에 임명된 강사 조회
+    @GetMapping("/lecture/{lectureCode}/teachers/accepted")
+    public Response<Page<TeacherDetailResponseDto>> readAcceptedTeachers(@PathVariable String lectureCode,
+                                                                         @AuthenticationPrincipal MemberDto memberDto,
+                                                                         @PageableDefault(sort = "createdAt",
+                                                                                 direction = Sort.Direction.DESC)
+                                                                         Pageable pageable) {
+        Page<TeacherDetailResponseDto> dtoList =
+                teacherService.lookupAcceptedTeachers(lectureCode, memberDto, pageable);
+        return Response.success(dtoList);
+    }
+
+    // 강의에 초대중인 강사 조회
+    @GetMapping("/lecture/{lectureCode}/teachers/unaccepted")
+    public Response<Page<TeacherDetailResponseDto>> readUnAcceptedTeachers(@PathVariable String lectureCode,
+                                                                           @AuthenticationPrincipal MemberDto memberDto,
+                                                                           @PageableDefault(sort = "createdAt",
+                                                                                   direction = Sort.Direction.DESC)
+                                                                           Pageable pageable) {
+        Page<TeacherDetailResponseDto> dtoList =
+                teacherService.lookupUnAcceptedTeachers(lectureCode, memberDto, pageable);
         return Response.success(dtoList);
     }
 
@@ -125,14 +174,39 @@ public class LectureController {
         return Response.success();
     }
 
-    // 수강 신청 인원 목록 조회
+    // 전체 학생 목록 조회
     @GetMapping("/lecture/{lectureCode}/applications")
     public Response<Page<StudentDetailResponseDto>> readStudents(@PathVariable String lectureCode,
                                                                  @AuthenticationPrincipal MemberDto memberDto,
                                                                  @PageableDefault(sort = "appliedAt",
                                                                          direction = Sort.Direction.DESC)
                                                                  Pageable pageable) {
-        Page<StudentDetailResponseDto> dtoList = studentService.checkApplicants(lectureCode, memberDto, pageable);
+        Page<StudentDetailResponseDto> dtoList =
+                studentService.lookupApplicants(lectureCode, memberDto, pageable);
+        return Response.success(dtoList);
+    }
+
+    // 수강 신청 인원 목록 조회
+    @GetMapping("/lecture/{lectureCode}/applications/unaccepted")
+    public Response<Page<StudentDetailResponseDto>> readUnAcceptedStudents(@PathVariable String lectureCode,
+                                                                           @AuthenticationPrincipal MemberDto memberDto,
+                                                                           @PageableDefault(sort = "appliedAt",
+                                                                                   direction = Sort.Direction.DESC)
+                                                                           Pageable pageable) {
+        Page<StudentDetailResponseDto> dtoList =
+                studentService.lookupUnAcceptedApplicants(lectureCode, memberDto, pageable);
+        return Response.success(dtoList);
+    }
+
+    // 수강중인 인원 목록 조회
+    @GetMapping("/lecture/{lectureCode}/applications/accepted")
+    public Response<Page<StudentDetailResponseDto>> readAcceptedStudents(@PathVariable String lectureCode,
+                                                                         @AuthenticationPrincipal MemberDto memberDto,
+                                                                         @PageableDefault(sort = "appliedAt",
+                                                                                 direction = Sort.Direction.DESC)
+                                                                         Pageable pageable) {
+        Page<StudentDetailResponseDto> dtoList =
+                studentService.lookupAcceptedApplicants(lectureCode, memberDto, pageable);
         return Response.success(dtoList);
     }
 

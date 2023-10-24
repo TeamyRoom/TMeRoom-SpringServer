@@ -183,7 +183,7 @@ class LectureControllerTest {
             List<TeacherDetailResponseDto> dtoList = List.of(TeacherDetailResponseDto.from(teacher));
             Page<TeacherDetailResponseDto> responseDtoPage = new PageImpl<>(dtoList);
 
-            given(teacherService.lookupTeachers(any(), any(), any())).willReturn(responseDtoPage);
+            given(teacherService.lookupAcceptedTeachers(any(), any(), any())).willReturn(responseDtoPage);
 
             // When & Then
             mockMvc.perform(get("/api/v1/lecture/code/teachers")
@@ -205,7 +205,7 @@ class LectureControllerTest {
             List<TeacherDetailResponseDto> dtoList = List.of(TeacherDetailResponseDto.from(teacher));
             Page<TeacherDetailResponseDto> responseDtoPage = new PageImpl<>(dtoList);
 
-            given(teacherService.lookupTeachers(any(), any(), any())).willReturn(responseDtoPage);
+            given(teacherService.lookupAcceptedTeachers(any(), any(), any())).willReturn(responseDtoPage);
 
             // When & Then
             mockMvc.perform(get("/api/v1/lecture/code/teachers")
@@ -329,7 +329,7 @@ class LectureControllerTest {
             Page<StudentDetailResponseDto> responseDtoPage = new PageImpl<>(dtoList);
 
             // When
-            when(studentService.checkApplicants(any(), any(), any())).thenReturn(responseDtoPage);
+            when(studentService.lookupUnAcceptedApplicants(any(), any(), any())).thenReturn(responseDtoPage);
 
             // Then
             mockMvc.perform(get("/api/v1/lecture/code/applications")
