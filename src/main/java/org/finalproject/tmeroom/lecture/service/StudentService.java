@@ -32,7 +32,7 @@ public class StudentService extends LectureCommon {
         Member member = memberRepository.getReferenceById(memberDTO.getId());
 
         Page<Student> myLectures = studentRepository.findAllByMember(member, pageable);
-        return myLectures.map(LectureDetailResponseDto::from);
+        return myLectures.map(LectureDetailResponseDto::fromStudent);
     }
 
     //수강 신청

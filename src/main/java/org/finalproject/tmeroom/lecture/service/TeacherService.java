@@ -8,9 +8,11 @@ import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.common.service.MailService;
 import org.finalproject.tmeroom.lecture.data.dto.request.AppointTeacherRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.request.TeacherSearchRequestDto;
+import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.TeacherDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.TeacherMemberPageReadResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
+import org.finalproject.tmeroom.lecture.data.entity.Student;
 import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
@@ -37,6 +39,14 @@ public class TeacherService extends LectureCommon {
     private final MailService mailService;
     @Value("${spring.config.host}")
     private String host_url;
+
+    // 수업 중인 내 강의 목록 보기
+    public Page<LectureDetailResponseDto> lookupMyTeacherLectures(MemberDto memberDTO, Pageable pageable) {
+        Member member = memberRepository.getReferenceById(memberDTO.getId());
+
+        Page<Teacher> myLectures = teacherRepository.findAllByMemberId(member.getId(), pageable);
+        return myLectures.map(LectureDetailResponseDto::fromTeacher);
+    }
 
     //강의에 임명될 강사 검색
     public TeacherMemberPageReadResponseDto searchMembers(TeacherSearchRequestDto requestDto, MemberDto memberDto) {

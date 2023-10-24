@@ -7,13 +7,17 @@ import org.finalproject.tmeroom.lecture.data.dto.request.LectureCreateRequestDto
 import org.finalproject.tmeroom.lecture.data.dto.request.LectureUpdateRequestDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureAccessResponseDTO;
 import org.finalproject.tmeroom.lecture.data.dto.response.LectureCreateResponseDto;
+import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
+import org.finalproject.tmeroom.lecture.data.entity.Student;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,13 @@ public class LectureService extends LectureCommon {
     private final MemberRepository memberRepository;
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
+
+    // 내 관리 강의 목록
+    public Page<LectureDetailResponseDto> lookupMyManagerLectures(MemberDto memberDTO, Pageable pageable) {
+
+        Page<Lecture> myLectures = lectureRepository.findAllByManagerId(memberDTO.getId(), pageable);
+        return myLectures.map(LectureDetailResponseDto::fromManager);
+    }
 
     //강의 생성
     public LectureCreateResponseDto createLecture(LectureCreateRequestDto requestDTO) {

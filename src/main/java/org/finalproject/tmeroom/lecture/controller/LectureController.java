@@ -150,12 +150,32 @@ public class LectureController {
     }
 
     // 수강 중인 강의 조회
-    @GetMapping("/lectures/taking")
+    @GetMapping("/lectures/taking/student")
     public Response<Page<LectureDetailResponseDto>> lookupMyLectures(@AuthenticationPrincipal MemberDto memberDto,
                                                                      @PageableDefault(sort = "appliedAt",
                                                                              direction = Sort.Direction.DESC)
                                                                      Pageable pageable) {
         Page<LectureDetailResponseDto> dtoList = studentService.lookupMyLectures(memberDto, pageable);
+        return Response.success(dtoList);
+    }
+
+    // 수업 중인 강의 조회
+    @GetMapping("/lectures/taking/teacher")
+    public Response<Page<LectureDetailResponseDto>> lookupMyTeacherLectures(@AuthenticationPrincipal MemberDto memberDto,
+                                                                     @PageableDefault(sort = "suggestedAt",
+                                                                             direction = Sort.Direction.DESC)
+                                                                     Pageable pageable) {
+        Page<LectureDetailResponseDto> dtoList = teacherService.lookupMyTeacherLectures(memberDto, pageable);
+        return Response.success(dtoList);
+    }
+
+    // 관리 중인 강의 조회
+    @GetMapping("/lectures/taking/manager")
+    public Response<Page<LectureDetailResponseDto>> lookupMyTManagerLectures(@AuthenticationPrincipal MemberDto memberDto,
+                                                                            @PageableDefault(sort = "createdAt",
+                                                                                    direction = Sort.Direction.DESC)
+                                                                            Pageable pageable) {
+        Page<LectureDetailResponseDto> dtoList = lectureService.lookupMyManagerLectures(memberDto, pageable);
         return Response.success(dtoList);
     }
 
