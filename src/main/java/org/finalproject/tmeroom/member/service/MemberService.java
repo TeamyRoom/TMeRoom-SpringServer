@@ -104,7 +104,7 @@ public class MemberService {
         Member foundMember = memberRepository.findById(memberDto.getId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(foundMember.getPw(), requestDto.getOldPassword())) {
+        if (!passwordEncoder.matches(requestDto.getOldPassword(), foundMember.getPw())) {
             throw new ApplicationException(ErrorCode.INVALID_PASSWORD);
         }
 
