@@ -106,7 +106,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: tmeroom-spring
-          IMAGE_TAG: ${{ github.run_number }}
+          IMAGE_TAG: ${{ github.run_number }}.${{ github.run_attempt }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -157,7 +157,7 @@ jobs:
           pwd
           ls
           cd TMeRoom-k8s-manifest/overlays/prd/ 
-          kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/tmeroom-spring=${{ steps.login-ecr.outputs.registry }}/tmeroom-spring:${{ github.run_number }}
+          kustomize edit set image ${{ steps.login-ecr.outputs.registry }}/tmeroom-spring=${{ steps.login-ecr.outputs.registry }}/tmeroom-spring:${{ github.run_number }}.${{ github.run_attempt }}
           cat kustomization.yaml
       # 수정된 kustomization.yaml 파일 commit push
       - name: Commit and Push manfiest files
@@ -165,7 +165,7 @@ jobs:
         with:
           author_name: yslee96
           author_email: dbstn322@gmail.com
-          message: "🔧   : 스프링 서버 이미지 태그 업데이트 #${{ github.run_number }}"
+          message: "🔧   : 스프링 서버 이미지 태그 업데이트 #${{ github.run_number }}.${{ github.run_attempt }}"
           cwd: './TMeRoom-k8s-manifest'
           push: true
 
