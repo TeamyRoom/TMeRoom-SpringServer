@@ -61,6 +61,15 @@ public class Member extends BaseTimeEntity {
         role = MemberRole.USER;
     }
 
+    public void updateEmail(String email) {
+        if (!role.equals(MemberRole.USER)) {
+            throw new ApplicationException(ErrorCode.EMAIL_ALREADY_CONFIRMED);
+        }
+        role = MemberRole.GUEST;
+
+        this.email = email;
+    }
+
     public boolean isIdMatch(String id) {
         return this.id.equals(id);
     }

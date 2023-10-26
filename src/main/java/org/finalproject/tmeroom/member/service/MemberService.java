@@ -76,6 +76,17 @@ public class MemberService {
         mailService.sendEmail(memberDto.getEmail(), subject, content, true, false);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW) // Redis에 인증 메일 정보 저장을 실패했다고 회원 가입까지 롤백되면 안됨
+    public void sendConfirmMailForUpdate(MemberDto memberDto) {
+
+        String confirmCode = UUID.randomUUID().toString();
+        emailConfirmCodeRepository.save(confirmCode, memberDto.getId());
+
+        String subject = "[티미룸] 인증 링크를 발송해 드립니다.";
+        String content = getConfirmMailForUpdateContent(confirmCode, memberDto);
+        mailService.sendEmail(memberDto.getEmail(), subject, content, true, false);
+    }
+
     public void confirmEmail(String confirmCode) {
 
         String memberId = emailConfirmCodeRepository.findMemberIdByCode(confirmCode)
@@ -97,6 +108,16 @@ public class MemberService {
         Member foundMember = memberRepository.findById(memberDto.getId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
         foundMember.updateInfo(requestDto);
+    }
+
+    public void updateEmail(EmailUpdateRequestDto requestDto, MemberDto memberDto) {
+
+        Member foundMember = memberRepository.findById(memberDto.getId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        foundMember.updateEmail(requestDto.getNewEmail());
+        memberDto.setEmail(requestDto.getNewEmail());
+        sendConfirmMailForUpdate(memberDto);
     }
 
     public void updatePassword(PasswordUpdateRequestDto requestDto, MemberDto memberDto) {
@@ -170,6 +191,21 @@ public class MemberService {
                 "<h3>안녕하세요 <strong style = 'color:#DB4455'>티미룸</strong> 입니다.</h3>" +
                 "<h3>" + memberDto.getNickname() + " 님의 회원가입을 축하드립니다.</h3>" +
                 "<h5>하기 인증확인 버튼을 누르시면 회원가입이 완료됩니다.</h5>" +
+                "<div style='font-size:130%'>" +
+                "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
+                "href='" + host_url + "/email-confirm/" + confirmCode + "'> 인증 확인</a>" +
+                "<p>감사합니다.</p>" +
+                "</div><br/></div></br></br>" +
+                "</div>";
+        return sb;
+    }
+
+    private String getConfirmMailForUpdateContent(String confirmCode, MemberDto memberDto) {
+        String sb = "<div style='margin:20px;'>" +
+                "<div align='center' style='border:1px solid black; font-family:verdana'>" +
+                "<h3>안녕하세요 <strong style = 'color:#DB4455'>티미룸</strong> 입니다.</h3>" +
+                "<h3>" + memberDto.getNickname() + " 님의 이메일 변경 요청입니다.</h3>" +
+                "<h5>하기 인증확인 버튼을 누르시면 이메일 변경 요청이 완료됩니다.</h5>" +
                 "<div style='font-size:130%'>" +
                 "<a style='display: inline-block; width: calc(50% - 5px); height: 45px; max-width: 280px; margin-right: 10px; background-color: #bdc3c7; font-size: 15px; color: #fff; text-align: center; line-height: 45px; vertical-align: top;' " +
                 "href='" + host_url + "/email-confirm/" + confirmCode + "'> 인증 확인</a>" +
