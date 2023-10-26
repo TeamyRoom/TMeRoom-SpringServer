@@ -64,6 +64,12 @@ public class MemberController {
         return Response.success();
     }
 
+    @PutMapping("/email")
+    public Response<Void> updateEmail(@RequestBody EmailUpdateRequestDto requestDto, @AuthenticationPrincipal MemberDto memberDto) {
+        memberService.updateEmail(requestDto, memberDto);
+        return Response.success();
+    }
+
 //    @GetMapping("/{memberEmail}")
 //    public Response<MemberSearchResponseDto> findMember(@PathVariable String memberEmail) {
 //        MemberSearchResponseDto responseDto = memberService.searchMember(memberEmail);
