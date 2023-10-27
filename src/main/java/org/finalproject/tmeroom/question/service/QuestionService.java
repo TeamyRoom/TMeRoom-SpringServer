@@ -21,10 +21,12 @@ import org.finalproject.tmeroom.question.repository.QuestionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
