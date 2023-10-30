@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_PERMISSION(HttpStatus.FORBIDDEN, "소유자 불일치"),
     INVALID_ACCESS_PERMISSION(HttpStatus.FORBIDDEN, "접근 권한 없음"),
     COURSE_REGISTRATION_NOT_COMPLETED(HttpStatus.FORBIDDEN, "수강신청 미허가"),
+    COURSE_REGISTRATION_NOT_YET_ACCEPTED(HttpStatus.BAD_REQUEST, "이미 수강신청 된 강의입니다."),
     INVALID_READ_QUESTION_PERMISSION(HttpStatus.FORBIDDEN, "질문을 볼 수 있는 권한이 없음"),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "일치하는 유저 없음"),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 불일치"),
