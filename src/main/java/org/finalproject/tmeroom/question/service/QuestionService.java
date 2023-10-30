@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -41,10 +42,9 @@ public class QuestionService {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        Teacher teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
-
-        if (!teacher.isAccepted() && !lecture.getManager().isIdMatch(memberDto.getId())) {
+        Optional<Teacher> teacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
+        
+        if (teacher.isEmpty() && !lecture.getManager().isIdMatch(memberDto.getId())) {
             throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
         }
 
