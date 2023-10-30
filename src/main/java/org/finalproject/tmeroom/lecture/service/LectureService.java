@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -107,6 +108,8 @@ public class LectureService extends LectureCommon {
             return Role.TEACHER;
         } else if (isStudentAndAccepted(member, lecture.getLectureCode())) {
             return Role.STUDENT;
+        } else if (isStudentWaiting(member, lecture.getLectureCode())) {
+            throw new ApplicationException((ErrorCode.COURSE_REGISTRATION_NOT_YET_ACCEPTED));
         }
 
         throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
@@ -128,5 +131,10 @@ public class LectureService extends LectureCommon {
         return studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .filter(Student::isAccepted)
                 .isPresent();
+    }
+
+    private boolean isStudentWaiting(MemberDto memberDto, String lectureCode) {
+        Optional<Student> foundStudent = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
+        return foundStudent.isPresent() && !foundStudent.get().isAccepted();
     }
 }
