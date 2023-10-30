@@ -9,6 +9,7 @@ import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.StudentRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
+import org.finalproject.tmeroom.member.constant.MemberRole;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
@@ -107,7 +108,7 @@ public class QuestionService {
         boolean studentAccepted = isStudentAndAccepted(memberDto, lectureCode);
         boolean teacherAccepted = isTeacherAndAccepted(memberDto, lectureCode);
 
-        if (!studentAccepted && !teacherAccepted) {
+        if (!studentAccepted && !teacherAccepted && member.getRole()!= MemberRole.ADMIN) {
             throw new ApplicationException(ErrorCode.INVALID_ACCESS_PERMISSION);
         }
 
