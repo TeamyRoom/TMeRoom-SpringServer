@@ -88,8 +88,8 @@ public class QuestionService {
             }
         } else {
             boolean studentAccepted = isStudentAndAccepted(memberDto, lectureCode);
-            if (studentAccepted ||
-                    teacherAccepted && author.isIdMatch(memberDto.getId()) && lecture.getManager().isIdMatch(
+            if (!studentAccepted &&
+                !teacherAccepted && !author.isIdMatch(memberDto.getId()) && !lecture.getManager().isIdMatch(
                             memberDto.getId())) {
                 throw new ApplicationException(ErrorCode.INVALID_READ_QUESTION_PERMISSION);
             }
