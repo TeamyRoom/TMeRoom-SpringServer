@@ -11,6 +11,8 @@ import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
 import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class LecturePermissionChecker {
@@ -35,5 +37,10 @@ public class LecturePermissionChecker {
         return studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .filter(Student::isAccepted)
                 .isPresent();
+    }
+
+    public boolean isStudentWaiting(MemberDto memberDto, String lectureCode) {
+        Optional<Student> foundStudent = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
+        return foundStudent.isPresent() && !foundStudent.get().isAccepted();
     }
 }

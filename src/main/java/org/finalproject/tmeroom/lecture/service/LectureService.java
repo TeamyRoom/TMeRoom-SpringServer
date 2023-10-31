@@ -39,7 +39,7 @@ public class LectureService  {
 
     //강의 생성
     public LectureCreateResponseDto createLecture(LectureCreateRequestDto requestDTO) {
-        Member manager = memberRepository.findById(requestDTO.getMemberDTO().getId()).orElseThrow();
+        Member manager = memberRepository.findById(requestDTO.getMemberDto().getId()).orElseThrow();
 
         Lecture lecture = requestDTO.toEntity(makeHashCode(), manager);
         lectureRepository.save(lecture);
@@ -61,7 +61,7 @@ public class LectureService  {
         Lecture lecture = lectureRepository.findById(requestDTO.getLectureCode())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        lecturePermissionChecker.isManager(lecture, requestDTO.getMemberDTO());
+        lecturePermissionChecker.isManager(lecture, requestDTO.getMemberDto());
 
         lecture.update(requestDTO);
     }
@@ -103,7 +103,7 @@ public class LectureService  {
             return Role.TEACHER;
         } else if (lecturePermissionChecker.isAcceptedStudent(member, lecture.getLectureCode())) {
             return Role.STUDENT;
-        } else if (isStudentWaiting(member, lecture.getLectureCode())) {
+        } else if (lecturePermissionChecker.isStudentWaiting(member, lecture.getLectureCode())) {
             throw new ApplicationException((ErrorCode.COURSE_REGISTRATION_NOT_YET_ACCEPTED));
         }
 
@@ -114,11 +114,5 @@ public class LectureService  {
         MANAGER,
         TEACHER,
         STUDENT
-    }
-
-
-    private boolean isStudentWaiting(MemberDto memberDto, String lectureCode) {
-        Optional<Student> foundStudent = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode);
-        return foundStudent.isPresent() && !foundStudent.get().isAccepted();
     }
 }
