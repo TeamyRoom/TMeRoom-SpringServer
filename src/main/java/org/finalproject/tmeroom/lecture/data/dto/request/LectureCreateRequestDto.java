@@ -17,7 +17,7 @@ import static org.finalproject.tmeroom.common.exception.ValidationMessage.LECTUR
 public class LectureCreateRequestDto {
     @NotBlank(message = LECTURE_UNDER_MIN)
     protected String lectureName;
-    protected MemberDto memberDTO;
+    protected MemberDto memberDto;
 
     public Lecture toEntity(String lectureCode, Member manager) {
         return Lecture.builder()

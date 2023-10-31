@@ -32,7 +32,7 @@ public class LectureController {
     public Response<LectureCreateResponseDto> createLecture(
             @RequestBody @Valid LectureCreateRequestDto lectureCreateRequestDto,
             @AuthenticationPrincipal MemberDto memberDto) {
-        lectureCreateRequestDto.setMemberDTO(memberDto);
+        lectureCreateRequestDto.setMemberDto(memberDto);
         LectureCreateResponseDto lectureCreateResponseDto = lectureService.createLecture(lectureCreateRequestDto);
         return Response.success(lectureCreateResponseDto);
     }
@@ -48,7 +48,7 @@ public class LectureController {
     public Response<Void> updateLecture(@PathVariable String lectureCode, @AuthenticationPrincipal MemberDto memberDto,
                                         @RequestBody @Valid LectureUpdateRequestDto requestDto) {
         requestDto.setLectureCode(lectureCode);
-        requestDto.setMemberDTO(memberDto);
+        requestDto.setMemberDto(memberDto);
         lectureService.updateLecture(requestDto);
         return Response.success();
     }
