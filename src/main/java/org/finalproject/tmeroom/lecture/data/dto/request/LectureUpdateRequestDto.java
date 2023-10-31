@@ -14,5 +14,5 @@ public class LectureUpdateRequestDto {
     String lectureCode;
     @NotBlank(message = LECTURE_UNDER_MIN)
     String lectureName;
-    MemberDto memberDTO;
+    MemberDto memberDto;
 }

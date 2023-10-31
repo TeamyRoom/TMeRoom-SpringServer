@@ -32,4 +32,31 @@ public class MemberTestService {
         );
     }
 
+    @PostConstruct
+    public void createTestTeacher() {
+
+        memberRepository.save(
+                Member.builder()
+                        .id("teacher")
+                        .pw(passwordEncoder.encode("teacher"))
+                        .nickname("강사")
+                        .email("whdals9711@gmail.com")
+                        .role(MemberRole.USER)
+                        .build()
+        );
+    }
+
+    @PostConstruct
+    public void createTestStudent() {
+
+        memberRepository.save(
+                Member.builder()
+                        .id("student")
+                        .pw(passwordEncoder.encode("student"))
+                        .nickname("학생")
+                        .email("testStudent@test.com")
+                        .role(MemberRole.USER)
+                        .build()
+        );
+    }
 }

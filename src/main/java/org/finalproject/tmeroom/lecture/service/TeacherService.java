@@ -2,7 +2,6 @@ package org.finalproject.tmeroom.lecture.service;
 
 import lombok.RequiredArgsConstructor;
 import org.finalproject.tmeroom.admin.constant.MemberSearchType;
-import org.finalproject.tmeroom.admin.data.dto.response.AdminMemberPageReadResponseDto;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
 import org.finalproject.tmeroom.common.exception.ErrorCode;
 import org.finalproject.tmeroom.common.service.MailService;
@@ -12,7 +11,6 @@ import org.finalproject.tmeroom.lecture.data.dto.response.LectureDetailResponseD
 import org.finalproject.tmeroom.lecture.data.dto.response.TeacherDetailResponseDto;
 import org.finalproject.tmeroom.lecture.data.dto.response.TeacherMemberPageReadResponseDto;
 import org.finalproject.tmeroom.lecture.data.entity.Lecture;
-import org.finalproject.tmeroom.lecture.data.entity.Student;
 import org.finalproject.tmeroom.lecture.data.entity.Teacher;
 import org.finalproject.tmeroom.lecture.repository.LectureRepository;
 import org.finalproject.tmeroom.lecture.repository.TeacherRepository;
@@ -32,7 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 @EnableWebSecurity
-public class TeacherService extends LectureCommon {
+public class TeacherService {
+    private final LecturePermissionChecker lecturePermissionChecker;
     private final TeacherRepository teacherRepository;
     private final MemberRepository memberRepository;
     private final LectureRepository lectureRepository;
@@ -41,8 +40,8 @@ public class TeacherService extends LectureCommon {
     private String host_url;
 
     // 수업 중인 내 강의 목록 보기
-    public Page<LectureDetailResponseDto> lookupMyTeacherLectures(MemberDto memberDTO, Pageable pageable) {
-        Member member = memberRepository.getReferenceById(memberDTO.getId());
+    public Page<LectureDetailResponseDto> lookupMyTeacherLectures(MemberDto memberDto, Pageable pageable) {
+        Member member = memberRepository.getReferenceById(memberDto.getId());
 
         Page<Teacher> myLectures = teacherRepository.findAllByMemberId(member.getId(), pageable);
         return myLectures.map(LectureDetailResponseDto::fromTeacher);
@@ -53,7 +52,7 @@ public class TeacherService extends LectureCommon {
         Lecture lecture = lectureRepository.findById(requestDto.getLectureCode())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        checkPermission(lecture, memberDto);
+        lecturePermissionChecker.isManager(lecture, memberDto);
 
         MemberSearchType searchType = requestDto.getSearchType();
         String keyword = requestDto.getKeyword();
@@ -78,7 +77,7 @@ public class TeacherService extends LectureCommon {
                                                                  Pageable pageable) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
-        checkPermission(lecture, memberDto);
+        lecturePermissionChecker.isManager(lecture, memberDto);
 
         Page<Teacher> teachers = teacherRepository.findByLecture(lecture, pageable);
 
@@ -90,7 +89,7 @@ public class TeacherService extends LectureCommon {
                                                                  Pageable pageable) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
-        checkPermission(lecture, memberDto);
+        lecturePermissionChecker.isManager(lecture, memberDto);
 
         Page<Teacher> teachers = teacherRepository.findByLectureAndAcceptedAtNotNull(lecture, pageable);
 
@@ -102,7 +101,7 @@ public class TeacherService extends LectureCommon {
                                                                    Pageable pageable) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
-        checkPermission(lecture, memberDto);
+        lecturePermissionChecker.isManager(lecture, memberDto);
 
         Page<Teacher> teachers = teacherRepository.findByLectureAndAcceptedAtIsNull(lecture, pageable);
 
@@ -110,11 +109,11 @@ public class TeacherService extends LectureCommon {
     }
 
     //강의 강사 임명(관리자 요청)
-    public void appointTeacher(String lectureCode, MemberDto memberDTO, AppointTeacherRequestDto requestDTO) {
+    public void appointTeacher(String lectureCode, MemberDto memberDto, AppointTeacherRequestDto requestDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        checkPermission(lecture, memberDTO);
+        lecturePermissionChecker.isManager(lecture, memberDto);
 
         Member appointedMember = memberRepository.findById(requestDTO.getTeacherId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
@@ -129,10 +128,10 @@ public class TeacherService extends LectureCommon {
     }
 
     //강의 강사 해임(관리자 요청)
-    public void dismissTeacher(String lectureCode, String teacherId, MemberDto memberDTO) {
+    public void dismissTeacher(String lectureCode, String teacherId, MemberDto memberDto) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
-        checkPermission(lecture, memberDTO);
+        lecturePermissionChecker.isManager(lecture, memberDto);
 
         Teacher dismissedTeacher = teacherRepository.findByMemberIdAndLectureCode(teacherId, lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
@@ -141,16 +140,16 @@ public class TeacherService extends LectureCommon {
     }
 
     // 강사 임명 수락(강사 요청)
-    public void acceptTeacher(String lectureCode, MemberDto memberDTO) {
-        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
+    public void acceptTeacher(String lectureCode, MemberDto memberDto) {
+        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
 
         suggestedTeacher.accept();
     }
 
     // 강사 임명 거부(강사 요청)
-    public void rejectTeacher(String lectureCode, MemberDto memberDTO) {
-        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
+    public void rejectTeacher(String lectureCode, MemberDto memberDto) {
+        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
 
         teacherRepository.delete(suggestedTeacher);
