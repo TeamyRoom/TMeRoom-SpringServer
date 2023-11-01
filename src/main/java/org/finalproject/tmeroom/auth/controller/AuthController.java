@@ -34,6 +34,7 @@ public class AuthController {
         LoginResponseDto responseDto = authService.login(requestDto);
 
         addTokenCookie(response, responseDto.getAccessToken(), TokenType.ACCESS);
+        addTokenCookie(response, responseDto.getRefreshToken(), TokenType.REFRESH);
 
         return Response.success();
     }
