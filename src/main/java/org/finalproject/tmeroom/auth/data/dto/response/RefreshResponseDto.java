@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class LoginResponseDto {
+public class RefreshResponseDto {
 
     private String accessToken;
     private String refreshToken;
 
     @Builder
-    public LoginResponseDto(String accessToken, String refreshToken) {
+    public RefreshResponseDto(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
