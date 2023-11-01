@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class StudentService{
@@ -37,7 +37,8 @@ public class StudentService{
     }
 
     //수강 신청
-    public void applyLecture(String lectureCode, MemberDto memberDto) {
+    @Transactional
+    public void applyLecture(String lectureCode, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
@@ -53,8 +54,9 @@ public class StudentService{
     }
 
     //수강 신청 철회
-    public void cancelApplication(String lectureCode, MemberDto memberDto) {
-        Student student = studentRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+    @Transactional
+    public void cancelApplication(String lectureCode, MemberDto memberDTO) {
+        Student student = studentRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
 
         studentRepository.delete(student);
@@ -97,7 +99,8 @@ public class StudentService{
     }
 
     //수강 신청 수락
-    public void acceptApplicant(String lectureCode, String applicantId, MemberDto memberDto) {
+    @Transactional
+    public void acceptApplicant(String lectureCode, String applicantId, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
@@ -110,7 +113,8 @@ public class StudentService{
     }
 
     //수강 신청 반려
-    public void rejectApplicant(String lectureCode, String applicantId, MemberDto memberDto) {
+    @Transactional
+    public void rejectApplicant(String lectureCode, String applicantId, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 

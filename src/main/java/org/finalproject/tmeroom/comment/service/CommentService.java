@@ -29,6 +29,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     // 댓글 조회
+    @Transactional(readOnly = true)
     public Page<CommentDetailResponseDto> readComments(Long questionId, Pageable pageable) {
         Question question = questionRepository.getReferenceById(questionId);
         Page<Comment> commentPage = commentRepository.findByQuestion(question, pageable);

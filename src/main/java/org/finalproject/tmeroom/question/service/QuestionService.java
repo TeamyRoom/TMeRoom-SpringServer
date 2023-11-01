@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
@@ -99,6 +99,7 @@ public class QuestionService {
     }
 
     // 질문 게시
+    @Transactional
     public void createQuestion(String lectureCode, MemberDto memberDto, QuestionCreateRequestDto requestDto) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
@@ -118,6 +119,7 @@ public class QuestionService {
     }
 
     // 질문 수정
+    @Transactional
     public void updateQuestion(Long questionId, MemberDto memberDto, QuestionUpdateRequestDto requestDto) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
@@ -128,6 +130,7 @@ public class QuestionService {
     }
 
     // 질문 삭제
+    @Transactional
     public void deleteQuestion(Long questionId, MemberDto memberDto) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));
@@ -137,6 +140,7 @@ public class QuestionService {
     }
 
     // 질문 공개 여부 수정
+    @Transactional
     public void openQuestion(Long questionId, MemberDto memberDto) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_QUESTION_ID));

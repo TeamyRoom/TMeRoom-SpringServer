@@ -100,6 +100,7 @@ public class MemberService {
         emailConfirmCodeRepository.deleteByCode(confirmCode);
     }
 
+    @Transactional(readOnly = true)
     public ReadMemberResponseDto readMember(MemberDto memberDto) {
         return ReadMemberResponseDto.from(memberDto);
     }

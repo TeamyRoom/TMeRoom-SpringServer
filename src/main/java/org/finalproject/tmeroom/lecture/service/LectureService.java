@@ -31,7 +31,8 @@ public class LectureService  {
     private final LectureRepository lectureRepository;
 
     // 내 관리 강의 목록
-    public Page<LectureDetailResponseDto> lookupMyManagerLectures(MemberDto memberDto, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<LectureDetailResponseDto> lookupMyManagerLectures(MemberDto memberDTO, Pageable pageable) {
 
         Page<Lecture> myLectures = lectureRepository.findAllByManagerId(memberDto.getId(), pageable);
         return myLectures.map(LectureDetailResponseDto::fromManager);
