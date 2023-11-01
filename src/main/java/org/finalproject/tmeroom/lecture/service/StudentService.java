@@ -42,7 +42,7 @@ public class StudentService{
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        Member registeringStudent = memberRepository.findById(memberDto.getId())
+        Member registeringStudent = memberRepository.findById(memberDTO.getId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
 
         Student student = Student.builder()
@@ -104,7 +104,7 @@ public class StudentService{
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        checkPermission(lecture, lectureCode, memberDto);
+        checkPermission(lecture, lectureCode, memberDTO);
 
         Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
@@ -118,7 +118,7 @@ public class StudentService{
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        checkPermission(lecture, lectureCode, memberDto);
+        checkPermission(lecture, lectureCode, memberDTO);
 
         Student student = studentRepository.findByMemberIdAndLectureCode(applicantId, lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_STUDENT_ID));
