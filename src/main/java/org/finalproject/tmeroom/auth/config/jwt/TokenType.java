@@ -8,7 +8,7 @@ import org.springframework.http.ResponseCookie;
 @AllArgsConstructor
 public enum TokenType {
 
-    ACCESS("accessToken", 1000L * 60 * 60, false),
+    ACCESS("accessToken", 1000L * 60 * 15, false),
     REFRESH("refreshToken", 1000L * 60 * 60 * 24 * 7, true),
     ;
 
