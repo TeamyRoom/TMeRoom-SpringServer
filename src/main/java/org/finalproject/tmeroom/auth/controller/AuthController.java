@@ -86,7 +86,7 @@ public class AuthController {
         return Arrays.stream(request.getCookies())
                 .filter(cookie -> tokenName.equals(cookie.getName()))
                 .findFirst()
-                .orElse(new Cookie("", ""))
+                .orElse(new Cookie(tokenName, ""))
                 .getValue();
     }
 

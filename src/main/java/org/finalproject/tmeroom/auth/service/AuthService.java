@@ -72,7 +72,7 @@ public class AuthService {
             throw new ApplicationException(ErrorCode.TOKEN_INVALID);
         }
 
-        String accessToken = jwtTokenProvider.createToken(foundRequestToken, TokenType.ACCESS);
+        String accessToken = jwtTokenProvider.createToken(memberId, TokenType.ACCESS);
 
         refreshTokenRepository.save(memberId, foundRequestToken);
 
