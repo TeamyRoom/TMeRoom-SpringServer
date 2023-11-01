@@ -8,24 +8,32 @@ import org.springframework.http.ResponseCookie;
 @AllArgsConstructor
 public enum TokenType {
 
-    ACCESS("accessToken", 1000L * 60 * 60),
-    REFRESH("refreshToken", 1000L * 60 * 60 * 24 * 7),
+    ACCESS("accessToken", 1000L * 60 * 15, false),
+    REFRESH("refreshToken", 1000L * 60 * 60 * 24 * 7, true),
     ;
 
     private final String name;
     private final long validTimeMilli;
+    private final boolean isHttpOnly;
 
     private long getValidTimeSec() {
         return validTimeMilli / 1000;
     }
 
-    public ResponseCookie createHttpOnlyCookieFrom(String token) {
-        return ResponseCookie.from(getName(), token)
-                .httpOnly(false)
+    public ResponseCookie createCookieFrom(String token) {
+        return createCookieFrom(token, getValidTimeSec());
+    }
+
+    public ResponseCookie removeCookie() {
+        return createCookieFrom("", 0);
+    }
+
+    public ResponseCookie createCookieFrom(String token, long validTimeSec) {
+        return ResponseCookie.from(name, token)
+                .httpOnly(isHttpOnly)
                 .secure(true)
-                .maxAge(getValidTimeSec())
+                .maxAge(validTimeSec)
                 .path("/")
                 .build();
     }
-
 }
