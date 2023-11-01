@@ -114,7 +114,7 @@ public class TeacherService {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
-        lecturePermissionChecker.isManager(lecture, memberDto);
+        lecturePermissionChecker.isManager(lecture, memberDTO);
 
         Member appointedMember = memberRepository.findById(requestDTO.getTeacherId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));
@@ -133,7 +133,7 @@ public class TeacherService {
     public void dismissTeacher(String lectureCode, String teacherId, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
-        lecturePermissionChecker.isManager(lecture, memberDto);
+        lecturePermissionChecker.isManager(lecture, memberDTO);
 
         Teacher dismissedTeacher = teacherRepository.findByMemberIdAndLectureCode(teacherId, lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));

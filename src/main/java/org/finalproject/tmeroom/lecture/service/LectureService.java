@@ -34,7 +34,7 @@ public class LectureService  {
     @Transactional(readOnly = true)
     public Page<LectureDetailResponseDto> lookupMyManagerLectures(MemberDto memberDTO, Pageable pageable) {
 
-        Page<Lecture> myLectures = lectureRepository.findAllByManagerId(memberDto.getId(), pageable);
+        Page<Lecture> myLectures = lectureRepository.findAllByManagerId(memberDTO.getId(), pageable);
         return myLectures.map(LectureDetailResponseDto::fromManager);
     }
 
