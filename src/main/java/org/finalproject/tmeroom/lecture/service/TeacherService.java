@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class TeacherService {
@@ -109,7 +109,8 @@ public class TeacherService {
     }
 
     //강의 강사 임명(관리자 요청)
-    public void appointTeacher(String lectureCode, MemberDto memberDto, AppointTeacherRequestDto requestDTO) {
+    @Transactional
+    public void appointTeacher(String lectureCode, MemberDto memberDTO, AppointTeacherRequestDto requestDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
 
@@ -128,7 +129,8 @@ public class TeacherService {
     }
 
     //강의 강사 해임(관리자 요청)
-    public void dismissTeacher(String lectureCode, String teacherId, MemberDto memberDto) {
+    @Transactional
+    public void dismissTeacher(String lectureCode, String teacherId, MemberDto memberDTO) {
         Lecture lecture = lectureRepository.findById(lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_LECTURE_CODE));
         lecturePermissionChecker.isManager(lecture, memberDto);
@@ -140,16 +142,18 @@ public class TeacherService {
     }
 
     // 강사 임명 수락(강사 요청)
-    public void acceptTeacher(String lectureCode, MemberDto memberDto) {
-        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+    @Transactional
+    public void acceptTeacher(String lectureCode, MemberDto memberDTO) {
+        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
 
         suggestedTeacher.accept();
     }
 
     // 강사 임명 거부(강사 요청)
-    public void rejectTeacher(String lectureCode, MemberDto memberDto) {
-        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDto.getId(), lectureCode)
+    @Transactional
+    public void rejectTeacher(String lectureCode, MemberDto memberDTO) {
+        Teacher suggestedTeacher = teacherRepository.findByMemberIdAndLectureCode(memberDTO.getId(), lectureCode)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.INVALID_TEACHER_ID));
 
         teacherRepository.delete(suggestedTeacher);

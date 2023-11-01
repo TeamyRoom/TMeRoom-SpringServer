@@ -7,6 +7,7 @@ import org.finalproject.tmeroom.member.data.dto.MemberDto;
 import org.finalproject.tmeroom.member.data.entity.Member;
 import org.finalproject.tmeroom.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 작성자: 김태민
@@ -19,6 +20,7 @@ public class TokenAuthenticationService {
 
     private final MemberRepository memberRepository;
 
+    @Transactional(readOnly = true)
     public MemberDto getMemberDto(String memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_FOUND));

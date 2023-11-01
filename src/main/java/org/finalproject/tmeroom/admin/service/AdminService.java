@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.function.Function;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AdminService {
 
@@ -127,12 +127,14 @@ public class AdminService {
         return AdminLectureDetailReadResponseDto.from(lecture);
     }
 
+    @Transactional
     public void deleteMember(String memberId, MemberDto loginMember) {
         checkAdmin(loginMember);
 
         memberRepository.deleteById(memberId);
     }
 
+    @Transactional
     public void deleteLecture(String lectureCode, MemberDto loginMember) {
         checkAdmin(loginMember);
 

@@ -2,7 +2,6 @@ package org.finalproject.tmeroom.file.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.finalproject.tmeroom.common.exception.ApplicationException;
@@ -25,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -50,6 +50,7 @@ public class FileService {
     private String bucket;
 
     // 파일 조회 및 검색
+    @Transactional(readOnly = true)
     public Page<FileDetailResponseDto> findFilesByKeywordAndLecture(String keyword, String lectureCode,
                                                                     String fileType, Pageable pageable,
                                                                     MemberDto memberDto) {
