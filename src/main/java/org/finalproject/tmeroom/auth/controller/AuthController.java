@@ -57,10 +57,12 @@ public class AuthController {
     }
 
     @DeleteMapping("/refresh")
-    public Response<Void> disableRefreshToken(HttpServletRequest request, HttpServletResponse response) {
-
-        String refreshToken = parseTokenCookie(request, TokenType.REFRESH);
-        authService.disableRefreshToken(refreshToken);
+    public Response<Void> disableRefreshToken(HttpServletRequest request, HttpServletResponse response,
+                                              @RequestParam Boolean isAll) {
+        if (isAll) {
+            String refreshToken = parseTokenCookie(request, TokenType.REFRESH);
+            authService.disableRefreshToken(refreshToken);
+        }
 
         removeTokenCookie(response, TokenType.ACCESS);
         removeTokenCookie(response, TokenType.REFRESH);
@@ -83,7 +85,11 @@ public class AuthController {
 
     private String parseTokenCookie(HttpServletRequest request, TokenType tokenType) {
         String tokenName = tokenType.getName();
-        return Arrays.stream(request.getCookies())
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            cookies = new Cookie[0];
+        }
+        return Arrays.stream(cookies)
                 .filter(cookie -> tokenName.equals(cookie.getName()))
                 .findFirst()
                 .orElse(new Cookie(tokenName, ""))
